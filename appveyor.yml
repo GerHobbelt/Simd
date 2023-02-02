@@ -8,4 +8,4 @@ platform:
 - x86
 build:
   project: ./prj/vs2022/Simd.sln
-  verbosity: detailed
+  verbosity: normal
