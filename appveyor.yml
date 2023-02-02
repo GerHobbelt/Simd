@@ -1,5 +1,11 @@
 version: 1.0.{build}
 image: Visual Studio 2022
+configuration:
+- Release
+- Debug
+platform:
+- x64
+- x86
 build:
   project: ./prj/vs2022/Simd.sln
-  verbosity: minimal
+  verbosity: detailed
