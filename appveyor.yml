@@ -8,4 +8,5 @@ platform:
 - Win32
 build:
   project: ./prj/vs2022/Simd.sln
+  parallel: true
   verbosity: minimal
