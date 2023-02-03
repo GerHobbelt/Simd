@@ -9,8 +9,10 @@ platform:
 
 environment:
   matrix:
-  - BUILD_SYSTEM: CMAKE
-  - BUILD_SYSTEM: MSVC
+  - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    BUILD_SYSTEM: CMAKE
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    BUILD_SYSTEM: MSVC
 
 build_script:
 - if "%BUILD_SYSTEM%" == "CMAKE" cd "%APPVEYOR_BUILD_FOLDER%\prj\cmake"
