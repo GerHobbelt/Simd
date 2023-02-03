@@ -1,12 +1,19 @@
 version: 1.0.{build}
+
 image: Visual Studio 2022
 configuration:
 - Release
-- Debug
+
 platform:
 - x64
-- Win32
-build:
-  project: ./prj/vs2022/Simd.sln
-  parallel: true
-  verbosity: minimal
+
+environment:
+  matrix:
+  - BUILD_SYSTEM: MSVC
+  - BUILD_SYSTEM: CMAKE
+
+build_script:
+- if "%BUILD_SYSTEM%"=="MSVC" msbuild "%APPVEYOR_BUILD_FOLDER%\prj\vs2022\Simd.sln" /m /v:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /property:Configuration=%CONFIGURATION%;Platform=%PLATFORM%
+- if "%BUILD_SYSTEM%" == "CMAKE" pushd "%APPVEYOR_BUILD_FOLDER%\build"
+- if "%BUILD_SYSTEM%" == "CMAKE" cmake --build . --config "%CONFIGURATION%" -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- if "%BUILD_SYSTEM%" == "CMAKE" popd
