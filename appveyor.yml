@@ -13,8 +13,8 @@ environment:
   - BUILD_SYSTEM: MSVC
 
 build_script:
-- if "%BUILD_SYSTEM%" == "CMAKE" pushd cd prj/cmake/
-- if "%BUILD_SYSTEM%" == "CMAKE" pushd "%APPVEYOR_BUILD_FOLDER%\build"
+- if "%BUILD_SYSTEM%" == "CMAKE" cd "%APPVEYOR_BUILD_FOLDER%\prj\cmake"
+- if "%BUILD_SYSTEM%" == "CMAKE" pushd "%APPVEYOR_BUILD_FOLDER%\prj\cmake\build"
 - if "%BUILD_SYSTEM%" == "CMAKE" cmake --build . --config "%CONFIGURATION%" -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 - if "%BUILD_SYSTEM%" == "CMAKE" popd
 - if "%BUILD_SYSTEM%"=="MSVC" msbuild "%APPVEYOR_BUILD_FOLDER%\prj\vs2022\Simd.sln" /m /v:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /property:Configuration=%CONFIGURATION%;Platform=%PLATFORM%
