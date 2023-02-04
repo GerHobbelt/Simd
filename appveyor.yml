@@ -25,6 +25,7 @@ for:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-powerpc-linux-gnu
   build_script:
+    - ECHO Installing %PLATFORM% %CONFIGURATION%
     - mkdir build
     - cd build
     - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE=%configuration%
