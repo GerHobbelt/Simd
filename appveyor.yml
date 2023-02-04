@@ -11,8 +11,8 @@ for:
     only:
       - image: Ubuntu
   install:
-    - sudo apt-get update
-    - sudo apt-get install g++-aarch64-linux-gnu
+    - sh: sudo apt-get update
+    - sh: sudo apt-get install g++-aarch64-linux-gnu
   build_script:
     - mkdir build
     - cd build
