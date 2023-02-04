@@ -8,17 +8,41 @@ environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: ppc64
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: ppc64
+      configuration: Release
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: arm
+      configuration: Debug
+     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: arm
+      configuration: Release
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: aarch64
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: aarch64
+      configuration: Release
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: x64
+      configuration: MinSizeRel
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: x64
+      configuration: Debug
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
+      configuration: MinSizeRel
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: Win32
+      configuration: Debug
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: ARM64
-      
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: ARM64
+      configuration: Debug
+
 for:
 -
   matrix:
