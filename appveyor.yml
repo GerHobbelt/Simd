@@ -12,12 +12,26 @@ for:
       - image: Ubuntu
   install:
     - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-arm-linux-gnueabihf
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE="Release"
+    - make
+    
+-
+  matrix:
+    only:
+      - image: Ubuntu
+  install:
+    - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-aarch64-linux-gnu
   build_script:
     - mkdir build
     - cd build
     - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="Release"
     - make
+
 -
   matrix:
     only:
@@ -25,3 +39,5 @@ for:
 
   build:
     project: prj\vs2022\Simd.sln
+    verbosity: minimal
+    parallel: true
