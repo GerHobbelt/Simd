@@ -151,7 +151,7 @@ elseif((CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc") OR (CMAKE_SYSTEM_PROCESSOR STREQU
 elseif((CMAKE_SYSTEM_PROCESSOR MATCHES "arm") OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64"))
 	include(arm.cmake)
 else()
-    message(FATAL_ERROR "Unknown value of CMAKE_SYSTEM_PROCESSOR!")
+#    message(FATAL_ERROR "Unknown value of CMAKE_SYSTEM_PROCESSOR!")
 endif()
 
 file(GLOB_RECURSE SIMD_LIB_HPP ${SIMD_ROOT}/src/Simd/Simd*.hpp)
