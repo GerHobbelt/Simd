@@ -22,13 +22,13 @@ environment:
       configuration: Release
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: x64
-      configuration: MinSizeRel
+      configuration: Release
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: x64
       configuration: Debug
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
-      configuration: MinSizeRel
+      configuration: Release
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
       configuration: Debug
