@@ -28,7 +28,8 @@ for:
     - ECHO Installing %PLATFORM% %CONFIGURATION%
     - mkdir build
     - cd build
-    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE=%configuration%
+    - if [%CONFIGURATION%]==[Release] cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="Release"
+    - if [%CONFIGURATION%]==[Debug] cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="Debug"
     - make
 -
   matrix:
