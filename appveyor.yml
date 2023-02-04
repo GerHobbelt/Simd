@@ -27,7 +27,7 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE=%configuration%
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="%configuration%"
     - make
 -
   matrix:
@@ -40,7 +40,7 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE=%configuration%
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE="%configuration%"
     - make
     
 -
@@ -54,7 +54,7 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE=%configuration%
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="%configuration%"
     - make
 
 -
