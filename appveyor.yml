@@ -12,6 +12,18 @@ for:
       - image: Ubuntu
   install:
     - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-powerpc-linux-gnu
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="Release"
+    - make
+-
+  matrix:
+    only:
+      - image: Ubuntu
+  install:
+    - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-arm-linux-gnueabihf
   build_script:
     - mkdir build
