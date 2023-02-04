@@ -16,7 +16,7 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/your_toolchain/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="Release"
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="Release"
     - make
 -
   matrix:
