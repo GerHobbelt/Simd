@@ -76,5 +76,5 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - sh: cmake ..\prj\cmake -A ARM64 -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
-    - msbuild ..\prj\vs2022\Simd.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    - cmake ..\prj\cmake -G "Visual Studio 16 2019" -T v142 -A ARM64 -D ENABLE_WARNINGS_AS_ERRORS=True -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - cmake --build . -j --config Release --target install
