@@ -11,6 +11,7 @@ for:
     only:
       - image: Ubuntu
   build_script:
+    - ls
     - cd /prj/cmake
     - cmake .
 -
