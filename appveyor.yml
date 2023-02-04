@@ -11,8 +11,10 @@ for:
     only:
       - image: Ubuntu
   build_script:
-    - cd prj/cmake
-    - cmake .
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="" -DSIMD_TARGET=""
+    - make
 -
   matrix:
     only:
