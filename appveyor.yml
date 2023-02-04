@@ -25,11 +25,9 @@ for:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-powerpc-linux-gnu
   build_script:
-    - ECHO Installing %PLATFORM% %CONFIGURATION%
     - mkdir build
     - cd build
-    - if [%CONFIGURATION%]==[Release] cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="Release"
-    - if [%CONFIGURATION%]==[Debug] cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="Debug"
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
     - make
 -
   matrix:
@@ -42,7 +40,7 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE=%configuration%
+    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
     - make
     
 -
@@ -56,7 +54,7 @@ for:
   build_script:
     - mkdir build
     - cd build
-    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE=%configuration%
+    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
     - make
 
 -
