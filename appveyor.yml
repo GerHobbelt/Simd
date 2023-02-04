@@ -13,8 +13,10 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: aarch64
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: x64
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
-      
+
 for:
 -
   matrix:
