@@ -10,10 +10,13 @@ for:
   matrix:
     only:
       - image: Ubuntu
+  install:
+    - sudo apt-get update
+    - sudo apt-get install g++-aarch64-linux-gnu
   build_script:
     - mkdir build
     - cd build
-    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="" -DSIMD_TARGET=""
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/your_toolchain/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="Release"
     - make
 -
   matrix:
