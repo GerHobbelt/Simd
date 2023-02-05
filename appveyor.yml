@@ -8,7 +8,7 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x64
       configuration: Release
-     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x86
       configuration: Debug
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
