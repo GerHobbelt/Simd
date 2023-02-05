@@ -94,7 +94,7 @@ for:
       name: library
   test_script:
     - sh: ls -l
-    - sh: Test -m=a -tt=1 -f=Sobel -ot=log.txt
+    - sh: ./Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
