@@ -90,10 +90,10 @@ for:
     - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
     - make
   artifacts:
-    - path: build\libSimd.a
+    - path: build/libSimd.a
       name: library
   test_script:
-    - sh: build\test
+    - sh: build/Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
@@ -108,10 +108,10 @@ for:
     - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
     - make
   artifacts:
-    - path: build\libSimd.a
+    - path: build/libSimd.a
       name: library
   test_script:
-    - sh: build\test
+    - sh: build/Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
@@ -126,10 +126,10 @@ for:
     - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
     - make
   artifacts:
-    - path: build\libSimd.a
+    - path: build/libSimd.a
       name: library
   test_script:
-    - sh: build\test
+    - sh: build/Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
@@ -143,7 +143,7 @@ for:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -157,7 +157,7 @@ for:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -171,7 +171,7 @@ for:
     - path: bin\v142\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -185,7 +185,7 @@ for:
     - path: bin\v142\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -199,7 +199,7 @@ for:
     - path: bin\v141\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -213,7 +213,7 @@ for:
     - path: bin\v141\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -227,7 +227,7 @@ for:
     - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
@@ -241,7 +241,7 @@ for:
     - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: bin\v143\%platform%\%configuration%\test
+    - cmd: prj\cmd\TestVisualStudio.cmd
 -
   matrix:
     only:
