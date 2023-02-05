@@ -104,11 +104,11 @@ for:
   artifacts:
     - path: build/libSimd.a
       name: library
-    - path: _out/log.txt
+    - path: ../log.txt
       name: testlog
   test_script:
     - sh: ./Test -m=a -tt=1 -ot=log.txt
-    - sh: cd _out
+    - sh: cd ..
     - sh: ls -l
 -
   matrix:
