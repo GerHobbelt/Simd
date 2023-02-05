@@ -32,6 +32,42 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
       configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: x64
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: x64
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: Win32
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: Win32
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: x64
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: x64
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: Win32
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: Win32
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: x64
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: x64
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: Win32
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: Win32
+      configuration: Debug
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: ARM64
       configuration: Release
@@ -111,6 +147,78 @@ for:
     parallel: true
   artifacts:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
+      name: library 
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+      - platform: x64
+  build:
+    project: prj\vs2019\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v142\%platform%\%configuration%\Simd.dll
+      name: library 
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+      - platform: Win32
+  build:
+    project: prj\vs2019\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v142\%platform%\%configuration%\Simd.dll
+      name: library 
+-
+  matrix:
+    only:
+      - image: Visual Studio 2017
+      - platform: x64
+  build:
+    project: prj\vs2017\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v141\%platform%\%configuration%\Simd.dll
+      name: library 
+-
+  matrix:
+    only:
+      - image: Visual Studio 2017
+      - platform: Win32
+  build:
+    project: prj\vs2017\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v141\%platform%\%configuration%\Simd.dll
+      name: library
+-
+  matrix:
+    only:
+      - image: Visual Studio 2015
+      - platform: x64
+  build:
+    project: prj\vs2015\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v140\%platform%\%configuration%\Simd.dll
+      name: library 
+-
+  matrix:
+    only:
+      - image: Visual Studio 2015
+      - platform: Win32
+  build:
+    project: prj\vs2015\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library 
 -
   matrix:
