@@ -3,6 +3,18 @@ version: 1.0.{build}
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: x64
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: x64
+      configuration: Release
+     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: x86
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: x86
+      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: ppc64
       configuration: Debug
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
@@ -80,6 +92,42 @@ for:
   matrix:
     only:
       - image: Ubuntu
+      - platform: x64
+  install:
+    - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-powerpc-linux-gnu
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - make
+  artifacts:
+    - path: build/libSimd.a
+      name: library
+  test_script:
+    - sh: ./Test -m=a -tt=1 -f=Sobel -ot=log.txt
+-
+  matrix:
+    only:
+      - image: Ubuntu
+      - platform: x86
+  install:
+    - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-powerpc-linux-gnu
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - make
+  artifacts:
+    - path: build/libSimd.a
+      name: library
+  test_script:
+    - sh: ./Test -m=a -tt=1 -f=Sobel -ot=log.txt
+-
+  matrix:
+    only:
+      - image: Ubuntu
       - platform: ppc64
   install:
     - sh: sudo apt-get update
@@ -92,9 +140,6 @@ for:
   artifacts:
     - path: build/libSimd.a
       name: library
-  test_script:
-    - sh: ls -l
-    - sh: ./Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
@@ -111,8 +156,6 @@ for:
   artifacts:
     - path: build/libSimd.a
       name: library
-  test_script:
-    - sh: build/Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
@@ -129,8 +172,6 @@ for:
   artifacts:
     - path: build/libSimd.a
       name: library
-  test_script:
-    - sh: build/Test -m=a -tt=1 -f=Sobel -ot=log.txt
 -
   matrix:
     only:
