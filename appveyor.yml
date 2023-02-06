@@ -148,9 +148,6 @@ for:
   matrix:
     only:
       - job_group: Ubuntu_x64
-  install:
-    - sh: sudo apt-get update
-    - sh: sudo apt-get -y install g++-powerpc-linux-gnu
   build_script:
     - mkdir build
     - cd build
@@ -167,9 +164,6 @@ for:
   matrix:
     only:
       - job_group: Ubuntu_x86
-  install:
-    - sh: sudo apt-get update
-    - sh: sudo apt-get -y install g++-powerpc-linux-gnu
   build_script:
     - mkdir build
     - cd build
