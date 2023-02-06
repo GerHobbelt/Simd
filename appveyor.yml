@@ -2,88 +2,144 @@ version: 1.0.{build}
   
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_x64_Debug
+      job_group: Ubuntu_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_x64_Release
+      job_group: Ubuntu_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_x86_Debug
+      job_group: Ubuntu_x86
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x86
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_x86_Release
+      job_group: Ubuntu_x86
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x86
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_ppc64_Debug
+      job_group: Ubuntu_ppc64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: ppc64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_ppc64_Release
+      job_group: Ubuntu_ppc64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: ppc64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_arm_Debug
+      job_group: Ubuntu_arm
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: arm
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_arm_Release
+      job_group: Ubuntu_arm
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: arm
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_aarch64_Debug
+      job_group: Ubuntu_aarch64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: aarch64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    - job_name: Ubuntu_aarch64_Release
+      job_group: Ubuntu_aarch64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: aarch64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - job_name: Vs2022_x64_Release
+      job_group: Vs2022_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: x64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - job_name: Vs2022_x64_Debug
+      job_group: Vs2022_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: x64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - job_name: Vs2022_Win32_Release
+      job_group: Vs2022_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - job_name: Vs2022_Win32_Debug
+      job_group: Vs2022_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: Win32
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - job_name: Vs2019_x64_Release
+      job_group: Vs2019_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       platform: x64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - job_name: Vs2019_x64_Debug
+      job_group: Vs2019_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       platform: x64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - job_name: Vs2019_Win32_Release
+      job_group: Vs2019_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       platform: Win32
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - job_name: Vs2019_Win32_Debug
+      job_group: Vs2019_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       platform: Win32
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    - job_name: Vs2017_x64_Release
+      job_group: Vs2017_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       platform: x64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    - job_name: Vs2017_x64_Debug
+      job_group: Vs2017_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       platform: x64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    - job_name: Vs2017_Win32_Release
+      job_group: Vs2017_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       platform: Win32
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    - job_name: Vs2017_Win32_Debug
+      job_group: Vs2017_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       platform: Win32
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    - job_name: Vs2015_x64_Release
+      job_group: Vs2015_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       platform: x64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    - job_name: Vs2015_x64_Debug
+      job_group: Vs2015_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       platform: x64
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    - job_name: Vs2015_Win32_Release
+      job_group: Vs2015_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       platform: Win32
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    - job_name: Vs2015_Win32_Debug
+      job_group: Vs2015_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       platform: Win32
       configuration: Debug
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - job_name: Vs2022_ARM64_Release
+      job_group: Vs2022_ARM64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: ARM64
       configuration: Release
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - job_name: Vs2022_ARM64_Debug
+      job_group: Vs2022_ARM64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       platform: ARM64
       configuration: Debug
 
@@ -91,8 +147,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
-      - platform: x64
+      - job_group: Ubuntu_x64
   install:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-powerpc-linux-gnu
@@ -111,8 +166,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
-      - platform: x86
+      - job_group: Ubuntu_x86
   install:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-powerpc-linux-gnu
@@ -131,8 +185,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
-      - platform: ppc64
+      - job_group: Ubuntu_ppc64
   install:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-powerpc-linux-gnu
@@ -147,8 +200,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
-      - platform: arm
+      - job_group: Ubuntu_arm
   install:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-arm-linux-gnueabihf
@@ -163,8 +215,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
-      - platform: aarch64
+      - job_group: Ubuntu_aarch64
   install:
     - sh: sudo apt-get update
     - sh: sudo apt-get -y install g++-aarch64-linux-gnu
@@ -179,8 +230,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2022
-      - platform: x64
+      - job_group: Vs2022_x64
   build:
     project: prj\vs2022\Simd.sln
     verbosity: minimal
@@ -193,8 +243,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2022
-      - platform: Win32
+      - job_group: Vs2022_Win32
   build:
     project: prj\vs2022\Simd.sln
     verbosity: minimal
@@ -207,8 +256,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2019
-      - platform: x64
+      - job_group: Vs2019_x64
   build:
     project: prj\vs2019\Simd.sln
     verbosity: minimal
@@ -221,8 +269,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2019
-      - platform: Win32
+      - job_group: Vs2019_Win32
   build:
     project: prj\vs2019\Simd.sln
     verbosity: minimal
@@ -235,8 +282,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2017
-      - platform: x64
+      - job_group: Vs2017_x64
   build:
     project: prj\vs2017\Simd.sln
     verbosity: minimal
@@ -249,8 +295,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2017
-      - platform: Win32
+      - job_group: Vs2017_Win32
   build:
     project: prj\vs2017\Simd.sln
     verbosity: minimal
@@ -263,8 +308,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2015
-      - platform: x64
+      - job_group: Vs2015_x64
   build:
     project: prj\vs2015\Simd.sln
     verbosity: minimal
@@ -277,8 +321,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2015
-      - platform: Win32
+      - job_group: Vs2015_Win32
   build:
     project: prj\vs2015\Simd.sln
     verbosity: minimal
@@ -291,8 +334,7 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2022
-      - platform: ARM64
+      - job_group: Vs2022_ARM64
   build_script:
     - mkdir build
     - cd build
