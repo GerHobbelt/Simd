@@ -2,25 +2,15 @@ version: 1.0.{build}
   
 environment:
   matrix:
-    - job_name: Ubuntu_x64_Debug
-      job_group: Ubuntu_x64
+    - job_name: Ubuntu_x86_x64_Debug
+      job_group: Ubuntu_x86_x64
       APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x64
       configuration: Debug
-    - job_name: Ubuntu_x64_Release
-      job_group: Ubuntu_x64
+    - job_name: Ubuntu_x86_x64_Release
+      job_group: Ubuntu_x86_x64
       APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       platform: x64
-      configuration: Release
-    - job_name: Ubuntu_x86_Debug
-      job_group: Ubuntu_x86
-      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      platform: x86
-      configuration: Debug
-    - job_name: Ubuntu_x86_Release
-      job_group: Ubuntu_x86
-      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      platform: x86
       configuration: Release
     - job_name: Ubuntu_ppc64_Debug
       job_group: Ubuntu_ppc64
@@ -147,23 +137,7 @@ for:
 -
   matrix:
     only:
-      - job_group: Ubuntu_x64
-  build_script:
-    - mkdir build
-    - cd build
-    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
-    - make
-  artifacts:
-    - path: build/libSimd.a
-      name: library
-    - path: build/log.txt
-      name: testlog
-  test_script:
-    - sh: ./Test -m=a -tt=1 -ot=log.txt
--
-  matrix:
-    only:
-      - job_group: Ubuntu_x86
+      - job_group: Ubuntu_x86_x64
   build_script:
     - mkdir build
     - cd build
