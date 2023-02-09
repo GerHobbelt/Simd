@@ -207,8 +207,8 @@ for:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v143\%platform%\%configuration%\*.* bin
-    - cmd: bin\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
+    - cmd: bin\v143\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -221,8 +221,8 @@ for:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v143\%platform%\%configuration%\*.* bin
-    - cmd: bin\v143\%platform%\%configuration%\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
+    - cmd: bin\v143\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -235,8 +235,8 @@ for:
     - path: bin\v142\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v142\%platform%\%configuration%\*.* bin
-    - cmd: bin\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
+    - cmd: bin\v142\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -249,8 +249,8 @@ for:
     - path: bin\v142\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v142\%platform%\%configuration%\*.* bin
-    - cmd: bin\v142\%platform%\%configuration%\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
+    - cmd: bin\v142\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -263,8 +263,8 @@ for:
     - path: bin\v141\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v141\%platform%\%configuration%\*.* bin
-    - cmd: bin\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
+    - cmd: bin\v141\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -277,8 +277,8 @@ for:
     - path: bin\v141\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v141\%platform%\%configuration%\*.* bin
-    - cmd: bin\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
+    - cmd: bin\v141\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -291,8 +291,8 @@ for:
     - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v140\%platform%\%configuration%\*.* bin
-    - cmd: bin\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
+    - cmd: bin\v140\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -305,8 +305,8 @@ for:
     - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: copy bin\v140\%platform%\%configuration%\*.* bin
-    - cmd: bin\test -m=a -tt=1 -ot=log.txt
+    - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
+    - cmd: bin\v140\test -m=a -tt=1 -ot=log.txt
 -
   matrix:
     only:
