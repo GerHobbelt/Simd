@@ -75,7 +75,7 @@ int main(int argc, char * argv[])
 
     typedef Simd::Detection<Simd::Allocator> Detection;
     Detection detection;
-    detection.Load("../../data/cascade/haar_face_0.xml");
+    detection.Load(ROOT_PATH + "data/cascade/haar_face_0.xml");
     detection.Init(Detection::Size(W, H), 1.2, Detection::Size(W, H) / 20);
 
     const char * WINDOW_NAME = "FaceDetection";
