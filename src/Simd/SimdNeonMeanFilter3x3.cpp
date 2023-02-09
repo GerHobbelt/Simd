@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ namespace Simd
             Store<align>(b + HA, SumCol<1>(a));
         }
 
-        const uint16x4_t K16_DIVISION_BY_9_FACTOR = SIMD_VEC_SET1_EPI32(Base::DIVISION_BY_9_FACTOR);
+        const uint16x4_t K16_DIVISION_BY_9_FACTOR = SIMD_VEC_SET1_PI16(Base::DIVISION_BY_9_FACTOR);
 
         SIMD_INLINE uint16x8_t DivBy9(uint16x8_t value)
         {

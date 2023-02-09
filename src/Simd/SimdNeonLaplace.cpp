@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Simd
 #ifdef SIMD_NEON_ENABLE    
     namespace Neon
     {
-        const uint8x8_t K8X8_08 = SIMD_VEC_SET1_EPI16(0x0008);
+        const uint8x8_t K8X8_08 = SIMD_VEC_SET1_PI8(0x08);
 
         template<int part> SIMD_INLINE int16x8_t Laplace(uint8x16_t a[3][3])
         {
