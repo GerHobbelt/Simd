@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -314,9 +314,9 @@ namespace Simd
             return vtbl2_u8((const uint8x8x2_t &)src, idx);
         }
 
-        const uint8x8_t K8_TBL_GRAY_TO_BGR_0 = SIMD_VEC_SETR_EPI16(0x0, 0x0, 0x0, 0x1, 0x1, 0x1, 0x2, 0x2);
-        const uint8x8_t K8_TBL_GRAY_TO_BGR_1 = SIMD_VEC_SETR_EPI16(0x2, 0x3, 0x3, 0x3, 0x4, 0x4, 0x4, 0x5);
-        const uint8x8_t K8_TBL_GRAY_TO_BGR_2 = SIMD_VEC_SETR_EPI16(0x5, 0x5, 0x6, 0x6, 0x6, 0x7, 0x7, 0x7);
+        const uint8x8_t K8_TBL_GRAY_TO_BGR_0 = SIMD_VEC_SETR_PI8(0x0, 0x0, 0x0, 0x1, 0x1, 0x1, 0x2, 0x2);
+        const uint8x8_t K8_TBL_GRAY_TO_BGR_1 = SIMD_VEC_SETR_PI8(0x2, 0x3, 0x3, 0x3, 0x4, 0x4, 0x4, 0x5);
+        const uint8x8_t K8_TBL_GRAY_TO_BGR_2 = SIMD_VEC_SETR_PI8(0x5, 0x5, 0x6, 0x6, 0x6, 0x7, 0x7, 0x7);
 
         template<> SIMD_INLINE void SynetSetInputNhwc3<SimdPixelFormatGray8>(const uint8_t * src, const float32x4_t * scale, const float32x4_t * shift, float * dst)
         {
@@ -367,9 +367,9 @@ namespace Simd
             StoreScaled<false>(dst + 0xB * F, UnpackU16<1>(bgr21), scale[2], shift[2]);
         }
 
-        const uint8x8_t K8_TBL_BGRA_TO_BGR_0 = SIMD_VEC_SETR_EPI16(0x0, 0x1, 0x2, 0x4, 0x5, 0x6, 0x8, 0x9);
-        const uint8x8_t K8_TBL_BGRA_TO_BGR_1 = SIMD_VEC_SETR_EPI16(0x0, 0x2, 0x3, 0x4, 0x6, 0x7, 0x8, 0xA);
-        const uint8x8_t K8_TBL_BGRA_TO_BGR_2 = SIMD_VEC_SETR_EPI16(0x5, 0x6, 0x8, 0x9, 0xA, 0xC, 0xD, 0xE);
+        const uint8x8_t K8_TBL_BGRA_TO_BGR_0 = SIMD_VEC_SETR_PI8(0x0, 0x1, 0x2, 0x4, 0x5, 0x6, 0x8, 0x9);
+        const uint8x8_t K8_TBL_BGRA_TO_BGR_1 = SIMD_VEC_SETR_PI8(0x0, 0x2, 0x3, 0x4, 0x6, 0x7, 0x8, 0xA);
+        const uint8x8_t K8_TBL_BGRA_TO_BGR_2 = SIMD_VEC_SETR_PI8(0x5, 0x6, 0x8, 0x9, 0xA, 0xC, 0xD, 0xE);
 
         template<> SIMD_INLINE void SynetSetInputNhwc3<SimdPixelFormatBgra32>(const uint8_t * src, const float32x4_t * scale, const float32x4_t * shift, float * dst)
         {
@@ -393,9 +393,9 @@ namespace Simd
             StoreScaled<false>(dst + 0xB * F, UnpackU16<1>(bgr5), scale[2], shift[2]);
         }
 
-        const uint8x8_t K8_TBL_RGB_TO_BGR_0 = SIMD_VEC_SETR_EPI16(0x2, 0x1, 0x0, 0x5, 0x4, 0x3, 0x8, 0x7);
-        const uint8x8_t K8_TBL_RGB_TO_BGR_1 = SIMD_VEC_SETR_EPI16(0x0, 0x5, 0x4, 0x3, 0x8, 0x7, 0x6, 0xB);
-        const uint8x8_t K8_TBL_RGB_TO_BGR_2 = SIMD_VEC_SETR_EPI16(0x8, 0x7, 0xC, 0xB, 0xA, 0xF, 0xE, 0xD);
+        const uint8x8_t K8_TBL_RGB_TO_BGR_0 = SIMD_VEC_SETR_PI8(0x2, 0x1, 0x0, 0x5, 0x4, 0x3, 0x8, 0x7);
+        const uint8x8_t K8_TBL_RGB_TO_BGR_1 = SIMD_VEC_SETR_PI8(0x0, 0x5, 0x4, 0x3, 0x8, 0x7, 0x6, 0xB);
+        const uint8x8_t K8_TBL_RGB_TO_BGR_2 = SIMD_VEC_SETR_PI8(0x8, 0x7, 0xC, 0xB, 0xA, 0xF, 0xE, 0xD);
 
         template<> SIMD_INLINE void SynetSetInputNhwc3<SimdPixelFormatRgb24>(const uint8_t * src, const float32x4_t * scale, const float32x4_t * shift, float * dst)
         {

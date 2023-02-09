@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ namespace Simd
 
         SIMD_INLINE void SobelDxAbsSum(uint8x16_t a[3][3], uint32x4_t & sum)
         {
-            sum = vaddq_u32(sum, vpaddlq_u16((uint16x8_t)vaddq_s16(SobelDx<true, 0>(a), SobelDx<true, 1>(a))));
+            sum = vaddq_u32(sum, vpaddlq_u16((uint16x8_t)vaddq_s16((SobelDx<true, 0>(a)), (SobelDx<true, 1>(a)))));
         }
 
         SIMD_INLINE void SetMask3(uint8x16_t a[3], uint8x16_t mask)
@@ -236,7 +236,7 @@ namespace Simd
 
         SIMD_INLINE void SobelDyAbsSum(uint8x16_t a[3][3], uint32x4_t & sum)
         {
-            sum = vaddq_u32(sum, vpaddlq_u16((uint16x8_t)vaddq_s16(SobelDy<true, 0>(a), SobelDy<true, 1>(a))));
+            sum = vaddq_u32(sum, vpaddlq_u16((uint16x8_t)vaddq_s16((SobelDy<true, 0>(a)), (SobelDy<true, 1>(a)))));
         }
 
         template <bool align> void SobelDyAbsSum(const uint8_t * src, size_t stride, size_t width, size_t height, uint64_t * sum)

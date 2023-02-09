@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2017 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -32,23 +32,23 @@ namespace Simd
 #ifdef SIMD_NEON_ENABLE    
     namespace Neon
     {
-        SIMD_INLINE int32x4_t MulDiv(const int32x4_t & dividend, const int32x4_t & divisor, const float32x4_t & KF_255_DIV_6)
+        SIMD_INLINE int32x4_t MulDiv32(const int32x4_t & dividend, const int32x4_t & divisor, const float32x4_t & KF_255_DIV_6)
         {
             return vcvtq_s32_f32(Div<SIMD_NEON_RCP_ITER>(vmulq_f32(KF_255_DIV_6, vcvtq_f32_s32(dividend)), vcvtq_f32_s32(divisor)));
         }
 
-        SIMD_INLINE int16x8_t MulDiv(const int16x8_t & dividend, const int16x8_t & divisor, const float32x4_t & KF_255_DIV_6)
+        SIMD_INLINE int16x8_t MulDiv16(const int16x8_t & dividend, const int16x8_t & divisor, const float32x4_t & KF_255_DIV_6)
         {
-            int32x4_t lo = MulDiv(UnpackI16<0>(dividend), UnpackI16<0>(divisor), KF_255_DIV_6);
-            int32x4_t hi = MulDiv(UnpackI16<1>(dividend), UnpackI16<1>(divisor), KF_255_DIV_6);
+            int32x4_t lo = MulDiv32(UnpackI16<0>(dividend), UnpackI16<0>(divisor), KF_255_DIV_6);
+            int32x4_t hi = MulDiv32(UnpackI16<1>(dividend), UnpackI16<1>(divisor), KF_255_DIV_6);
             return PackI32(lo, hi);
         }
 
-        SIMD_INLINE int16x8_t YuvToHue(const int16x8_t & y, const int16x8_t & u, const int16x8_t & v, const float32x4_t & KF_255_DIV_6)
+        SIMD_INLINE int16x8_t YuvToHue16(const int16x8_t & y, const int16x8_t & u, const int16x8_t & v, const float32x4_t & KF_255_DIV_6)
         {
-            int16x8_t red = SaturateByU8(YuvToRed(y, v));
-            int16x8_t blue = SaturateByU8(YuvToBlue(y, u));
-            int16x8_t green = SaturateByU8(YuvToGreen(y, u, v));
+            int16x8_t red = SaturateByU8(YuvToRed16(y, v));
+            int16x8_t blue = SaturateByU8(YuvToBlue16(y, u));
+            int16x8_t green = SaturateByU8(YuvToGreen16(y, u, v));
             int16x8_t max = vmaxq_s16(blue, vmaxq_s16(green, red));
             int16x8_t min = vminq_s16(blue, vminq_s16(green, red));
             int16x8_t range = vsubq_s16(max, min);
@@ -63,13 +63,13 @@ namespace Simd
 
             int16x8_t dividend = vorrq_s16(vorrq_s16(redMaxCase, greenMaxCase), blueMaxCase);
 
-            return vandq_s16(vmvnq_s16((int16x8_t)vceqq_s16(range, (int16x8_t)K16_0000)), vandq_s16(MulDiv(dividend, range, KF_255_DIV_6), (int16x8_t)K16_00FF));
+            return vandq_s16(vmvnq_s16((int16x8_t)vceqq_s16(range, (int16x8_t)K16_0000)), vandq_s16(MulDiv16(dividend, range, KF_255_DIV_6), (int16x8_t)K16_00FF));
         }
 
         SIMD_INLINE uint8x16_t YuvToHue(const uint8x16_t & y, const uint8x16_t & u, const uint8x16_t & v, const float32x4_t & KF_255_DIV_6)
         {
-            uint16x8_t lo = (uint16x8_t)YuvToHue(AdjustY<0>(y), AdjustUV<0>(u), AdjustUV<0>(v), KF_255_DIV_6);
-            uint16x8_t hi = (uint16x8_t)YuvToHue(AdjustY<1>(y), AdjustUV<1>(u), AdjustUV<1>(v), KF_255_DIV_6);
+            uint16x8_t lo = (uint16x8_t)YuvToHue16(AdjustY<0>(y), AdjustUV<0>(u), AdjustUV<0>(v), KF_255_DIV_6);
+            uint16x8_t hi = (uint16x8_t)YuvToHue16(AdjustY<1>(y), AdjustUV<1>(u), AdjustUV<1>(v), KF_255_DIV_6);
             return PackU16(lo, hi);
         }
 
