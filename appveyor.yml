@@ -150,6 +150,7 @@ for:
       name: testlog
   test_script:
     - sh: ./Test -tt=1 -ot=log.txt
+    - ls
 -
   matrix:
     only:
@@ -206,11 +207,13 @@ for:
   artifacts:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v143\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
     - cmd: cd bin\v143
     - cmd: test -tt=1 -ot=log.txt
-    - cmd: ls
+    - cmd: dir
 -
   matrix:
     only:
@@ -222,6 +225,8 @@ for:
   artifacts:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v143\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
     - cmd: cd bin\v143
@@ -237,6 +242,8 @@ for:
   artifacts:
     - path: bin\v142\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v142\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
     - cmd: cd bin\v142
@@ -252,6 +259,8 @@ for:
   artifacts:
     - path: bin\v142\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v142\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
     - cmd: cd bin\v142
@@ -267,6 +276,8 @@ for:
   artifacts:
     - path: bin\v141\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v141\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
     - cmd: cd bin\v141
@@ -282,6 +293,8 @@ for:
   artifacts:
     - path: bin\v141\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v141\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
     - cmd: cd bin\v141
@@ -297,6 +310,8 @@ for:
   artifacts:
     - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v140\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
     - cmd: cd bin\v140
@@ -312,6 +327,8 @@ for:
   artifacts:
     - path: bin\v140\%platform%\%configuration%\Simd.dll
       name: library
+    - path: bin\v140\log.txt
+      name: testlog
   test_script:
     - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
     - cmd: cd bin\v140
