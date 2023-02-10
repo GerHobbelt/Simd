@@ -223,7 +223,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
-    - cmd: bin\v143\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v143
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -237,7 +238,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
-    - cmd: bin\v142\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v142
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -251,7 +253,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
-    - cmd: bin\v142\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v142
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -265,7 +268,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
-    - cmd: bin\v141\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v141
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -279,7 +283,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
-    - cmd: bin\v141\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v141
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -293,7 +298,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
-    - cmd: bin\v140\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v140
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
@@ -307,7 +313,8 @@ for:
       name: library
   test_script:
     - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
-    - cmd: bin\v140\test -tt=1 -ot=log.txt
+    - cmd: cd bin\v140
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
