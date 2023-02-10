@@ -207,12 +207,9 @@ for:
     - path: bin\v143\%platform%\%configuration%\Simd.dll
       name: library
   test_script:
-    - cmd: ls
     - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
-    - cmd: bin\v143\test -tt=1 -ot=log.txt
-    - cmd: ls
-    - cmd: cd ..
-    - cmd: ls
+    - cmd: cd bin\v143
+    - cmd: test -tt=1 -ot=log.txt
 -
   matrix:
     only:
