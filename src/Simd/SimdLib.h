@@ -1,3 +1,4 @@
+/* UTF8 auto-detect: äñÿwäÿ */
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
@@ -7430,7 +7431,7 @@ extern "C"
 
         \fn void* SimdSynetPermuteInit(const size_t * shape, const size_t* order, size_t count, SimdTensorDataType type);
 
-        \short Initilizes permute algorithm.
+        \short Initializes permute algorithm.
 
         \param [in] shape - a pointer to shape of input tensor.
         \param [in] order - a pointer to order of dimensions in output tensor.
@@ -7506,7 +7507,7 @@ extern "C"
         \param [in] kernelC - a channel size of the pooling kernel in 3D case. In 2D case it must be equal to 1.
         \param [in] kernelY - a height of the pooling kernel.
         \param [in] kernelX - a width of the pooling kernel.
-        \param [in] strideC - a �-stride of the pooling in 3D case. In 2D case it must be equal to 1.
+        \param [in] strideC - a ñ-stride of the pooling in 3D case. In 2D case it must be equal to 1.
         \param [in] strideY - a y-stride of the pooling.
         \param [in] strideX - a x-stride of the pooling.
         \param [in] padC - a channel pad to the begin of the input image.
