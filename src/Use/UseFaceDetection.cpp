@@ -39,7 +39,12 @@
 #include "Simd/SimdDetection.hpp"
 #include "Simd/SimdDrawing.hpp"
 
-int main(int argc, char * argv[])
+
+#if defined(BUILD_MONOLITHIC)
+#define main    simdimg_use_face_detection_example_main
+#endif
+
+int main(int argc, const char ** argv)
 {
     if (argc < 2)
     {

@@ -27,9 +27,12 @@
 #include <string>
 #include <vector>
 
+namespace
+{
+
 struct Example
 {
-    typedef int(*Function)(int argc, char * argv[]);
+    typedef int(*Function)(int argc, const char ** argv);
 
     std::string name;
     Function func;
@@ -45,7 +48,7 @@ Examples g_examples;
 
 #ifdef SIMD_OPENCV_ENABLE
 #define USE_ADD_OPENCV_EXAMPLE(name) \
-    int Use##name(int argc, char * argv[]); \
+    int Use##name(int argc, const char ** argv); \
     bool Use##name##Add(){ g_examples.push_back(Example(#name, Use##name)); return true; } \
     bool Use##name##Added = Use##name##Add();
 #else
@@ -63,7 +66,14 @@ void Print()
     std::cout << std::endl;
 }
 
-int main(int argc, char * argv[])
+}
+
+
+#if defined(BUILD_MONOLITHIC)
+#define main    simdimg_use_example_main
+#endif
+
+int main(int argc, const char ** argv)
 {
     if (argc < 2)
     {

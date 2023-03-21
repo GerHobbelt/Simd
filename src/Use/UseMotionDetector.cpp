@@ -100,7 +100,12 @@ void Annotate(const Metadata & metadata, const Simd::Font & font, EventList & ev
     }
 }
 
-int main(int argc, char * argv[])
+
+#if defined(BUILD_MONOLITHIC)
+#define main    simdimg_use_motion_detector_example_main
+#endif
+
+int main(int argc, const char ** argv)
 {
     if (argc < 2)
     {
