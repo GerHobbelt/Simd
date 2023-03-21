@@ -1,3 +1,4 @@
+/* UTF8 auto-detect: äñÿwäÿ */
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
@@ -3062,7 +3063,7 @@ namespace Simd
 
         All images must have the same width, height and pixel format.
 
-        \note This function is a C++ wrapper for function� ::SimdRecursiveBilateralFilterInit and ::SimdRecursiveBilateralFilterRun.
+        \note This function is a C++ wrapper for functionû ::SimdRecursiveBilateralFilterInit and ::SimdRecursiveBilateralFilterRun.
 
         \param [in] src - an original input image.
         \param [out] dst - a filtered output image.
