@@ -145,6 +145,27 @@ namespace Simd
         }
     }
 #endif 
+
+#ifdef SIMD_NEON_ENABLE    
+    namespace Neon
+    {
+        namespace Bf16
+        {
+            const uint32x4_t ROUND = SIMD_VEC_SET1_EPI32(Base::Bf16::ROUND);
+            const uint32x4_t MASK = SIMD_VEC_SET1_EPI32(Base::Bf16::MASK);
+        }
+
+        SIMD_INLINE uint32x4_t Float32ToBFloat16(float32x4_t value)
+        {
+            return vshrq_n_u32(vaddq_u32(vreinterpretq_u32_f32(value), Bf16::ROUND), Base::Bf16::SHIFT);
+        }
+
+        SIMD_INLINE float32x4_t BFloat16ToFloat32(uint32x4_t value)
+        {
+            return vreinterpretq_f32_u32(vshlq_n_u32(value, Base::Bf16::SHIFT));
+        }
+    }
+#endif 
 }
 
 #endif//__SimdBFloat16_h__
