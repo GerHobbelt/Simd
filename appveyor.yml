@@ -1,0 +1,344 @@
+version: 1.0.{build}
+  
+environment:
+  matrix:
+    - job_name: Vs2022_x64_Debug
+      job_group: Vs2022_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: x64
+      configuration: Debug
+    - job_name: Vs2022_ARM64_Debug
+      job_group: Vs2022_ARM64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: ARM64
+      configuration: Debug
+    - job_name: Ubuntu_x86_x64_Debug
+      job_group: Ubuntu_x86_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: x64
+      configuration: Debug
+    - job_name: Ubuntu_x86_x64_Release
+      job_group: Ubuntu_x86_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: x64
+      configuration: Release
+    - job_name: Ubuntu_ppc64_Debug
+      job_group: Ubuntu_ppc64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: ppc64
+      configuration: Debug
+    - job_name: Ubuntu_ppc64_Release
+      job_group: Ubuntu_ppc64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: ppc64
+      configuration: Release
+    - job_name: Ubuntu_arm_Debug
+      job_group: Ubuntu_arm
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: arm
+      configuration: Debug
+    - job_name: Ubuntu_arm_Release
+      job_group: Ubuntu_arm
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: arm
+      configuration: Release
+    - job_name: Ubuntu_aarch64_Debug
+      job_group: Ubuntu_aarch64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: aarch64
+      configuration: Debug
+    - job_name: Ubuntu_aarch64_Release
+      job_group: Ubuntu_aarch64
+      APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      platform: aarch64
+      configuration: Release
+    - job_name: Vs2022_x64_Release
+      job_group: Vs2022_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: x64
+      configuration: Release
+    - job_name: Vs2022_Win32_Release
+      job_group: Vs2022_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: Win32
+      configuration: Release
+    - job_name: Vs2022_Win32_Debug
+      job_group: Vs2022_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: Win32
+      configuration: Debug
+    - job_name: Vs2019_x64_Release
+      job_group: Vs2019_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: x64
+      configuration: Release
+    - job_name: Vs2019_x64_Debug
+      job_group: Vs2019_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: x64
+      configuration: Debug
+    - job_name: Vs2019_Win32_Release
+      job_group: Vs2019_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: Win32
+      configuration: Release
+    - job_name: Vs2019_Win32_Debug
+      job_group: Vs2019_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      platform: Win32
+      configuration: Debug
+    - job_name: Vs2017_x64_Release
+      job_group: Vs2017_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: x64
+      configuration: Release
+    - job_name: Vs2017_x64_Debug
+      job_group: Vs2017_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: x64
+      configuration: Debug
+    - job_name: Vs2017_Win32_Release
+      job_group: Vs2017_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: Win32
+      configuration: Release
+    - job_name: Vs2017_Win32_Debug
+      job_group: Vs2017_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: Win32
+      configuration: Debug
+    - job_name: Vs2015_x64_Release
+      job_group: Vs2015_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: x64
+      configuration: Release
+    - job_name: Vs2015_x64_Debug
+      job_group: Vs2015_x64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: x64
+      configuration: Debug
+    - job_name: Vs2015_Win32_Release
+      job_group: Vs2015_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: Win32
+      configuration: Release
+    - job_name: Vs2015_Win32_Debug
+      job_group: Vs2015_Win32
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      platform: Win32
+      configuration: Debug
+    - job_name: Vs2022_ARM64_Release
+      job_group: Vs2022_ARM64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+      platform: ARM64
+      configuration: Release
+
+for:
+-
+  matrix:
+    only:
+      - job_group: Ubuntu_x86_x64
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - make
+  artifacts:
+    - path: build/libSimd.a
+      name: library
+    - path: build/log.txt
+      name: testlog
+  test_script:
+    - sh: ./Test -tt=1 -ot=log.txt
+    - ls
+-
+  matrix:
+    only:
+      - job_group: Ubuntu_ppc64
+  install:
+    - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-powerpc-linux-gnu
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/powerpc-linux-gnu-g++" -DSIMD_TARGET="ppc64" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - make
+  artifacts:
+    - path: build/libSimd.a
+      name: library
+-
+  matrix:
+    only:
+      - job_group: Ubuntu_arm
+  install:
+    - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-arm-linux-gnueabihf
+  build_script:
+    - mkdir build
+    - cd build
+    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/arm-linux-gnueabihf-g++" -DSIMD_TARGET="arm" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - make
+  artifacts:
+    - path: build/libSimd.a
+      name: library
+-
+  matrix:
+    only:
+      - job_group: Ubuntu_aarch64
+  install:
+    - sh: sudo apt-get update
+    - sh: sudo apt-get -y install g++-aarch64-linux-gnu
+  build_script:
+    - mkdir build
+    - cd build
+    - sh: cmake ../prj/cmake -DSIMD_TOOLCHAIN="/usr/bin/aarch64-linux-gnu-g++" -DSIMD_TARGET="aarch64" -DCMAKE_BUILD_TYPE="$CONFIGURATION"
+    - make
+  artifacts:
+    - path: build/libSimd.a
+      name: library
+-
+  matrix:
+    only:
+      - job_group: Vs2022_x64
+  build:
+    project: prj\vs2022\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v143\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v143\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
+    - cmd: cd bin\v143
+    - cmd: test -tt=1 -ot=log.txt
+    - cmd: dir
+-
+  matrix:
+    only:
+      - job_group: Vs2022_Win32
+  build:
+    project: prj\vs2022\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v143\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v143\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v143\%platform%\%configuration%\*.* bin\v143
+    - cmd: cd bin\v143
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2019_x64
+  build:
+    project: prj\vs2019\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v142\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v142\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
+    - cmd: cd bin\v142
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2019_Win32
+  build:
+    project: prj\vs2019\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v142\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v142\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v142\%platform%\%configuration%\*.* bin\v142
+    - cmd: cd bin\v142
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2017_x64
+  build:
+    project: prj\vs2017\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v141\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v141\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
+    - cmd: cd bin\v141
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2017_Win32
+  build:
+    project: prj\vs2017\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v141\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v141\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v141\%platform%\%configuration%\*.* bin\v141
+    - cmd: cd bin\v141
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2015_x64
+  build:
+    project: prj\vs2015\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v140\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v140\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
+    - cmd: cd bin\v140
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2015_Win32
+  build:
+    project: prj\vs2015\Simd.sln
+    verbosity: minimal
+    parallel: true
+  artifacts:
+    - path: bin\v140\%platform%\%configuration%\Simd.dll
+      name: library
+    - path: bin\v140\log.txt
+      name: testlog
+  test_script:
+    - cmd: copy bin\v140\%platform%\%configuration%\*.* bin\v140
+    - cmd: cd bin\v140
+    - cmd: test -tt=1 -ot=log.txt
+-
+  matrix:
+    only:
+      - job_group: Vs2022_ARM64
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake ..\prj\cmake -G "Visual Studio 17 2022" -T v143 -A ARM64 -DSIMD_TOOLCHAIN="" -DSIMD_TARGET="" -DCMAKE_BUILD_TYPE="%CONFIGURATION%"
+    - cmake --build . -j --config Release --target install
