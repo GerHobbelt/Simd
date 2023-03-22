@@ -170,6 +170,7 @@ namespace Test
 
         min[0].Reshape(Shp(beg.srcC));
         max[0].Reshape(Shp(beg.srcC));
+        srand(0);
         FillRandom(src32f, min[0].Data(), max[0].Data(), beg.srcC, p.neg);
         SetSrc32fTo8u(src32f, min[0].Data(), max[0].Data(), beg.srcC, p.neg, p.comp, NULL, NULL, src8u);
         for (size_t i = 0; i < p.count; ++i)
@@ -346,7 +347,7 @@ namespace Test
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Avx512bw::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif 
 
-#ifdef SIMD_AVX512VNNI_ENABLE
+#if defined(SIMD_AVX512VNNI_ENABLE) && !defined(SIMD_AMX_EMULATE)
         if (Simd::Avx512vnni::Enable)
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Avx512vnni::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif

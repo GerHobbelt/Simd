@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -114,6 +114,14 @@ namespace Simd
             _mm512_storeu_ps(buffer, value);
             Simd::Log<float>(buffer, F, name);
         }
+
+        template<class T> SIMD_INLINE void Log(const __m512i& value, const std::string& name)
+        {
+            const size_t n = sizeof(__m512i) / sizeof(T);
+            T buffer[n];
+            _mm512_storeu_si512((__m512i*)buffer, value);
+            Simd::Log<T>(buffer, n, name);
+        }
     }
 #endif
 
@@ -180,42 +188,42 @@ namespace Simd
 #ifdef SIMD_NEON_ENABLE
     namespace Neon
     {
-        SIMD_INLINE void Log(const uint8x16_t & value, const std::string & name)
+        SIMD_INLINE void Log8u(const uint8x16_t & value, const std::string & name)
         {
             uint8_t buffer[16];
             vst1q_u8(buffer, value);
             Simd::Log(buffer, 16, name);
         }
 
-        SIMD_INLINE void Log(const uint16x8_t & value, const std::string & name)
+        SIMD_INLINE void Log16u(const uint16x8_t & value, const std::string & name)
         {
             uint16_t buffer[8];
             vst1q_u16(buffer, value);
             Simd::Log(buffer, 8, name);
         }
 
-        SIMD_INLINE void Log(const int16x8_t & value, const std::string & name)
+        SIMD_INLINE void Log16i(const int16x8_t & value, const std::string & name)
         {
             int16_t buffer[8];
             vst1q_s16(buffer, value);
             Simd::Log(buffer, 8, name);
         }
 
-        SIMD_INLINE void Log(const uint32x4_t & value, const std::string & name)
+        SIMD_INLINE void Log32u(const uint32x4_t & value, const std::string & name)
         {
             uint32_t buffer[4];
             vst1q_u32(buffer, value);
             Simd::Log(buffer, 4, name);
         }
 
-        SIMD_INLINE void Log(const int32x4_t & value, const std::string & name)
+        SIMD_INLINE void Log32i(const int32x4_t & value, const std::string & name)
         {
             int32_t buffer[4];
             vst1q_s32(buffer, value);
             Simd::Log(buffer, 4, name);
         }
 
-        SIMD_INLINE void Log(const float32x4_t & value, const std::string & name)
+        SIMD_INLINE void Log32f(const float32x4_t & value, const std::string & name)
         {
             float buffer[4];
             vst1q_f32(buffer, value);

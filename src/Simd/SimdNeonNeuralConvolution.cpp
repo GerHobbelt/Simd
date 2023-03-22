@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar,
+* Copyright (c) 2011-2023 Yermalayeu Ihar,
 *               2018-2018 Radchenko Andrey.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -295,7 +295,7 @@ namespace Simd
                 for (; col < alignedWidth; col += F)
                 {
                     float32x4_t _dst = Load<align>(dst + col);
-                    _dst = vaddq_f32(_dst, Convolution<coreX, coreY>::template Forward<align>(src + col, srcStride, _weights));
+                    _dst = vaddq_f32(_dst, (Convolution<coreX, coreY>::template Forward<align>(src + col, srcStride, _weights)));
                     Store<align>(dst + col, _dst);
                 }
                 if (width - alignedWidth)
@@ -957,7 +957,7 @@ namespace Simd
                                 for (; col < alignedWidth; col += F)
                                 {
                                     float32x4_t _dst = Load<align>(pdst + col);
-                                    _dst = vaddq_f32(_dst, Convolution<kernelX, kernelY>::template Forward<align>(psrc + col, srcWidth, _weight));
+                                    _dst = vaddq_f32(_dst, (Convolution<kernelX, kernelY>::template Forward<align>(psrc + col, srcWidth, _weight)));
                                     Store<align>(pdst + col, _dst);
                                 }
                                 if (dstWidth - alignedWidth)
@@ -1209,7 +1209,7 @@ namespace Simd
                 for (size_t col = 0; col < alignedWidth; col += F)
                 {
                     float32x4_t _dst = Load<align>(dst + col);
-                    _dst = vaddq_f32(_dst, Convolution<coreX, coreY>::template Backward<true>(buffer, col, _weights));
+                    _dst = vaddq_f32(_dst, (Convolution<coreX, coreY>::template Backward<true>(buffer, col, _weights)));
                     Store<align>(dst + col, _dst);
                 }
                 if (width - alignedWidth)

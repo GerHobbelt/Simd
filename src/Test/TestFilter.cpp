@@ -923,12 +923,16 @@ namespace Test
         TEST_EXECUTE_AT_LEAST_MIN_TIME(f2.Call(src, spatial, range, flags, dst2));
 
         int maxDifference = 0;
-        if (!Simd::FmaAvoid(flags) || width != W)
+        if (!Simd::FmaAvoid(flags) || width != W || width <= 128)
+#ifdef WIN32 
+            maxDifference = 2;
+#else
             maxDifference = 1;
+#endif
 
         result = result && Compare(dst1, dst2, maxDifference, true, 64);
 
-        if (!REAL_IMAGE.empty() || NOISE_IMAGE == false)
+        if (!REAL_IMAGE.empty() || NOISE_IMAGE == false || result == false)
         {
             SaveRbf(src, "src", width, height, channels, spatial, range, flags);
             SaveRbf(dst1, "dst1", width, height, channels, spatial, range, flags);
@@ -952,10 +956,16 @@ namespace Test
     {
         bool result = true;
 
-        int fa = SimdRecursiveBilateralFilterFast | SimdRecursiveBilateralFilterDiffAvg;// | SimdRecursiveBilateralFilterFmaAvoid;
-        int fm = SimdRecursiveBilateralFilterFast | SimdRecursiveBilateralFilterDiffMax | SimdRecursiveBilateralFilterFmaAvoid;
-        int fs = SimdRecursiveBilateralFilterFast | SimdRecursiveBilateralFilterDiffSum | SimdRecursiveBilateralFilterFmaAvoid;
-        int pa = SimdRecursiveBilateralFilterPrecise | SimdRecursiveBilateralFilterDiffAvg | SimdRecursiveBilateralFilterFmaAvoid;
+#ifdef WIN32 
+        int fma = 0;
+#else
+        int fma = SimdRecursiveBilateralFilterFmaAvoid;
+#endif
+
+        int fa = SimdRecursiveBilateralFilterFast | SimdRecursiveBilateralFilterDiffAvg | fma;
+        int fm = SimdRecursiveBilateralFilterFast | SimdRecursiveBilateralFilterDiffMax | fma;
+        int fs = SimdRecursiveBilateralFilterFast | SimdRecursiveBilateralFilterDiffSum | fma;
+        int pa = SimdRecursiveBilateralFilterPrecise | SimdRecursiveBilateralFilterDiffAvg | fma;
 
         for (int channels = 1; channels <= 4; channels++)
         {

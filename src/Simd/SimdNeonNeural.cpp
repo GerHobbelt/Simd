@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar,
+* Copyright (c) 2011-2023 Yermalayeu Ihar,
 *               2018-2018 Radchenko Andrey.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -721,8 +721,8 @@ namespace Simd
             return vmaxq_f32(vmaxq_f32(Load<align>(src), Load<align>(src + stride)), Load<align>(src + 2 * stride));
         }
 
-        const uint8x8_t K8_TBL_BITS_LO = SIMD_VEC_SETR_EPI16(0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B);
-        const uint8x8_t K8_TBL_BITS_HI = SIMD_VEC_SETR_EPI16(0x04, 0x05, 0x06, 0x07, 0x0C, 0x0D, 0x0E, 0x0F);
+        const uint8x8_t K8_TBL_BITS_LO = SIMD_VEC_SETR_PI8(0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B);
+        const uint8x8_t K8_TBL_BITS_HI = SIMD_VEC_SETR_PI8(0x04, 0x05, 0x06, 0x07, 0x0C, 0x0D, 0x0E, 0x0F);
 
         SIMD_INLINE float32x4_t CombineFor2x2(const float32x4_t & lo, const float32x4_t & hi)
         {

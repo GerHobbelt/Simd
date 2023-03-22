@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -151,7 +151,7 @@ namespace Simd
     (SIMD_SHORT_AS_ULONGLONG(c) << 32) | (SIMD_SHORT_AS_ULONGLONG(d) << 48)
 
 #define SIMD_ULL_SET1_EPI32(a) \
-    SIMD_INT_AS_LONGLONG(a) | (SIMD_INT_AS_ULONGLONG(a) << 32)
+    SIMD_INT_AS_ULONGLONG(a) | (SIMD_INT_AS_ULONGLONG(a) << 32)
 
 #define SIMD_ULL_SET2_EPI32(a, b) \
     SIMD_INT_AS_ULONGLONG(a) | (SIMD_INT_AS_ULONGLONG(b) << 32)
