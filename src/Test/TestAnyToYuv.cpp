@@ -629,8 +629,8 @@ namespace Test
         const int uvHeight = height / dy;
 
         View bgra(width, height, View::Bgra32, NULL, TEST_ALIGN(width));
-        //FillRandom(bgra);
-        FillSequence(bgra);
+        FillRandom(bgra);
+        //FillSequence(bgra);
 
         View y1(width, height, View::Gray8, NULL, TEST_ALIGN(width));
         View u1(uvWidth, uvHeight, View::Gray8, NULL, TEST_ALIGN(uvWidth));
@@ -669,25 +669,25 @@ namespace Test
 
         result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Base::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
 
-//#ifdef SIMD_SSE41_ENABLE
-//        if (Simd::Sse41::Enable && W >= Simd::Sse41::DA)
-//            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Sse41::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
-//#endif 
-//
-//#ifdef SIMD_AVX2_ENABLE
-//        if (Simd::Avx2::Enable && W >= Simd::Avx2::DA)
-//            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Avx2::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
-//#endif
-//
-//#ifdef SIMD_AVX512BW_ENABLE
-//        if (Simd::Avx512bw::Enable)
-//            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Avx512bw::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
-//#endif
-//
-//#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable && W >= Simd::Neon::DA)
-//            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Neon::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
-//#endif
+#ifdef SIMD_SSE41_ENABLE
+        if (Simd::Sse41::Enable && W >= Simd::Sse41::DA)
+            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Sse41::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
+#endif 
+
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable && W >= Simd::Avx2::DA)
+            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Avx2::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
+#endif
+
+#ifdef SIMD_AVX512BW_ENABLE
+        if (Simd::Avx512bw::Enable)
+            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Avx512bw::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
+#endif
+
+#ifdef SIMD_NEON_ENABLE
+        if (Simd::Neon::Enable && W >= Simd::Neon::DA)
+            result = result && BgraToYuvaV2AutoTest(2, 2, FUNC_YUVA2(Simd::Neon::BgraToYuva420pV2), FUNC_YUVA2(SimdBgraToYuva420pV2));
+#endif
 
         return result;
     }
