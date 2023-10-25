@@ -43,10 +43,11 @@
  <li>NEON optimizations of function Float32ToBFloat16.</li>
  <li>NEON optimizations of function BFloat16ToFloat32.</li>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function BgraToYuva420pV2.</li>
+ <li>Support of SynetUnaryOperation32fErf in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetUnaryOperation32f.</li>
 </ul>
 <h5>Improving</h5>
 <ul>
- <li>Base implementation, SSE4.1, AVX2 optimizations of function SynetSoftmaxLayerForward.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetSoftmaxLayerForward.</li>
 </ul>
 <h5>Bug fixing</h5>
 <ul>
@@ -71,6 +72,10 @@
  <li>Function SynetSpecifyTensorFormat.</li>
  <li>Support of all formats besides NHWC and NCHW for enumeration SimdTensorFormatType.</li>
 </ul>
+<h5>Renaming</h5>
+<ul>
+ <li>Function from SynetUnaryOperation32fLayerForward to SynetUnaryOperation32f.</li>
+</ul>
  
 <h4>Test framework</h4>
 <h5>New features</h5>
@@ -79,6 +84,10 @@
  <li>Tests for verifying functionality of function BgraToYuv422pV2.</li>
  <li>Tests for verifying functionality of function BgraToYuva420pV2.</li>
  <li>Improving header of performance report.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in test SynetUnaryOperation32fLayerForward.</li>
 </ul>
 
 <a href="#HOME">Home</a>
