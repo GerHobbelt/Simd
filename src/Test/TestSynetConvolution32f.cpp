@@ -610,11 +610,13 @@ namespace Test
         //result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationPrelu, SimdTrue, fp32, f1, f2);
         //result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationSwish, SimdFalse, bf16, f1, f2);
         //result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationIdentity, SimdTrue, bf16, f1, f2);
-        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationRelu, SimdFalse, fp32, f1, f2);
-        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationRelu, SimdTrue, fp32, f1, f2);
+        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationGelu, SimdFalse, fp32, f1, f2);
+        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationGelu, SimdTrue, fp32, f1, f2);
+        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationGelu, SimdFalse, bf16, f1, f2);
+        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationGelu, SimdTrue, bf16, f1, f2);
 #else
-        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationRelu, SimdFalse, fp32, f1, f2);
-        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationRelu, SimdTrue, fp32, f1, f2);
+        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationGelu, SimdFalse, bf16, f1, f2);
+        result = result && SynetConvolution32fForwardAutoTest(eps, SimdConvolutionActivationGelu, SimdTrue, bf16, f1, f2);
 #endif
 
         return result;
