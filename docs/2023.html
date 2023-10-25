@@ -33,7 +33,18 @@
 </center>
 
 <hr/>
-<h3 id="R124">April X, 2023 (version X.X.124)</h3>
+<h3 id="R125">May X, 2023 (version X.X.125)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>AVX-512BW optimizations of function SynetGelu32f.</li>
+ <li>SimdConvolutionActivationGelu member in enumeration SimdConvolutionActivationType.</li>
+ <li>Support of SynetUnaryOperation32fErf in NEON optimizations of function SynetUnaryOperation32f.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R124">April 3, 2023 (version 5.2.124)</h3>
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>
@@ -44,6 +55,7 @@
  <li>NEON optimizations of function BFloat16ToFloat32.</li>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function BgraToYuva420pV2.</li>
  <li>Support of SynetUnaryOperation32fErf in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetUnaryOperation32f.</li>
+ <li>Base implementation, SSE4.1, AVX2 optimizations of function SynetGelu32f.</li>
 </ul>
 <h5>Improving</h5>
 <ul>
@@ -84,6 +96,7 @@
  <li>Tests for verifying functionality of function BgraToYuv422pV2.</li>
  <li>Tests for verifying functionality of function BgraToYuva420pV2.</li>
  <li>Improving header of performance report.</li>
+ <li>Tests for verifying functionality of function SynetGelu32f.</li>
 </ul>
 <h5>Bug fixing</h5>
 <ul>
