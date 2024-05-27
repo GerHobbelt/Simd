@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -115,23 +115,14 @@ namespace Simd
 
         void BgraToRgba(const uint8_t* bgra, size_t width, size_t height, size_t bgraStride, uint8_t* rgba, size_t rgbaStride);
 
-        void BgraToYuv420p(const uint8_t* bgra, size_t width, size_t height, size_t bgraStride, uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride);
-
         void BgraToYuv420pV2(const uint8_t* bgra, size_t bgraStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, SimdYuvType yuvType);
-
-        void BgraToYuv422p(const uint8_t* bgra, size_t width, size_t height, size_t bgraStride, uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride);
 
         void BgraToYuv422pV2(const uint8_t* bgra, size_t bgraStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, SimdYuvType yuvType);
 
-        void BgraToYuv444p(const uint8_t* bgra, size_t width, size_t height, size_t bgraStride, uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride);
-
         void BgraToYuv444pV2(const uint8_t* bgra, size_t bgraStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, SimdYuvType yuvType);
-
-        void BgraToYuva420p(const uint8_t* bgra, size_t bgraStride, size_t width, size_t height,
-            uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, uint8_t* a, size_t aStride);
 
         void BgraToYuva420pV2(const uint8_t* bgra, size_t bgraStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, uint8_t* a, size_t aStride, SimdYuvType yuvType);
@@ -147,17 +138,11 @@ namespace Simd
 
         void BgrToRgb(const uint8_t* bgr, size_t width, size_t height, size_t bgrStride, uint8_t* rgb, size_t rgbStride);
 
-        void BgrToYuv420p(const uint8_t* bgr, size_t width, size_t height, size_t bgrStride, uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride);
-
         void BgrToYuv420pV2(const uint8_t* bgr, size_t bgrStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, SimdYuvType yuvType);
 
-        void BgrToYuv422p(const uint8_t* bgr, size_t width, size_t height, size_t bgrStride, uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride);
-
         void BgrToYuv422pV2(const uint8_t* bgr, size_t bgrStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, SimdYuvType yuvType);
-
-        void BgrToYuv444p(const uint8_t* bgr, size_t width, size_t height, size_t bgrStride, uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride);
 
         void BgrToYuv444pV2(const uint8_t* bgr, size_t bgrStride, size_t width, size_t height,
             uint8_t* y, size_t yStride, uint8_t* u, size_t uStride, uint8_t* v, size_t vStride, SimdYuvType yuvType);
@@ -213,24 +198,6 @@ namespace Simd
         void DetectionLbpDetect16ii(const void * hid, const uint8_t * mask, size_t maskStride,
             ptrdiff_t left, ptrdiff_t top, ptrdiff_t right, ptrdiff_t bottom, uint8_t * dst, size_t dstStride);
 
-        void EdgeBackgroundGrowRangeSlow(const uint8_t* value, size_t valueStride, size_t width, size_t height,
-            uint8_t* background, size_t backgroundStride);
-
-        void EdgeBackgroundGrowRangeFast(const uint8_t* value, size_t valueStride, size_t width, size_t height,
-            uint8_t* background, size_t backgroundStride);
-
-        void EdgeBackgroundIncrementCount(const uint8_t* value, size_t valueStride, size_t width, size_t height,
-            const uint8_t* backgroundValue, size_t backgroundValueStride, uint8_t* backgroundCount, size_t backgroundCountStride);
-
-        void EdgeBackgroundAdjustRange(uint8_t* backgroundCount, size_t backgroundCountStride, size_t width, size_t height,
-            uint8_t* backgroundValue, size_t backgroundValueStride, uint8_t threshold);
-
-        void EdgeBackgroundAdjustRangeMasked(uint8_t* backgroundCount, size_t backgroundCountStride, size_t width, size_t height,
-            uint8_t* backgroundValue, size_t backgroundValueStride, uint8_t threshold, const uint8_t* mask, size_t maskStride);
-
-        void EdgeBackgroundShiftRangeMasked(const uint8_t* value, size_t valueStride, size_t width, size_t height,
-            uint8_t* background, size_t backgroundStride, const uint8_t* mask, size_t maskStride);
-
         void Fill32f(float* dst, size_t size, const float* value);
 
         void FillBgr(uint8_t* dst, size_t stride, size_t width, size_t height, uint8_t blue, uint8_t green, uint8_t red);
@@ -263,6 +230,8 @@ namespace Simd
 
         void GrayToBgra(const uint8_t* gray, size_t width, size_t height, size_t grayStride, uint8_t* bgra, size_t bgraStride, uint8_t alpha);
 
+        void GrayToY(const uint8_t* gray, size_t grayStride, size_t width, size_t height, uint8_t* y, size_t yStride);
+
         void AbsSecondDerivativeHistogram(const uint8_t* src, size_t width, size_t height, size_t stride,
             size_t step, size_t indent, uint32_t* histogram);
 
@@ -280,31 +249,7 @@ namespace Simd
 
         void HogFilterSeparable(const float* src, size_t srcStride, size_t width, size_t height, const float* rowFilter, size_t rowSize, const float* colFilter, size_t colSize, float* dst, size_t dstStride, int add);
 
-        void HogLiteExtractFeatures(const uint8_t * src, size_t srcStride, size_t width, size_t height, size_t cell, float * features, size_t featuresStride);
-
-        void HogLiteFilterFeatures(const float * src, size_t srcStride, size_t srcWidth, size_t srcHeight, size_t featureSize, const float * filter, size_t filterWidth, size_t filterHeight, const uint32_t * mask, size_t maskStride, float * dst, size_t dstStride);
-
-        void HogLiteResizeFeatures(const float * src, size_t srcStride, size_t srcWidth, size_t srcHeight, size_t featureSize, float * dst, size_t dstStride, size_t dstWidth, size_t dstHeight);
-
-        void HogLiteCompressFeatures(const float * src, size_t srcStride, size_t width, size_t height, const float * pca, float * dst, size_t dstStride);
-
-        void HogLiteFilterSeparable(const float * src, size_t srcStride, size_t srcWidth, size_t srcHeight, size_t featureSize, const float * hFilter, size_t hSize, const float * vFilter, size_t vSize, float * dst, size_t dstStride, int add);
-
-        void HogLiteFindMax7x7(const float * a, size_t aStride, const float * b, size_t bStride, size_t height, float * value, size_t * col, size_t * row);
-
-        void HogLiteCreateMask(const float * src, size_t srcStride, size_t srcWidth, size_t srcHeight, const float * threshold, size_t scale, size_t size, uint32_t * dst, size_t dstStride);
-
         void Int16ToGray(const uint8_t* src, size_t width, size_t height, size_t srcStride, uint8_t* dst, size_t dstStride);
-
-        void InterferenceIncrement(uint8_t* statistic, size_t stride, size_t width, size_t height, uint8_t increment, int16_t saturation);
-
-        void InterferenceIncrementMasked(uint8_t* statistic, size_t statisticStride, size_t width, size_t height,
-            uint8_t increment, int16_t saturation, const uint8_t* mask, size_t maskStride, uint8_t index);
-
-        void InterferenceDecrement(uint8_t* statistic, size_t stride, size_t width, size_t height, uint8_t decrement, int16_t saturation);
-
-        void InterferenceDecrementMasked(uint8_t* statistic, size_t statisticStride, size_t width, size_t height,
-            uint8_t decrement, int16_t saturation, const uint8_t* mask, size_t maskStride, uint8_t index);
 
         void InterleaveUv(const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride, size_t width, size_t height, uint8_t* uv, size_t uvStride);
 
@@ -388,12 +333,6 @@ namespace Simd
 
         void NeuralProductSum(const float* a, const float* b, size_t size, float* sum);
 
-        void NeuralRoughSigmoid(const float* src, size_t size, const float* slope, float* dst);
-
-        void NeuralRoughSigmoid2(const float* src, size_t size, const float* slope, float* dst);
-
-        void NeuralRoughTanh(const float* src, size_t size, const float* slope, float* dst);
-
         void NeuralUpdateWeights(const float* x, size_t size, const float* a, const float* b, float* d, float* w);
 
         void OperationBinary8u(const uint8_t* a, size_t aStride, const uint8_t* b, size_t bStride,
@@ -426,9 +365,6 @@ namespace Simd
         void Reorder32bit(const uint8_t* src, size_t size, uint8_t* dst);
 
         void Reorder64bit(const uint8_t* src, size_t size, uint8_t* dst);
-
-        void ResizeBilinear(const uint8_t* src, size_t srcWidth, size_t srcHeight, size_t srcStride,
-            uint8_t* dst, size_t dstWidth, size_t dstHeight, size_t dstStride, size_t channelCount);
 
         void RgbToBgra(const uint8_t* rgb, size_t width, size_t height, size_t rgbStride, uint8_t* bgra, size_t bgraStride, uint8_t alpha);
 
@@ -509,8 +445,6 @@ namespace Simd
         void StretchGray2x2(const uint8_t* src, size_t srcWidth, size_t srcHeight, size_t srcStride,
             uint8_t* dst, size_t dstWidth, size_t dstHeight, size_t dstStride);
 
-        void SvmSumLinear(const float* x, const float* svs, const float* weights, size_t length, size_t count, float* sum);
-
         void SynetAdd8i(const uint8_t* aData, const float* aScale, const float* aShift, const uint8_t* bData, const float* bScale, const float* bShift,
             uint8_t* cData, const float* cScale, const float* cShift, size_t batch, size_t channels, size_t spatial, SimdTensorFormatType format, SimdSynetCompatibilityType compatibility);
 
@@ -559,20 +493,6 @@ namespace Simd
 
         void SynetSetInput(const uint8_t * src, size_t width, size_t height, size_t stride, SimdPixelFormatType srcFormat,
             const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType dstFormat);
-
-        void SynetFusedLayerForward0(const float* src, const float* bias, const float* scale, size_t channels, size_t spatial, float* dst, SimdTensorFormatType format);
-
-        void SynetFusedLayerForward1(const float* src, const float* bias0, const float* scale1, const float* bias1, size_t channels, size_t spatial, float* dst, SimdTensorFormatType format);
-
-        void SynetFusedLayerForward2(const float* src, const float* scale, const float* bias, size_t channels, size_t spatial, const float* slope, float* dst, SimdTensorFormatType format);
-
-        void SynetFusedLayerForward3(const float* src, const float* bias, const float* scale, size_t channels, size_t spatial, float* dst, SimdTensorFormatType format);
-
-        void SynetFusedLayerForward4(const float* src, const float* bias0, const float* scale1, const float* bias1, size_t channels, size_t spatial, float* dst, SimdTensorFormatType format);
-
-        void SynetFusedLayerForward8(const float* src0, const float* src1, const float* src2, size_t channels, size_t spatial, float* dst, SimdTensorFormatType format);
-
-        void SynetFusedLayerForward9(const float* src0, const float* src1, const float* scale, const float* bias, size_t channels0, size_t channels1, size_t spatial, float* dst0, float* dst1, SimdTensorFormatType format);
 
         void SynetGelu32f(const float* src, size_t size, float* dst);
 
@@ -670,62 +590,40 @@ namespace Simd
 
         void WinogradKernel3x3Block4x4SetOutput(const float* src, size_t srcStride, float* dst, size_t dstChannels, size_t dstHeight, size_t dstWidth, SimdBool trans);
 
-        void Yuva420pToBgra(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            const uint8_t* a, size_t aStride, size_t width, size_t height, uint8_t* bgra, size_t bgraStride);
+        void YToGray(const uint8_t* y, size_t yStride, size_t width, size_t height, uint8_t* gray, size_t grayStride);
+
+        void Yuva420pToBgraV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
+            const uint8_t* a, size_t aStride, size_t width, size_t height, uint8_t* bgra, size_t bgraStride, SimdYuvType yuvType);
+
+        void Yuva422pToBgraV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
+            const uint8_t* a, size_t aStride, size_t width, size_t height, uint8_t* bgra, size_t bgraStride, SimdYuvType yuvType);
 
         void Yuva444pToBgraV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             const uint8_t* a, size_t aStride, size_t width, size_t height, uint8_t* bgra, size_t bgraStride, SimdYuvType yuvType);
 
-        void Yuv420pToBgra(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* bgra, size_t bgraStride, uint8_t alpha);
-
         void Yuv420pToBgraV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* bgra, size_t bgraStride, uint8_t alpha, SimdYuvType yuvType);
-
-        void Yuv422pToBgra(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* bgra, size_t bgraStride, uint8_t alpha);
 
         void Yuv422pToBgraV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* bgra, size_t bgraStride, uint8_t alpha, SimdYuvType yuvType);
 
-        void Yuv444pToBgra(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* bgra, size_t bgraStride, uint8_t alpha);
-
         void Yuv444pToBgraV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* bgra, size_t bgraStride, uint8_t alpha, SimdYuvType yuvType);
-
-        void Yuv420pToBgr(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* bgr, size_t bgrStride);
 
         void Yuv420pToBgrV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* bgr, size_t bgrStride, SimdYuvType yuvType);
 
-        void Yuv422pToBgr(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* bgr, size_t bgrStride);
-
         void Yuv422pToBgrV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* bgr, size_t bgrStride, SimdYuvType yuvType);
-
-        void Yuv444pToBgr(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* bgr, size_t bgrStride);
 
         void Yuv444pToBgrV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* bgr, size_t bgrStride, SimdYuvType yuvType);
 
-        void Yuv420pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* rgb, size_t rgbStride);
-
         void Yuv420pToRgbV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* rgb, size_t rgbStride, SimdYuvType yuvType);
 
-        void Yuv422pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* rgb, size_t rgbStride);
-
         void Yuv422pToRgbV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* rgb, size_t rgbStride, SimdYuvType yuvType);
-
-        void Yuv444pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
-            size_t width, size_t height, uint8_t* rgb, size_t rgbStride);
 
         void Yuv444pToRgbV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
             size_t width, size_t height, uint8_t* rgb, size_t rgbStride, SimdYuvType yuvType);

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -609,15 +609,234 @@ namespace Simd
             kernelTM = GemmKernelMx8nn;
             kernelTT = GemmKernelMx8nn;
 #endif
-            GemmNN::PackA packA = NULL;// K*M > 1024 * 1024 ? Avx::GemmPackA : NULL;
+            GemmNN::PackA packA = NULL;// K*M > 1024 * 1024 ? Avx2::GemmPackA : NULL;
             L1 = N > 4096 ? Base::AlgCacheL2() : Base::AlgCacheL1();
             L2 = N > 4096 ? Base::AlgCacheL3() : Base::AlgCacheL2();
             GemmNN gemmNN(M, N, K, microM, microN, L1, L2, Base::AlgCacheL3(), 
-                kernelMM, kernelMT, kernelTM, kernelTT, packA, Avx::GemmPackB, Avx::GemmScaleC, NULL);
+                kernelMM, kernelMT, kernelTM, kernelTT, packA, Avx2::GemmPackB, Avx2::GemmScaleC, NULL);
             gemmNN.Run(alpha, A, lda, B, ldb, beta, C, ldc);
         }
 
-        //---------------------------------------------------------------------
+        SIMD_INLINE void GemmPackA_4x8(const float* src, size_t stride, float* dst)
+        {
+            __m256 s0 = _mm256_loadu_ps(src + 0 * stride);
+            __m256 s1 = _mm256_loadu_ps(src + 1 * stride);
+            __m256 s2 = _mm256_loadu_ps(src + 2 * stride);
+            __m256 s3 = _mm256_loadu_ps(src + 3 * stride);
+            __m256 s00 = _mm256_unpacklo_ps(s0, s2);
+            __m256 s01 = _mm256_unpacklo_ps(s1, s3);
+            __m256 s10 = _mm256_unpackhi_ps(s0, s2);
+            __m256 s11 = _mm256_unpackhi_ps(s1, s3);
+            __m256 d0 = _mm256_unpacklo_ps(s00, s01);
+            __m256 d1 = _mm256_unpackhi_ps(s00, s01);
+            __m256 d2 = _mm256_unpacklo_ps(s10, s11);
+            __m256 d3 = _mm256_unpackhi_ps(s10, s11);
+            _mm256_storeu_ps(dst + 0x00, _mm256_permute2f128_ps(d0, d1, 0x20));
+            _mm256_storeu_ps(dst + 0x08, _mm256_permute2f128_ps(d2, d3, 0x20));
+            _mm256_storeu_ps(dst + 0x10, _mm256_permute2f128_ps(d0, d1, 0x31));
+            _mm256_storeu_ps(dst + 0x18, _mm256_permute2f128_ps(d2, d3, 0x31));
+        }
+
+        SIMD_INLINE void GemmPackA_4x4(const float* src, size_t stride, float* dst)
+        {
+            __m128 s0 = _mm_loadu_ps(src + 0 * stride);
+            __m128 s1 = _mm_loadu_ps(src + 1 * stride);
+            __m128 s2 = _mm_loadu_ps(src + 2 * stride);
+            __m128 s3 = _mm_loadu_ps(src + 3 * stride);
+            __m128 s00 = _mm_unpacklo_ps(s0, s2);
+            __m128 s01 = _mm_unpacklo_ps(s1, s3);
+            __m128 s10 = _mm_unpackhi_ps(s0, s2);
+            __m128 s11 = _mm_unpackhi_ps(s1, s3);
+            _mm_storeu_ps(dst + 0, _mm_unpacklo_ps(s00, s01));
+            _mm_storeu_ps(dst + 4, _mm_unpackhi_ps(s00, s01));
+            _mm_storeu_ps(dst + 8, _mm_unpacklo_ps(s10, s11));
+            _mm_storeu_ps(dst + 12, _mm_unpackhi_ps(s10, s11));
+        }
+
+        SIMD_INLINE void GemmPackA_6x4(const float* src, size_t stride, float* dst)
+        {
+            __m128 s0 = _mm_loadu_ps(src + 0 * stride);
+            __m128 s1 = _mm_loadu_ps(src + 1 * stride);
+            __m128 s2 = _mm_loadu_ps(src + 2 * stride);
+            __m128 s3 = _mm_loadu_ps(src + 3 * stride);
+            __m128 s4 = _mm_loadu_ps(src + 4 * stride);
+            __m128 s5 = _mm_loadu_ps(src + 5 * stride);
+            __m128 s00 = _mm_unpacklo_ps(s0, s2);
+            __m128 s01 = _mm_unpacklo_ps(s1, s3);
+            __m128 s10 = _mm_unpackhi_ps(s0, s2);
+            __m128 s11 = _mm_unpackhi_ps(s1, s3);
+            __m128 s20 = _mm_unpacklo_ps(s4, s5);
+            __m128 s21 = _mm_unpackhi_ps(s4, s5);
+            _mm_storeu_ps(dst + 0, _mm_unpacklo_ps(s00, s01));
+            _mm_storel_pi((__m64*)(dst + 4), s20);
+            _mm_storeu_ps(dst + 6, _mm_unpackhi_ps(s00, s01));
+            _mm_storeh_pi((__m64*)(dst + 10), s20);
+            _mm_storeu_ps(dst + 12, _mm_unpacklo_ps(s10, s11));
+            _mm_storel_pi((__m64*)(dst + 16), s21);
+            _mm_storeu_ps(dst + 18, _mm_unpackhi_ps(s10, s11));
+            _mm_storeh_pi((__m64*)(dst + 22), s21);
+        }
+
+        void GemmPackA(const float* src, size_t stride, size_t M, size_t K, size_t cell, float* dst)
+        {
+            size_t K4 = AlignLo(K, 4), K8 = AlignLo(K, 8);
+            for (size_t i = 0; i < M; i += cell)
+            {
+                size_t m = Simd::Min(cell, M - i), k = 0;
+                if (cell == 4 && m == 4)
+                {
+                    for (; k < K8; k += 8, dst += 32)
+                        GemmPackA_4x8(src + k, stride, dst);
+                    for (; k < K4; k += 4, dst += 16)
+                        GemmPackA_4x4(src + k, stride, dst);
+                }
+                else if (cell == 6 && m == 6)
+                {
+                    for (; k < K4; k += 4, dst += 24)
+                        GemmPackA_6x4(src + k, stride, dst);
+                }
+                for (; k < K; ++k)
+                {
+                    for (size_t c = 0; c < m; ++c)
+                        *(dst++) = src[c * stride + k];
+                }
+                src += cell * stride;
+            }
+        }
+
+        void GemmPackB(const float* B, size_t ldb, size_t K, size_t N, size_t microN, float* pB)
+        {
+            for (size_t j = 0; j < N; j += microN)
+            {
+                size_t n = Simd::Min(microN, N - j);
+                size_t k = 0;
+                if (microN == 1 * F)
+                {
+                    if (n == microN)
+                    {
+                        for (; k < K; ++k)
+                        {
+                            const float* b = B + k * ldb;
+                            _mm256_storeu_ps(pB + 0 * F, _mm256_loadu_ps(b + 0 * F));
+                            pB += microN;
+                        }
+                    }
+                    else
+                    {
+                        __m256 mask0 = LeftNotZero32f(n - 0 * F);
+                        for (; k < K - 1; ++k)
+                        {
+                            const float* b = B + k * ldb;
+                            _mm256_storeu_ps(pB + 0 * F, _mm256_and_ps(mask0, _mm256_loadu_ps(b + 0 * F)));
+                            pB += microN;
+                        }
+                    }
+                }
+                else if (microN == 2 * F)
+                {
+                    if (n == microN)
+                    {
+                        for (; k < K; ++k)
+                        {
+                            const float* b = B + k * ldb;
+                            _mm256_storeu_ps(pB + 0 * F, _mm256_loadu_ps(b + 0 * F));
+                            _mm256_storeu_ps(pB + 1 * F, _mm256_loadu_ps(b + 1 * F));
+                            pB += microN;
+                        }
+                    }
+                    else
+                    {
+                        __m256 mask0 = LeftNotZero32f(n - 0 * F);
+                        __m256 mask1 = LeftNotZero32f(n - 1 * F);
+                        for (; k < K - 1; ++k)
+                        {
+                            const float* b = B + k * ldb;
+                            _mm256_storeu_ps(pB + 0 * F, _mm256_and_ps(mask0, _mm256_loadu_ps(b + 0 * F)));
+                            _mm256_storeu_ps(pB + 1 * F, _mm256_and_ps(mask1, _mm256_loadu_ps(b + 1 * F)));
+                            pB += microN;
+                        }
+                    }
+                }
+                else if (microN == 3 * F)
+                {
+                    if (n == microN)
+                    {
+                        for (; k < K; ++k)
+                        {
+                            const float* b = B + k * ldb;
+                            _mm256_storeu_ps(pB + 0 * F, _mm256_loadu_ps(b + 0 * F));
+                            _mm256_storeu_ps(pB + 1 * F, _mm256_loadu_ps(b + 1 * F));
+                            _mm256_storeu_ps(pB + 2 * F, _mm256_loadu_ps(b + 2 * F));
+                            pB += microN;
+                        }
+                    }
+                    else
+                    {
+                        __m256 mask0 = LeftNotZero32f(n - 0 * F);
+                        __m256 mask1 = LeftNotZero32f(n - 1 * F);
+                        __m256 mask2 = LeftNotZero32f(n - 2 * F);
+                        for (; k < K - 1; ++k)
+                        {
+                            const float* b = B + k * ldb;
+                            _mm256_storeu_ps(pB + 0 * F, _mm256_and_ps(mask0, _mm256_loadu_ps(b + 0 * F)));
+                            _mm256_storeu_ps(pB + 1 * F, _mm256_and_ps(mask1, _mm256_loadu_ps(b + 1 * F)));
+                            _mm256_storeu_ps(pB + 2 * F, _mm256_and_ps(mask2, _mm256_loadu_ps(b + 2 * F)));
+                            pB += microN;
+                        }
+                    }
+                }
+                for (; k < K; ++k)
+                {
+                    const float* b = B + k * ldb;
+                    size_t c = 0;
+                    for (; c < n; ++c)
+                        *(pB++) = *(b++);
+                    for (; c < microN; ++c)
+                        *(pB++) = 0;
+                }
+                B += microN;
+            }
+        }
+
+        SIMD_INLINE void ScaleC(float* C, __m256 beta)
+        {
+            _mm256_storeu_ps(C, _mm256_mul_ps(_mm256_loadu_ps(C), beta));
+        }
+
+        void GemmScaleC(size_t M, size_t N, float beta, float* C, size_t ldc)
+        {
+            if (beta == 1.0f)
+                return;
+            else if (beta == 0.0f)
+            {
+                for (size_t i = 0; i < M; ++i)
+                    memset(C + i * ldc, 0, N * sizeof(float));
+            }
+            else
+            {
+                size_t NQF = AlignLo(N, QF);
+                size_t NF = AlignLo(N, F);
+                __m256 _beta = _mm256_set1_ps(beta);
+                for (size_t i = 0; i < M; ++i)
+                {
+                    size_t j = 0;
+                    for (; j < NQF; j += QF)
+                    {
+                        ScaleC(C + j + F * 0, _beta);
+                        ScaleC(C + j + F * 1, _beta);
+                        ScaleC(C + j + F * 2, _beta);
+                        ScaleC(C + j + F * 3, _beta);
+                    }
+                    for (; j < NF; j += F)
+                        ScaleC(C + j, _beta);
+                    for (; j < N; ++j)
+                        C[j] *= beta;
+                    C += ldc;
+                }
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
 
         typedef Simd::GemmNNcb<float, F, size_t> Gemm32fNNcb;
 
@@ -668,7 +887,7 @@ namespace Simd
             kernelTT = Avx2::GetGemmTail(M%microM, microN);
 #endif
             return Gemm32fNNcb(M, N, K, microM, microN, Base::AlgCacheL1(), Base::AlgCacheL2(), Base::AlgCacheL3(), 
-                kernelMM, kernelMT, kernelTM, kernelTT, Avx::GemmPackA, Avx::GemmPackB, Avx::GemmScaleC, NULL, compatibility);
+                kernelMM, kernelMT, kernelTM, kernelTT, Avx2::GemmPackA, Avx2::GemmPackB, Avx2::GemmScaleC, NULL, compatibility);
         }
 
         size_t Gemm32fNNcbBufferSize(size_t M, size_t N, size_t K, GemmKernelType type, bool compatibility)
@@ -689,7 +908,7 @@ namespace Simd
             gemm.Run(A, K, pB, C, N);
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         SIMD_INLINE __m256 Tail(size_t tail)
         {
@@ -725,7 +944,7 @@ namespace Simd
                 b0 = _mm256_loadu_ps(B0 + k);
                 c00 = _mm256_fmadd_ps(a0, b0, c00);
             }
-            C[0] += alpha * Avx::ExtractSum(c00);
+            C[0] += alpha * ExtractSum(c00);
         }
 
         static SIMD_NOINLINE void Kernel1x4x8nt(size_t K, float alpha, const float * A, size_t lda, const float * B, size_t ldb, float * C, size_t ldc)
@@ -798,8 +1017,8 @@ namespace Simd
                 c00 = _mm256_fmadd_ps(a0, b0, c00);
                 c10 = _mm256_fmadd_ps(a1, b0, c10);
             }
-            C[0 * ldc] += alpha * Avx::ExtractSum(c00);
-            C[1 * ldc] += alpha * Avx::ExtractSum(c10);
+            C[0 * ldc] += alpha * ExtractSum(c00);
+            C[1 * ldc] += alpha * ExtractSum(c10);
         }
 
         static SIMD_NOINLINE void Kernel2x4x8nt(size_t K, float alpha, const float * A, size_t lda, const float * B, size_t ldb, float * C, size_t ldc)
@@ -894,9 +1113,9 @@ namespace Simd
                 c10 = _mm256_fmadd_ps(a1, b0, c10);
                 c20 = _mm256_fmadd_ps(a2, b0, c20);
             }
-            C[0 * ldc] += alpha * Avx::ExtractSum(c00);
-            C[1 * ldc] += alpha * Avx::ExtractSum(c10);
-            C[2 * ldc] += alpha * Avx::ExtractSum(c20);
+            C[0 * ldc] += alpha * ExtractSum(c00);
+            C[1 * ldc] += alpha * ExtractSum(c10);
+            C[2 * ldc] += alpha * ExtractSum(c20);
         }
 
         static SIMD_NOINLINE void Kernel3x4x8nt(size_t K, float alpha, const float * A, size_t lda, const float * B, size_t ldb, float * C, size_t ldc)
@@ -980,10 +1199,10 @@ namespace Simd
 
             typedef Simd::GemmNT<float, F> GemmNT;
 #ifdef SIMD_X64_ENABLE
-            GemmNT gemmNT(M, N, K, Base::AlgCacheL1(), Base::AlgCacheL2(), Base::AlgCacheL3(), Avx::GemmScaleC,
+            GemmNT gemmNT(M, N, K, Base::AlgCacheL1(), Base::AlgCacheL2(), Base::AlgCacheL3(), Avx2::GemmScaleC,
                 Kernel1x1x8nt, Kernel1x4x8nt, Kernel2x1x8nt, Kernel2x4x8nt, Kernel3x1x8nt, Kernel3x4x8nt, NULL, NULL);
 #else
-            GemmNT gemmNT(M, N, K, Base::AlgCacheL1(), Base::AlgCacheL2(), Base::AlgCacheL3(), Sse41::GemmScaleC,
+            GemmNT gemmNT(M, N, K, Base::AlgCacheL1(), Base::AlgCacheL2(), Base::AlgCacheL3(), Avx2::GemmScaleC,
                 Kernel1x1x8nt, Kernel1x4x8nt, NULL, NULL, NULL, NULL, NULL, NULL);
 #endif
             gemmNT.Run(alpha, A, lda, B, ldb, beta, C, ldc);

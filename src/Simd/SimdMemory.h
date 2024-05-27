@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *               2016-2016 Sintegrial Technologies.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -245,25 +245,18 @@ namespace Simd
     }
 #endif// SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
         SIMD_INLINE bool Aligned(size_t size, size_t align = sizeof(__m256))
         {
             return Simd::Aligned(size, align);
         }
 
-        SIMD_INLINE bool Aligned(const void * ptr, size_t align = sizeof(__m256))
+        SIMD_INLINE bool Aligned(const void* ptr, size_t align = sizeof(__m256))
         {
             return Simd::Aligned(ptr, align);
         }
-    }
-#endif// SIMD_AVX_ENABLE
-
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
-        using Avx::Aligned;
     }
 #endif// SIMD_AVX2_ENABLE
 
@@ -295,28 +288,6 @@ namespace Simd
         using Avx512bw::Aligned;
     }
 #endif// SIMD_AVX512BW_ENABLE
-
-#ifdef SIMD_VMX_ENABLE
-    namespace Vmx
-    {
-        SIMD_INLINE bool Aligned(size_t size, size_t align = sizeof(vec_uchar16))
-        {
-            return Simd::Aligned(size, align);
-        }
-
-        SIMD_INLINE bool Aligned(const void * ptr, size_t align = sizeof(vec_uchar16))
-        {
-            return Simd::Aligned(ptr, align);
-        }
-    }
-#endif// SIMD_VMX_ENABLE
-
-#ifdef SIMD_VSX_ENABLE
-    namespace Vsx
-    {
-        using Vmx::Aligned;
-    }
-#endif// SIMD_VSX_ENABLE
 
 #ifdef SIMD_NEON_ENABLE
     namespace Neon

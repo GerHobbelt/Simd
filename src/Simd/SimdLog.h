@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -78,8 +78,8 @@ namespace Simd
     }
 #endif //SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
         SIMD_INLINE void Log(const __m256 & value, const std::string & name)
         {
@@ -87,13 +87,6 @@ namespace Simd
             _mm256_storeu_ps(buffer, value);
             Simd::Log<float>(buffer, F, name);
         }
-    }
-#endif //SIMD_AVX_ENABLE
-
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
-        using Avx::Log;
 
         template<class T> SIMD_INLINE void Log(const __m256i & value, const std::string & name)
         {
@@ -124,66 +117,6 @@ namespace Simd
         }
     }
 #endif
-
-#ifdef SIMD_VMX_ENABLE
-    namespace Vmx
-    {
-        SIMD_INLINE void Log(const v128_u8 & value, const std::string & name)
-        {
-            std::cout << name << " = { ";
-            for (int i = 0; i < 16; i++)
-            {
-                int element = vec_extract(value, i);
-                std::cout << element << " ";
-            }
-            std::cout << "} " << std::endl;
-        }
-
-        SIMD_INLINE void Log(const v128_u16 & value, const std::string & name)
-        {
-            std::cout << name << " = { ";
-            for (int i = 0; i < 8; i++)
-            {
-                int element = vec_extract(value, i);
-                std::cout << element << " ";
-            }
-            std::cout << "} " << std::endl;
-        }
-
-        SIMD_INLINE void Log(const v128_s16 & value, const std::string & name)
-        {
-            std::cout << name << " = { ";
-            for (int i = 0; i < 8; i++)
-            {
-                int element = vec_extract(value, i);
-                std::cout << element << " ";
-            }
-            std::cout << "} " << std::endl;
-        }
-
-        SIMD_INLINE void Log(const v128_u32 & value, const std::string & name)
-        {
-            std::cout << name << " = { ";
-            for (int i = 0; i < 4; i++)
-            {
-                int element = vec_extract(value, i);
-                std::cout << element << " ";
-            }
-            std::cout << "} " << std::endl;
-        }
-
-        SIMD_INLINE void Log(const v128_f32 & value, const std::string & name)
-        {
-            std::cout << name << " = { ";
-            for (int i = 0; i < 4; i++)
-            {
-                float element = vec_extract(value, i);
-                std::cout << element << " ";
-            }
-            std::cout << "} " << std::endl;
-        }
-    }
-#endif//SIMD_VMX_ENABLE
 
 #ifdef SIMD_NEON_ENABLE
     namespace Neon

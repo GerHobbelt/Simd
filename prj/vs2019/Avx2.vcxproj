@@ -22,12 +22,10 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2BFloat16.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgraToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgraToGray.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2BgraToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgraToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToRgb.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Binarization.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Conditional.cpp" />
@@ -39,7 +37,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2DescrIntDec.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2DescrIntEnc.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Detection.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2EdgeBackground.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Fill.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Float16.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Float32.cpp" />
@@ -47,16 +44,15 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2Gemm32f.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2GrayToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2GrayToBgra.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2GrayToY.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Histogram.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Hog.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2HogLite.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ImageLoad.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ImageSave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ImageSaveJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ImageSavePng.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Int16ToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Integral.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2Interference.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Interleave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Laplace.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Lbp.cpp" />
@@ -72,7 +68,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2ReduceGray4x4.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ReduceGray5x5.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Reorder.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2ResizeBilinear.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2Resizer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ResizerArea.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2ResizerBicubic.cpp" />
@@ -127,8 +122,10 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2UyvyToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2UyvyToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2WarpAffine.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToBgr.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToBgra.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2Winograd1.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2Winograd2.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2Winograd3.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2YToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToBgraV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToBgrV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToHue.cpp" />
@@ -164,6 +161,7 @@
     <ClInclude Include="..\..\src\Simd\SimdGather.h" />
     <ClInclude Include="..\..\src\Simd\SimdGaussianBlur.h" />
     <ClInclude Include="..\..\src\Simd\SimdGemm.h" />
+    <ClInclude Include="..\..\src\Simd\SimdGrayToY.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageLoad.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageSave.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageSaveJpeg.h" />
@@ -191,6 +189,7 @@
     <ClInclude Include="..\..\src\Simd\SimdResizerCommon.h" />
     <ClInclude Include="..\..\src\Simd\SimdRuntime.h" />
     <ClInclude Include="..\..\src\Simd\SimdSet.h" />
+    <ClInclude Include="..\..\src\Simd\SimdShuffle.h" />
     <ClInclude Include="..\..\src\Simd\SimdSse41.h" />
     <ClInclude Include="..\..\src\Simd\SimdStore.h" />
     <ClInclude Include="..\..\src\Simd\SimdStream.h" />
@@ -214,6 +213,7 @@
     <ClInclude Include="..\..\src\Simd\SimdView.hpp" />
     <ClInclude Include="..\..\src\Simd\SimdWarpAffine.h" />
     <ClInclude Include="..\..\src\Simd\SimdWarpAffineCommon.h" />
+    <ClInclude Include="..\..\src\Simd\SimdWinograd.h" />
     <ClInclude Include="..\..\src\Simd\SimdYuvToBgr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />

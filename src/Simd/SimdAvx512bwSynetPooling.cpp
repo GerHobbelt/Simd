@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 #include "Simd/SimdStore.h"
 #include "Simd/SimdBase.h"
 #include "Simd/SimdSse41.h"
-#include "Simd/SimdAvx1.h"
 #include "Simd/SimdAvx2.h"
 #include "Simd/SimdAvx512bw.h"
 
@@ -148,7 +147,7 @@ namespace Simd
         {
             if (format == SimdTensorFormatNhwc)
             {
-                if (srcC > Avx::F)
+                if (srcC > Avx2::F)
                 {
                     size_t srcS = srcW * srcC;
                     size_t srcCF1 = AlignLo(srcC, 1 * F);
@@ -212,7 +211,7 @@ namespace Simd
                     return;
                 }
             }
-            Avx::SynetPoolingAverage(src, srcC, srcH, srcW, kernelY, kernelX, strideY, strideX, padY, padX, dst, dstH, dstW, excludePad, format);
+            Avx2::SynetPoolingAverage(src, srcC, srcH, srcW, kernelY, kernelX, strideY, strideX, padY, padX, dst, dstH, dstW, excludePad, format);
         }
 
         //-----------------------------------------------------------------------------------------

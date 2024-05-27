@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -119,11 +119,6 @@ namespace Test
             result = result && TextureBoostedSaturatedGradientAutoTest(FUNC1(Simd::Avx512bw::TextureBoostedSaturatedGradient), FUNC1(SimdTextureBoostedSaturatedGradient));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && TextureBoostedSaturatedGradientAutoTest(FUNC1(Simd::Vmx::TextureBoostedSaturatedGradient), FUNC1(SimdTextureBoostedSaturatedGradient));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && TextureBoostedSaturatedGradientAutoTest(FUNC1(Simd::Neon::TextureBoostedSaturatedGradient), FUNC1(SimdTextureBoostedSaturatedGradient));
@@ -216,11 +211,6 @@ namespace Test
             result = result && TextureBoostedUvAutoTest(FUNC2(Simd::Avx512bw::TextureBoostedUv), FUNC2(SimdTextureBoostedUv));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && TextureBoostedUvAutoTest(FUNC2(Simd::Vmx::TextureBoostedUv), FUNC2(SimdTextureBoostedUv));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && TextureBoostedUvAutoTest(FUNC2(Simd::Neon::TextureBoostedUv), FUNC2(SimdTextureBoostedUv));
@@ -304,11 +294,6 @@ namespace Test
         if (Simd::Avx512bw::Enable)
             result = result && TextureGetDifferenceSumAutoTest(FUNC3(Simd::Avx512bw::TextureGetDifferenceSum), FUNC3(SimdTextureGetDifferenceSum));
 #endif
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && TextureGetDifferenceSumAutoTest(FUNC3(Simd::Vmx::TextureGetDifferenceSum), FUNC3(SimdTextureGetDifferenceSum));
-#endif 
 
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)
@@ -403,11 +388,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && TexturePerformCompensationAutoTest(FUNC4(Simd::Avx512bw::TexturePerformCompensation), FUNC4(SimdTexturePerformCompensation));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && TexturePerformCompensationAutoTest(FUNC4(Simd::Vmx::TexturePerformCompensation), FUNC4(SimdTexturePerformCompensation));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE

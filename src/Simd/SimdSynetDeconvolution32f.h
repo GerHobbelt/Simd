@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -268,41 +268,17 @@ namespace Simd
     }
 #endif
 
-#ifdef SIMD_AVX_ENABLE    
-    namespace Avx
-    {
-        class SynetDeconvolution32fGemmNN : public Sse41::SynetDeconvolution32fGemmNN
-        {
-        public:
-            SynetDeconvolution32fGemmNN(const DeconvParam32f & p);
-            virtual String Ext() const { return "Avx"; }
-
-        protected:
-            virtual void RowToImg(const float* src, float* dst);
-        };
-
-        class SynetDeconvolution32fNhwcDirect2x2 : public Sse41::SynetDeconvolution32fNhwcDirect2x2
-        {
-        public:
-            SynetDeconvolution32fNhwcDirect2x2(const DeconvParam32f & p);
-            virtual String Ext() const { return "Avx"; }
-        };
-
-        void * SynetDeconvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
-    }
-#endif//SIMD_AVX_ENABLE
-
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
     {
-        class SynetDeconvolution32fGemmNN : public Avx::SynetDeconvolution32fGemmNN
+        class SynetDeconvolution32fGemmNN : public Sse41::SynetDeconvolution32fGemmNN
         {
         public:
             SynetDeconvolution32fGemmNN(const DeconvParam32f & p);
             virtual String Ext() const { return "Avx2"; }
         };
 
-        class SynetDeconvolution32fNhwcDirect2x2 : public Avx::SynetDeconvolution32fNhwcDirect2x2
+        class SynetDeconvolution32fNhwcDirect2x2 : public Sse41::SynetDeconvolution32fNhwcDirect2x2
         {
         public:
             SynetDeconvolution32fNhwcDirect2x2(const DeconvParam32f & p);

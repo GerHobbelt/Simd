@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@
 #include "Simd/SimdExtract.h"
 #include "Simd/SimdBase.h"
 #include "Simd/SimdSse41.h"
-#include "Simd/SimdAvx1.h"
 #include "Simd/SimdAvx2.h"
 #include "Simd/SimdArray.h"
 #include "Simd/SimdPow.h"
@@ -97,22 +96,22 @@ namespace Simd
                 buf[1] = Avx2::Gather<3>(src + 1);
                 buf[2] = Avx2::Gather<3>(src + 2);
                 SynetSoftmaxLayerForward31(exp, buf);
-                Avx::Scater<3>(dst + 0, buf[0]);
-                Avx::Scater<3>(dst + 1, buf[1]);
-                Avx::Scater<3>(dst + 2, buf[2]);
+                Scater<3>(dst + 0, buf[0]);
+                Scater<3>(dst + 1, buf[1]);
+                Scater<3>(dst + 2, buf[2]);
                 src += 3 * F;
                 dst += 3 * F;
             }
             if (aligned < outer)
             {
                 size_t tail = outer - aligned;
-                buf[0] = Avx::Gather<3>(src + 0, tail);
-                buf[1] = Avx::Gather<3>(src + 1, tail);
-                buf[2] = Avx::Gather<3>(src + 2, tail);
+                buf[0] = Gather<3>(src + 0, tail);
+                buf[1] = Gather<3>(src + 1, tail);
+                buf[2] = Gather<3>(src + 2, tail);
                 SynetSoftmaxLayerForward31(exp, buf);
-                Avx::Scater<3>(dst + 0, buf[0], tail);
-                Avx::Scater<3>(dst + 1, buf[1], tail);
-                Avx::Scater<3>(dst + 2, buf[2], tail);
+                Scater<3>(dst + 0, buf[0], tail);
+                Scater<3>(dst + 1, buf[1], tail);
+                Scater<3>(dst + 2, buf[2], tail);
             }
         }
 

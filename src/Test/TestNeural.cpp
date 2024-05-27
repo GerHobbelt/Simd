@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -117,14 +117,6 @@ namespace Test
         }
 #endif
 
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-        {
-            result = result && NeuralConvertAutoTest(EPS, FUNC_C1(Simd::Vsx::NeuralConvert, true), FUNC_C1(SimdNeuralConvert, true));
-            result = result && NeuralConvertAutoTest(EPS, FUNC_C1(Simd::Vsx::NeuralConvert, false), FUNC_C1(SimdNeuralConvert, false));
-        }
-#endif
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
         {
@@ -201,11 +193,6 @@ namespace Test
             result = result && NeuralProductSumAutoTest(EPS, FUNC_PS(Simd::Sse41::NeuralProductSum), FUNC_PS(SimdNeuralProductSum));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralProductSumAutoTest(EPS, FUNC_PS(Simd::Avx::NeuralProductSum), FUNC_PS(SimdNeuralProductSum));
-#endif
-
 #ifdef SIMD_AVX2_ENABLE
         if (Simd::Avx2::Enable)
             result = result && NeuralProductSumAutoTest(EPS, FUNC_PS(Simd::Avx2::NeuralProductSum), FUNC_PS(SimdNeuralProductSum));
@@ -214,11 +201,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && NeuralProductSumAutoTest(EPS, FUNC_PS(Simd::Avx512bw::NeuralProductSum), FUNC_PS(SimdNeuralProductSum));
-#endif
-
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-            result = result && NeuralProductSumAutoTest(EPS, FUNC_PS(Simd::Vsx::NeuralProductSum), FUNC_PS(SimdNeuralProductSum));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
@@ -297,11 +279,6 @@ namespace Test
         if (Simd::Sse41::Enable)
             result = result && NeuralAddVectorMultipliedByValueAutoTest(EPS, FUNC_AVMV(Simd::Sse41::NeuralAddVectorMultipliedByValue), FUNC_AVMV(SimdNeuralAddVectorMultipliedByValue));
 #endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralAddVectorMultipliedByValueAutoTest(EPS, FUNC_AVMV(Simd::Avx::NeuralAddVectorMultipliedByValue), FUNC_AVMV(SimdNeuralAddVectorMultipliedByValue));
-#endif
 
 #ifdef SIMD_AVX2_ENABLE
         if (Simd::Avx2::Enable)
@@ -388,9 +365,9 @@ namespace Test
             result = result && NeuralAddVectorAutoTest(EPS, FUNC_ADDVEC(Simd::Sse41::NeuralAddVector), FUNC_ADDVEC(SimdNeuralAddVector));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralAddVectorAutoTest(EPS, FUNC_ADDVEC(Simd::Avx::NeuralAddVector), FUNC_ADDVEC(SimdNeuralAddVector));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralAddVectorAutoTest(EPS, FUNC_ADDVEC(Simd::Avx2::NeuralAddVector), FUNC_ADDVEC(SimdNeuralAddVector));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -472,9 +449,9 @@ namespace Test
             result = result && NeuralAddValueAutoTest(EPS, FUNC_ADDVAL(Simd::Sse41::NeuralAddValue), FUNC_ADDVAL(SimdNeuralAddValue));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralAddValueAutoTest(EPS, FUNC_ADDVAL(Simd::Avx::NeuralAddValue), FUNC_ADDVAL(SimdNeuralAddValue));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralAddValueAutoTest(EPS, FUNC_ADDVAL(Simd::Avx2::NeuralAddValue), FUNC_ADDVAL(SimdNeuralAddValue));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -538,103 +515,6 @@ namespace Test
         const float lo = -10.0f, hi = 10.0f;
         result = result && NeuralActivateFunctionAutoTest(W*H, error, relative, slope, lo, hi, f1, f2);
         result = result && NeuralActivateFunctionAutoTest(W*H + O, error, relative, slope, lo, hi, f1, f2);
-
-        return result;
-    }
-
-    bool NeuralRoughSigmoidAutoTest()
-    {
-        bool result = true;
-
-        result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Base::NeuralRoughSigmoid), FUNC_AF(SimdNeuralRoughSigmoid));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Sse41::NeuralRoughSigmoid), FUNC_AF(SimdNeuralRoughSigmoid));
-#endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx::NeuralRoughSigmoid), FUNC_AF(SimdNeuralRoughSigmoid));
-#endif
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx512bw::NeuralRoughSigmoid), FUNC_AF(SimdNeuralRoughSigmoid));
-#endif
-
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Vsx::NeuralRoughSigmoid), FUNC_AF(SimdNeuralRoughSigmoid));
-#endif
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Neon::NeuralRoughSigmoid), FUNC_AF(SimdNeuralRoughSigmoid));
-#endif
-
-        return result;
-    }
-
-    bool NeuralRoughSigmoid2AutoTest()
-    {
-        bool result = true;
-
-        result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Base::NeuralRoughSigmoid2), FUNC_AF(SimdNeuralRoughSigmoid2));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Sse41::NeuralRoughSigmoid2), FUNC_AF(SimdNeuralRoughSigmoid2));
-#endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx::NeuralRoughSigmoid2), FUNC_AF(SimdNeuralRoughSigmoid2));
-#endif
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx2::NeuralRoughSigmoid2), FUNC_AF(SimdNeuralRoughSigmoid2));
-#endif
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx512bw::NeuralRoughSigmoid2), FUNC_AF(SimdNeuralRoughSigmoid2));
-#endif
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Neon::NeuralRoughSigmoid2), FUNC_AF(SimdNeuralRoughSigmoid2));
-#endif
-
-        return result;
-    }
-
-    bool NeuralRoughTanhAutoTest()
-    {
-        bool result = true;
-
-        result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Base::NeuralRoughTanh), FUNC_AF(SimdNeuralRoughTanh));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Sse41::NeuralRoughTanh), FUNC_AF(SimdNeuralRoughTanh));
-#endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx::NeuralRoughTanh), FUNC_AF(SimdNeuralRoughTanh));
-#endif
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Avx512bw::NeuralRoughTanh), FUNC_AF(SimdNeuralRoughTanh));
-#endif
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && NeuralActivateFunctionAutoTest(EPS, false, 1.1f, FUNC_AF(Simd::Neon::NeuralRoughTanh), FUNC_AF(SimdNeuralRoughTanh));
-#endif
 
         return result;
     }
@@ -750,9 +630,9 @@ namespace Test
             result = result && NeuralActivateDerivativeAutoTest(EPS, true, 3.0f, FUNC_AD(Simd::Sse41::NeuralDerivativeSigmoid), FUNC_AD(SimdNeuralDerivativeSigmoid));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralActivateDerivativeAutoTest(EPS, true, 3.0f, FUNC_AD(Simd::Avx::NeuralDerivativeSigmoid), FUNC_AD(SimdNeuralDerivativeSigmoid));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralActivateDerivativeAutoTest(EPS, true, 3.0f, FUNC_AD(Simd::Avx2::NeuralDerivativeSigmoid), FUNC_AD(SimdNeuralDerivativeSigmoid));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -779,9 +659,9 @@ namespace Test
             result = result && NeuralActivateDerivativeAutoTest(EPS, true, 3.0f, FUNC_AD(Simd::Sse41::NeuralDerivativeTanh), FUNC_AD(SimdNeuralDerivativeTanh));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralActivateDerivativeAutoTest(EPS, true, 3.0f, FUNC_AD(Simd::Avx::NeuralDerivativeTanh), FUNC_AD(SimdNeuralDerivativeTanh));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralActivateDerivativeAutoTest(EPS, true, 3.0f, FUNC_AD(Simd::Avx2::NeuralDerivativeTanh), FUNC_AD(SimdNeuralDerivativeTanh));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -808,9 +688,9 @@ namespace Test
             result = result && NeuralActivateDerivativeAutoTest(EPS, true, 0.5f, FUNC_AD(Simd::Sse41::NeuralDerivativeRelu), FUNC_AD(SimdNeuralDerivativeRelu));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralActivateDerivativeAutoTest(EPS, true, 0.5f, FUNC_AD(Simd::Avx::NeuralDerivativeRelu), FUNC_AD(SimdNeuralDerivativeRelu));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralActivateDerivativeAutoTest(EPS, true, 0.5f, FUNC_AD(Simd::Avx2::NeuralDerivativeRelu), FUNC_AD(SimdNeuralDerivativeRelu));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -900,9 +780,9 @@ namespace Test
             result = result && NeuralUpdateWeightsAutoTest(EPS, false, FUNC_UW(Simd::Sse41::NeuralUpdateWeights), FUNC_UW(SimdNeuralUpdateWeights));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralUpdateWeightsAutoTest(EPS, false, FUNC_UW(Simd::Avx::NeuralUpdateWeights), FUNC_UW(SimdNeuralUpdateWeights));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralUpdateWeightsAutoTest(EPS, false, FUNC_UW(Simd::Avx2::NeuralUpdateWeights), FUNC_UW(SimdNeuralUpdateWeights));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -993,9 +873,9 @@ namespace Test
             result = result && NeuralAdaptiveGradientUpdateAutoTest(EPS, false, FUNC_AGU(Simd::Sse41::NeuralAdaptiveGradientUpdate), FUNC_AGU(SimdNeuralAdaptiveGradientUpdate));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && NeuralAdaptiveGradientUpdateAutoTest(EPS, false, FUNC_AGU(Simd::Avx::NeuralAdaptiveGradientUpdate), FUNC_AGU(SimdNeuralAdaptiveGradientUpdate));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && NeuralAdaptiveGradientUpdateAutoTest(EPS, false, FUNC_AGU(Simd::Avx2::NeuralAdaptiveGradientUpdate), FUNC_AGU(SimdNeuralAdaptiveGradientUpdate));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -1105,9 +985,9 @@ namespace Test
             result = result && NeuralPoolingMaxAutoTest(stride, pooling, pad, EPS, FUNC_M(Simd::Sse41::NeuralPooling2x2Max2x2), FUNC_M(SimdNeuralPooling2x2Max2x2));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable && W >= Simd::Avx::DF)
-            result = result && NeuralPoolingMaxAutoTest(stride, pooling, pad, EPS, FUNC_M(Simd::Avx::NeuralPooling2x2Max2x2), FUNC_M(SimdNeuralPooling2x2Max2x2));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable && W >= Simd::Avx2::DF)
+            result = result && NeuralPoolingMaxAutoTest(stride, pooling, pad, EPS, FUNC_M(Simd::Avx2::NeuralPooling2x2Max2x2), FUNC_M(SimdNeuralPooling2x2Max2x2));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE

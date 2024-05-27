@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ namespace Test
                 ss << "[" << p.srcC << "x" << p.srcH << "x" << p.srcW;
                 ss << "-" << p.kernelY << "x" << p.kernelX;
                 ss << "-" << p.strideX << "-" << Simd::Max(p.padX, p.padY) << "-" << p.excludePad;
-                ss << "-" << (p.format == SimdTensorFormatNhwc ? "1" : "0");
+                ss << "-" << (p.format == SimdTensorFormatNhwc ? "1" : "0") << "]";
                 desc = ss.str();
             }
 
@@ -138,9 +138,15 @@ namespace Test
 
         Size _0(0, 0), _1(1, 1), _2(2, 2), _3(3, 3);
 
+#ifdef NDEBUG
         result = result && SynetPoolingAverageAutoTest(ParamP(10, 238, 132, _2, _2, _0, _0, f, c, e), f1, f2);
         result = result && SynetPoolingAverageAutoTest(ParamP(32, 99, 99, _3, _1, _1, _1, f, c, e), f1, f2);
         result = result && SynetPoolingAverageAutoTest(ParamP(32, 46, 46, _3, _2, _0, _1, f, c, e), f1, f2);
+#else
+        result = result && SynetPoolingAverageAutoTest(ParamP(7, 54, 40, _2, _2, _0, _0, f, c, e), f1, f2);
+        result = result && SynetPoolingAverageAutoTest(ParamP(16, 33, 33, _3, _1, _1, _1, f, c, e), f1, f2);
+        result = result && SynetPoolingAverageAutoTest(ParamP(16, 22, 22, _3, _2, _0, _1, f, c, e), f1, f2);
+#endif
 
         return result;
     }
@@ -168,9 +174,9 @@ namespace Test
             result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Sse41::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Avx::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Avx2::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE

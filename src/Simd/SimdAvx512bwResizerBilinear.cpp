@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -792,11 +792,11 @@ namespace Simd
                         size_t rs6 = AlignLoAny(rs3, 6);
                         for (; dx < rs6; dx += 6)
                         {
-                            __m256 s0 = Avx::Load<false>(ps + _ix[dx + 0] + 0, ps + _ix[dx + 3] + 0);
-                            __m256 s1 = Avx::Load<false>(ps + _ix[dx + 0] + 3, ps + _ix[dx + 3] + 3);
-                            __m256 fx1 = Avx::Load<false>(_ax.data + dx + 0, _ax.data + dx + 3);
+                            __m256 s0 = Avx2::Load<false>(ps + _ix[dx + 0] + 0, ps + _ix[dx + 3] + 0);
+                            __m256 s1 = Avx2::Load<false>(ps + _ix[dx + 0] + 3, ps + _ix[dx + 3] + 3);
+                            __m256 fx1 = Avx2::Load<false>(_ax.data + dx + 0, _ax.data + dx + 3);
                             __m256 fx0 = _mm256_sub_ps(_1, fx1);
-                            Avx::Store<false>(pb + dx + 0, pb + dx + 3, _mm256_fmadd_ps(fx0, s0, _mm256_mul_ps(fx1, s1)));
+                            Avx2::Store<false>(pb + dx + 0, pb + dx + 3, _mm256_fmadd_ps(fx0, s0, _mm256_mul_ps(fx1, s1)));
                         }
                         for (; dx < rs3; dx += 3)
                         {

@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -125,11 +125,6 @@ namespace Test
 #ifdef SIMD_SSE41_ENABLE
         if (Simd::Sse41::Enable)
             result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Sse41::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
-#endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Avx::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
@@ -280,10 +275,13 @@ namespace Test
         SimdSynetCompatibilityType cP = (SimdSynetCompatibilityType)(SimdSynetCompatibility8iPrecise | SimdSynetCompatibilityFmaUse);
         SimdSynetCompatibilityType cN = (SimdSynetCompatibilityType)(SimdSynetCompatibility8iNarrowed | SimdSynetCompatibilityFmaUse);
 
-        result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(2, 3, 30007, s, d, f, cN, 1, 1), f1, f2);
-        result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(1, 255, 1005, s, d, f, cP, 1, 0), f1, f2);
 #ifdef NDEBUG
+        result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(2, 3, 30007, s, d, f, cN, 1, 1), f1, f2);
+        result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(1, 255, 1005, s, d, f, cP, 1, 0), f1, f2);        
         result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(1, 65, 1603, s, d, f, cN, 0, 1), f1, f2);
+#else
+        result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(2, 3, 3007, s, d, f, cN, 1, 1), f1, f2);
+        result = result && SynetScale8iForwardAutoTest(e, Scale8iParam(1, 25, 1005, s, d, f, cP, 1, 0), f1, f2);
 #endif
 
         return result;

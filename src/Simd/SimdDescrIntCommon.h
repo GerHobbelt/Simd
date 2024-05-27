@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -256,7 +256,7 @@ namespace Simd
             bMean = _mm256_unpacklo_ps(aMean, aNorm);
             bNorm = _mm256_unpackhi_ps(aMean, aNorm);
 
-            aNorm = Avx::Load<false>((float*)A[0], (float*)A[1]);
+            aNorm = Load<false>((float*)A[0], (float*)A[1]);
             aScale = Broadcast<0>(aNorm);
             aShift = Broadcast<1>(aNorm);
             aMean = Broadcast<2>(aNorm);
@@ -266,7 +266,7 @@ namespace Simd
             ab = _mm256_fmadd_ps(aMean, bShift, ab);
             ab = _mm256_fmadd_ps(bMean, aShift, ab);
 
-            Avx::Store<false>(distances + 0 * stride, distances + 1 * stride,
+            Store<false>(distances + 0 * stride, distances + 1 * stride,
                 _mm256_min_ps(_mm256_max_ps(_mm256_sub_ps(_mm256_set1_ps(1.0f), _mm256_div_ps(ab, _mm256_mul_ps(aNorm, bNorm))), _mm256_setzero_ps()), _mm256_set1_ps(2.0f)));
         }
 

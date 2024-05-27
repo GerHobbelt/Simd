@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 #include "Simd/SimdSynetConvolution32fCommon.h"
 #include "Simd/SimdSet.h"
 #include "Simd/SimdLoad.h"
-#include "Simd/SimdAvx1.h"
 #include "Simd/SimdAvx2.h"
 #include "Simd/SimdGemm.h"
 #include "Simd/SimdSynet.h"
@@ -36,7 +35,7 @@ namespace Simd
     namespace Avx2
     {
         SynetConvolution32fDirectNhwc::SynetConvolution32fDirectNhwc(const ConvParam32f & p)
-            : Avx::SynetConvolution32fDirectNhwc(p)
+            : Sse41::SynetConvolution32fDirectNhwc(p)
         {
             _convolutionBiasActivation = SetConvolutionBiasActivation();
         }
@@ -991,7 +990,7 @@ namespace Simd
                 case ::SimdConvolutionActivationGelu: func = GetConvolutionBiasActivation<::SimdConvolutionActivationGelu>(p); break;
                 }
             }
-            return func ? func : Avx::SynetConvolution32fDirectNhwc::SetConvolutionBiasActivation();
+            return func ? func : Sse41::SynetConvolution32fDirectNhwc::SetConvolutionBiasActivation();
         };
     }
 #endif//SIMD_AVX2_ENABLE

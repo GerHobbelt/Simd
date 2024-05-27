@@ -155,19 +155,9 @@
     \short Functions for BGR-24 image conversions.
 */
 
-/*! @ingroup bgr_conversion
-    @defgroup bgr_conversion_old Old API 
-    \short Old deprecated functions for BGR-24 image conversions.
-*/
-
 /*! @ingroup conversion
     @defgroup bgra_conversion BGRA-32 
     \short Functions for BGRA-32 image conversions.
-*/
-
-/*! @ingroup bgra_conversion
-    @defgroup bgra_conversion_old Old API 
-    \short Old deprecated functions for BGRA-32 image conversions.
 */
 
 /*! @ingroup conversion
@@ -188,11 +178,6 @@
 /*! @ingroup conversion
     @defgroup yuv_conversion YUV 
     \short Functions for YUV image conversions.
-*/
-
-/*! @ingroup yuv_conversion
-    @defgroup yuv_conversion_old Old API 
-    \short Old deprecated functions for YUV image conversions.
 */
 
 /*! @ingroup conversion
@@ -279,10 +264,6 @@
     @defgroup resizing Resizing
     \short Functions for image resizing.
 */
-/*! @ingroup resizing
-    @defgroup resizing_old Old API 
-    \short Old deprecated functions for image resizing.
-*/
 
 /*! @ingroup functions
     @defgroup shifting Shifting
@@ -360,28 +341,13 @@
 */
 
 /*! @ingroup motion_detection
-    @defgroup interference Interference Detection
-    \short Functions for detection of interference in motion detection algorithm.
-*/
-
-/*! @ingroup motion_detection
     @defgroup background Background Updating
     \short Functions for background updating.
-*/
-
-/*! @ingroup motion_detection
-    @defgroup edge_background Edge Background Updating
-    \short Functions for edge background updating.
 */
 
 /*! @ingroup functions
     @defgroup hog HOG (Histogram of Oriented Gradients)
     \short Functions for extraction and processing of HOG features.
-*/
-
-/*! @ingroup functions
-    @defgroup svm SVM
-    \short Support Vector Machine's functions.
 */
 
 /*! @ingroup functions
@@ -442,11 +408,6 @@
 /*! @ingroup synet
     @defgroup synet_deconvolution_fp32 FP32 deconvolution framework
     \short A framework to accelerate FP32 deconvolution in <a href="http://github.com/ermig1979/Synet">Synet Framework</a>.
-*/
-
-/*! @ingroup synet
-    @defgroup synet_fused FusedLayer functions
-    \short Functions to acceleratе FusedLayer in <a href="http://github.com/ermig1979/Synet">Synet Framework</a>.
 */
 
 /*! @ingroup synet

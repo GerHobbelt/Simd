@@ -27,9 +27,6 @@
     <ProjectReference Include="AmxBf16.vcxproj">
       <Project>{3e68d81a-dbc0-47b4-912b-7c9efce28b6f}</Project>
     </ProjectReference>
-    <ProjectReference Include="Avx1.vcxproj">
-      <Project>{d6e29b9b-ee2d-4339-8417-dcadc283884f}</Project>
-    </ProjectReference>
     <ProjectReference Include="Avx2.vcxproj">
       <Project>{4c82474f-3b9a-4b92-ac74-2434ca1d5064}</Project>
     </ProjectReference>
@@ -53,12 +50,6 @@
     </ProjectReference>
     <ProjectReference Include="Sse41.vcxproj">
       <Project>{50073d4b-e2ef-4fa5-9868-380c4a4dae0c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="Vmx.vcxproj">
-      <Project>{a88b854a-fcf9-484a-bda2-e27f1ec3a0a9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="Vsx.vcxproj">
-      <Project>{e3be9fd8-d69d-4b04-b719-c475d868c5eb}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +79,6 @@
     <ClCompile Include="..\..\src\Test\TestDetection.cpp" />
     <ClCompile Include="..\..\src\Test\TestDifferenceSum.cpp" />
     <ClCompile Include="..\..\src\Test\TestDrawing.cpp" />
-    <ClCompile Include="..\..\src\Test\TestEdgeBackground.cpp" />
     <ClCompile Include="..\..\src\Test\TestFile.cpp" />
     <ClCompile Include="..\..\src\Test\TestFill.cpp" />
     <ClCompile Include="..\..\src\Test\TestFilter.cpp" />
@@ -98,12 +88,10 @@
     <ClCompile Include="..\..\src\Test\TestGemm.cpp" />
     <ClCompile Include="..\..\src\Test\TestHistogram.cpp" />
     <ClCompile Include="..\..\src\Test\TestHog.cpp" />
-    <ClCompile Include="..\..\src\Test\TestHogLite.cpp" />
     <ClCompile Include="..\..\src\Test\TestHtml.cpp" />
     <ClCompile Include="..\..\src\Test\TestImageIO.cpp" />
     <ClCompile Include="..\..\src\Test\TestImageMatcher.cpp" />
     <ClCompile Include="..\..\src\Test\TestIntegral.cpp" />
-    <ClCompile Include="..\..\src\Test\TestInterference.cpp" />
     <ClCompile Include="..\..\src\Test\TestInterleave.cpp" />
     <ClCompile Include="..\..\src\Test\TestLog.cpp" />
     <ClCompile Include="..\..\src\Test\TestMotion.cpp" />
@@ -120,7 +108,6 @@
     <ClCompile Include="..\..\src\Test\TestStatistic.cpp" />
     <ClCompile Include="..\..\src\Test\TestStretchGray.cpp" />
     <ClCompile Include="..\..\src\Test\TestString.cpp" />
-    <ClCompile Include="..\..\src\Test\TestSvm.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynet.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetActivation.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetAdd.cpp" />
@@ -128,7 +115,6 @@
     <ClCompile Include="..\..\src\Test\TestSynetConvolution32f.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetConvolution8i.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetDeconvolution32f.cpp" />
-    <ClCompile Include="..\..\src\Test\TestSynetFused.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetGridSample.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetInnerProduct.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetMergedConvolution32f.cpp" />

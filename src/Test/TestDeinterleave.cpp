@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -103,11 +103,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && DeinterleaveUvAutoTest(FUNC2(Simd::Avx512bw::DeinterleaveUv), FUNC2(SimdDeinterleaveUv));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && DeinterleaveUvAutoTest(FUNC2(Simd::Vmx::DeinterleaveUv), FUNC2(SimdDeinterleaveUv));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE

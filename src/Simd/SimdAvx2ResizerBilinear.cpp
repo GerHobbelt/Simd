@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "Simd/SimdStore.h"
 #include "Simd/SimdSet.h"
 #include "Simd/SimdUpdate.h"
+#include "Simd/SimdEnable.h"
 
 namespace Simd
 {
@@ -367,6 +368,18 @@ namespace Simd
             return _mm256_add_ps(m0, m1);
         }
 
+        SIMD_INLINE __m256 BilColS1NoGather(const uint16_t* src, const int32_t* idx, __m256 fx0, __m256 fx1)
+        {
+            __m256i s = _mm256_setr_epi32(
+                *(uint32_t*)(src + idx[0]), *(uint32_t*)(src + idx[1]),
+                *(uint32_t*)(src + idx[2]), *(uint32_t*)(src + idx[3]),
+                *(uint32_t*)(src + idx[4]), *(uint32_t*)(src + idx[5]),
+                *(uint32_t*)(src + idx[6]), *(uint32_t*)(src + idx[7]));
+            __m256 m0 = _mm256_mul_ps(fx0, _mm256_cvtepi32_ps(_mm256_shuffle_epi8(s, RSB_1_0)));
+            __m256 m1 = _mm256_mul_ps(fx1, _mm256_cvtepi32_ps(_mm256_shuffle_epi8(s, RSB_1_1)));
+            return _mm256_add_ps(m0, m1);
+        }
+
         const __m256i RSB_2_0 = SIMD_MM256_SETR_EPI8(
             0x0, 0x1, -1, -1, 0x2, 0x3, -1, -1, 0x8, 0x9, -1, -1, 0xA, 0xB, -1, -1,
             0x0, 0x1, -1, -1, 0x2, 0x3, -1, -1, 0x8, 0x9, -1, -1, 0xA, 0xB, -1, -1);
@@ -451,11 +464,23 @@ namespace Simd
                     size_t dx = 0;
                     if (N == 1)
                     {
-                        for (; dx < rs8; dx += 8)
+                        if (Avx2::SlowGather)
                         {
-                            __m256 fx1 = _mm256_loadu_ps(_ax.data + dx);
-                            __m256 fx0 = _mm256_sub_ps(_1, fx1);
-                            _mm256_storeu_ps(pb + dx, BilColS1(ps, _ix.data + dx, fx0, fx1));
+                            for (; dx < rs8; dx += 8)
+                            {
+                                __m256 fx1 = _mm256_loadu_ps(_ax.data + dx);
+                                __m256 fx0 = _mm256_sub_ps(_1, fx1);
+                                _mm256_storeu_ps(pb + dx, BilColS1NoGather(ps, _ix.data + dx, fx0, fx1));
+                            }
+                        }
+                        else
+                        {
+                            for (; dx < rs8; dx += 8)
+                            {
+                                __m256 fx1 = _mm256_loadu_ps(_ax.data + dx);
+                                __m256 fx0 = _mm256_sub_ps(_1, fx1);
+                                _mm256_storeu_ps(pb + dx, BilColS1(ps, _ix.data + dx, fx0, fx1));
+                            }
                         }
                         for (; dx < rs4; dx += 4)
                         {
@@ -483,7 +508,7 @@ namespace Simd
                     {
                         for (; dx < rs6; dx += 6)
                         {
-                            __m256 fx1 = Avx::Load<false>(_ax.data + dx, _ax.data + dx + 3);
+                            __m256 fx1 = Load<false>(_ax.data + dx, _ax.data + dx + 3);
                             __m256 fx0 = _mm256_sub_ps(_1, fx1);
                             _mm256_storeu_ps(pb + dx, BilColS3(ps, _ix.data + dx, fx0, fx1));
                         }
@@ -578,29 +603,58 @@ namespace Simd
                 __m256 _fy1 = _mm256_set1_ps(fy1);
                 if (N == 1)
                 {
-                    for (; dx < rs16; dx += 16)
+                    if (Avx2::SlowGather)
                     {
-                        __m256 fx01 = _mm256_loadu_ps(_ax.data + dx + 0);
-                        __m256 fx00 = _mm256_sub_ps(_1, fx01);
-                        __m256 m00 = _mm256_mul_ps(BilColS1(ps0, _ix.data + dx + 0, fx00, fx01), _fy0);
-                        __m256 m01 = _mm256_mul_ps(BilColS1(ps1, _ix.data + dx + 0, fx00, fx01), _fy1);
-                        __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m00, m01));
-                        __m256 fx11 = _mm256_loadu_ps(_ax.data + dx + 8);
-                        __m256 fx10 = _mm256_sub_ps(_1, fx11);
-                        __m256 m10 = _mm256_mul_ps(BilColS1(ps0, _ix.data + dx + 8, fx10, fx11), _fy0);
-                        __m256 m11 = _mm256_mul_ps(BilColS1(ps1, _ix.data + dx + 8, fx10, fx11), _fy1);
-                        __m256i i1 = _mm256_cvttps_epi32(_mm256_add_ps(m10, m11));
-                        _mm256_storeu_si256((__m256i*)(dst + dx), PackU32ToI16(i0, i1));
+                        for (; dx < rs16; dx += 16)
+                        {
+                            __m256 fx01 = _mm256_loadu_ps(_ax.data + dx + 0);
+                            __m256 fx00 = _mm256_sub_ps(_1, fx01);
+                            __m256 m00 = _mm256_mul_ps(BilColS1NoGather(ps0, _ix.data + dx + 0, fx00, fx01), _fy0);
+                            __m256 m01 = _mm256_mul_ps(BilColS1NoGather(ps1, _ix.data + dx + 0, fx00, fx01), _fy1);
+                            __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m00, m01));
+                            __m256 fx11 = _mm256_loadu_ps(_ax.data + dx + 8);
+                            __m256 fx10 = _mm256_sub_ps(_1, fx11);
+                            __m256 m10 = _mm256_mul_ps(BilColS1NoGather(ps0, _ix.data + dx + 8, fx10, fx11), _fy0);
+                            __m256 m11 = _mm256_mul_ps(BilColS1NoGather(ps1, _ix.data + dx + 8, fx10, fx11), _fy1);
+                            __m256i i1 = _mm256_cvttps_epi32(_mm256_add_ps(m10, m11));
+                            _mm256_storeu_si256((__m256i*)(dst + dx), PackU32ToI16(i0, i1));
+                        }
+                        for (; dx < rs8; dx += 8)
+                        {
+                            __m256 fx1 = _mm256_loadu_ps(_ax.data + dx);
+                            __m256 fx0 = _mm256_sub_ps(_1, fx1);
+                            __m256 m0 = _mm256_mul_ps(BilColS1NoGather(ps0, _ix.data + dx, fx0, fx1), _fy0);
+                            __m256 m1 = _mm256_mul_ps(BilColS1NoGather(ps1, _ix.data + dx, fx0, fx1), _fy1);
+                            __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m0, m1));
+                            _mm_storeu_si128((__m128i*)(dst + dx), _mm256_castsi256_si128(PackU32ToI16(i0, K_ZERO)));
+                        }
                     }
-                    for (; dx < rs8; dx += 8)
+                    else
                     {
-                        __m256 fx1 = _mm256_loadu_ps(_ax.data + dx);
-                        __m256 fx0 = _mm256_sub_ps(_1, fx1);
-                        __m256 m0 = _mm256_mul_ps(BilColS1(ps0, _ix.data + dx, fx0, fx1), _fy0);
-                        __m256 m1 = _mm256_mul_ps(BilColS1(ps1, _ix.data + dx, fx0, fx1), _fy1);
-                        __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m0, m1));
-                        _mm_storeu_si128((__m128i*)(dst + dx), _mm256_castsi256_si128(PackU32ToI16(i0, K_ZERO)));
-                    }                    
+                        for (; dx < rs16; dx += 16)
+                        {
+                            __m256 fx01 = _mm256_loadu_ps(_ax.data + dx + 0);
+                            __m256 fx00 = _mm256_sub_ps(_1, fx01);
+                            __m256 m00 = _mm256_mul_ps(BilColS1(ps0, _ix.data + dx + 0, fx00, fx01), _fy0);
+                            __m256 m01 = _mm256_mul_ps(BilColS1(ps1, _ix.data + dx + 0, fx00, fx01), _fy1);
+                            __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m00, m01));
+                            __m256 fx11 = _mm256_loadu_ps(_ax.data + dx + 8);
+                            __m256 fx10 = _mm256_sub_ps(_1, fx11);
+                            __m256 m10 = _mm256_mul_ps(BilColS1(ps0, _ix.data + dx + 8, fx10, fx11), _fy0);
+                            __m256 m11 = _mm256_mul_ps(BilColS1(ps1, _ix.data + dx + 8, fx10, fx11), _fy1);
+                            __m256i i1 = _mm256_cvttps_epi32(_mm256_add_ps(m10, m11));
+                            _mm256_storeu_si256((__m256i*)(dst + dx), PackU32ToI16(i0, i1));
+                        }
+                        for (; dx < rs8; dx += 8)
+                        {
+                            __m256 fx1 = _mm256_loadu_ps(_ax.data + dx);
+                            __m256 fx0 = _mm256_sub_ps(_1, fx1);
+                            __m256 m0 = _mm256_mul_ps(BilColS1(ps0, _ix.data + dx, fx0, fx1), _fy0);
+                            __m256 m1 = _mm256_mul_ps(BilColS1(ps1, _ix.data + dx, fx0, fx1), _fy1);
+                            __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m0, m1));
+                            _mm_storeu_si128((__m128i*)(dst + dx), _mm256_castsi256_si128(PackU32ToI16(i0, K_ZERO)));
+                        }
+                    }
                     for (; dx < rs4; dx += 4)
                     {
                         __m128 fx1 = _mm_loadu_ps(_ax.data + dx);
@@ -650,12 +704,12 @@ namespace Simd
                 {
                     for (; dx < rs12; dx += 12)
                     {
-                        __m256 fx01 = Avx::Load<false>(_ax.data + dx + 0, _ax.data + dx + 3);
+                        __m256 fx01 = Load<false>(_ax.data + dx + 0, _ax.data + dx + 3);
                         __m256 fx00 = _mm256_sub_ps(_1, fx01);
                         __m256 m00 = _mm256_mul_ps(BilColS3(ps0, _ix.data + dx, fx00, fx01), _fy0);
                         __m256 m01 = _mm256_mul_ps(BilColS3(ps1, _ix.data + dx, fx00, fx01), _fy1);
                         __m256i i0 = _mm256_cvttps_epi32(_mm256_add_ps(m00, m01));
-                        __m256 fx11 = Avx::Load<false>(_ax.data + dx + 6, _ax.data + dx + 9);
+                        __m256 fx11 = Load<false>(_ax.data + dx + 6, _ax.data + dx + 9);
                         __m256 fx10 = _mm256_sub_ps(_1, fx11);
                         __m256 m10 = _mm256_mul_ps(BilColS3(ps0, _ix.data + dx + 6, fx10, fx11), _fy0);
                         __m256 m11 = _mm256_mul_ps(BilColS3(ps1, _ix.data + dx + 6, fx10, fx11), _fy1);
@@ -664,7 +718,7 @@ namespace Simd
                     }
                     for (; dx < rs6; dx += 6)
                     {
-                        __m256 fx1 = Avx::Load<false>(_ax.data + dx, _ax.data + dx + 3);
+                        __m256 fx1 = Load<false>(_ax.data + dx, _ax.data + dx + 3);
                         __m256 fx0 = _mm256_sub_ps(_1, fx1);
                         __m256 m0 = _mm256_mul_ps(BilColS3(ps0, _ix.data + dx, fx0, fx1), _fy0);
                         __m256 m1 = _mm256_mul_ps(BilColS3(ps1, _ix.data + dx, fx0, fx1), _fy1);
@@ -745,7 +799,7 @@ namespace Simd
         //---------------------------------------------------------------------
 
         ResizerFloatBilinear::ResizerFloatBilinear(const ResParam & param)
-            : Base::ResizerFloatBilinear(param)
+            : Sse41::ResizerFloatBilinear(param)
         {
         }
 
@@ -755,7 +809,7 @@ namespace Simd
             size_t rs = _param.dstW * cn;
             float * pbx[2] = { _bx[0].data, _bx[1].data };
             int32_t prev = -2;
-            size_t rsa = AlignLo(rs, Avx::F);
+            size_t rsa = AlignLo(rs, F);
             size_t rsh = AlignLo(rs, Sse41::F);
             for (size_t dy = 0; dy < _param.dstH; dy++, dst += dstStride)
             {
@@ -782,16 +836,32 @@ namespace Simd
                     if (cn == 1)
                     {
                         __m256 _1 = _mm256_set1_ps(1.0f);
-                        for (; dx < rsa; dx += Avx::F)
+                        if (Avx2::SlowGather)
                         {
-                            __m256i idx = Avx2::LoadPermuted<true>((__m256i*)(_ix.data + dx));
-                            __m256 s0145 = _mm256_castpd_ps(_mm256_i32gather_pd((double*)ps, _mm256_extracti128_si256(idx, 0), 4));
-                            __m256 s2367 = _mm256_castpd_ps(_mm256_i32gather_pd((double*)ps, _mm256_extracti128_si256(idx, 1), 4));
-                            __m256 fx1 = _mm256_load_ps(_ax.data + dx);
-                            __m256 fx0 = _mm256_sub_ps(_1, fx1);
-                            __m256 s0 = _mm256_shuffle_ps(s0145, s2367, 0x88);
-                            __m256 s1 = _mm256_shuffle_ps(s0145, s2367, 0xDD);
-                            _mm256_store_ps(pb + dx, _mm256_fmadd_ps(s0, fx0, _mm256_mul_ps(s1, fx1)));
+                            for (; dx < rsa; dx += F)
+                            {
+                                __m256 s0145 = Load(ps + _ix[dx + 0], ps + _ix[dx + 1], ps + _ix[dx + 4], ps + _ix[dx + 5]);
+                                __m256 s2367 = Load(ps + _ix[dx + 2], ps + _ix[dx + 3], ps + _ix[dx + 6], ps + _ix[dx + 7]);
+                                __m256 fx1 = _mm256_load_ps(_ax.data + dx);
+                                __m256 fx0 = _mm256_sub_ps(_1, fx1);
+                                __m256 m0 = _mm256_mul_ps(fx0, _mm256_shuffle_ps(s0145, s2367, 0x88));
+                                __m256 m1 = _mm256_mul_ps(fx1, _mm256_shuffle_ps(s0145, s2367, 0xDD));
+                                _mm256_store_ps(pb + dx, _mm256_add_ps(m0, m1));
+                            }
+                        }
+                        else
+                        {
+                            for (; dx < rsa; dx += F)
+                            {
+                                __m256i idx = Avx2::LoadPermuted<true>((__m256i*)(_ix.data + dx));
+                                __m256 s0145 = _mm256_castpd_ps(_mm256_i32gather_pd((double*)ps, _mm256_extracti128_si256(idx, 0), 4));
+                                __m256 s2367 = _mm256_castpd_ps(_mm256_i32gather_pd((double*)ps, _mm256_extracti128_si256(idx, 1), 4));
+                                __m256 fx1 = _mm256_load_ps(_ax.data + dx);
+                                __m256 fx0 = _mm256_sub_ps(_1, fx1);
+                                __m256 s0 = _mm256_shuffle_ps(s0145, s2367, 0x88);
+                                __m256 s1 = _mm256_shuffle_ps(s0145, s2367, 0xDD);
+                                _mm256_store_ps(pb + dx, _mm256_fmadd_ps(s0, fx0, _mm256_mul_ps(s1, fx1)));
+                            }
                         }
                         for (; dx < rsh; dx += Sse41::F)
                         {
@@ -811,11 +881,11 @@ namespace Simd
                         size_t rs6 = AlignLoAny(rs3, 6);
                         for (; dx < rs6; dx += 6)
                         {
-                            __m256 s0 = Avx::Load<false>(ps + _ix[dx + 0] + 0, ps + _ix[dx + 3] + 0);
-                            __m256 s1 = Avx::Load<false>(ps + _ix[dx + 0] + 3, ps + _ix[dx + 3] + 3);
-                            __m256 fx1 = Avx::Load<false>(_ax.data + dx + 0, _ax.data + dx + 3);
+                            __m256 s0 = Load<false>(ps + _ix[dx + 0] + 0, ps + _ix[dx + 3] + 0);
+                            __m256 s1 = Load<false>(ps + _ix[dx + 0] + 3, ps + _ix[dx + 3] + 3);
+                            __m256 fx1 = Load<false>(_ax.data + dx + 0, _ax.data + dx + 3);
                             __m256 fx0 = _mm256_sub_ps(_1, fx1);
-                            Avx::Store<false>(pb + dx + 0, pb + dx + 3, _mm256_fmadd_ps(fx0, s0, _mm256_mul_ps(fx1, s1)));
+                            Store<false>(pb + dx + 0, pb + dx + 3, _mm256_fmadd_ps(fx0, s0, _mm256_mul_ps(fx1, s1)));
                         }
                         for (; dx < rs3; dx += 3)
                         {
@@ -826,11 +896,11 @@ namespace Simd
                             _mm_storeu_ps(pb + dx, _mm_add_ps(_mm_mul_ps(fx0, s0), _mm_mul_ps(fx1, s1)));
                         }
                     }
-                    else
+                    else if (Avx2::SlowGather)
                     {
                         __m256 _1 = _mm256_set1_ps(1.0f);
                         __m256i _cn = _mm256_set1_epi32((int)cn);
-                        for (; dx < rsa; dx += Avx::F)
+                        for (; dx < rsa; dx += F)
                         {
                             __m256i i0 = _mm256_load_si256((__m256i*)(_ix.data + dx));
                             __m256i i1 = _mm256_add_epi32(i0, _cn);
@@ -852,7 +922,7 @@ namespace Simd
                 size_t dx = 0;
                 __m256 _fy0 = _mm256_set1_ps(fy0);
                 __m256 _fy1 = _mm256_set1_ps(fy1);
-                for (; dx < rsa; dx += Avx::F)
+                for (; dx < rsa; dx += F)
                 {
                     __m256 b0 = _mm256_load_ps(pbx[0] + dx);
                     __m256 b1 = _mm256_load_ps(pbx[1] + dx);

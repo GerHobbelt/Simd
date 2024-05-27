@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Simd
 #if defined(SIMD_SYNET_ENABLE)
 
 #if defined(SIMD_PERFORMANCE_STATISTIC) && (defined(NDEBUG) || defined(SIMD_PERF_STAT_IN_DEBUG))
-    Base::PerformanceMeasurer * SynetInnerProduct32f::Perf(const String& func)
+    Base::PerformanceMeasurer * SynetInnerProduct32f::Perf(const char* func)
     {
         if (_perf == NULL)
             _perf = Simd::Base::PerformanceMeasurerStorage::s_storage.Get(func, Param().Info() + " " + Desc(), Param().Flop());

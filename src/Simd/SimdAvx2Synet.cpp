@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@
 #include "Simd/SimdExtract.h"
 #include "Simd/SimdBase.h"
 #include "Simd/SimdSse41.h"
-#include "Simd/SimdAvx1.h"
 #include "Simd/SimdAvx2.h"
 #include "Simd/SimdArray.h"
 #include "Simd/SimdPow.h"
@@ -39,22 +38,86 @@ namespace Simd
 #if defined(SIMD_AVX2_ENABLE) && defined(SIMD_SYNET_ENABLE)    
     namespace Avx2
     {
-        template <bool align> void SynetEltwiseLayerForwardSum(const float * src0, const __m256 & weight0, const float * src1, const __m256 & weight1, float * dst, size_t offset)
+        template <SimdSynetEltwiseOperationType type> __m256 SynetEltwiseLayerForward(__m256 src0, __m256 src1);
+
+        template <> SIMD_INLINE __m256 SynetEltwiseLayerForward<SimdSynetEltwiseOperationProduct>(__m256 src0, __m256 src1)
         {
-            Avx::Store<align>(dst + offset, _mm256_fmadd_ps(Avx::Load<align>(src0 + offset), weight0, _mm256_mul_ps(Avx::Load<align>(src1 + offset), weight1)));
+            return _mm256_mul_ps(src0, src1);
         }
 
-        template <bool align> void SynetEltwiseLayerForwardSum(const float * src, const __m256 & weight, float * dst, size_t offset)
+        template <> SIMD_INLINE __m256 SynetEltwiseLayerForward<SimdSynetEltwiseOperationMax>(__m256 src0, __m256 src1)
         {
-            Avx::Store<align>(dst + offset, _mm256_fmadd_ps(Avx::Load<align>(src + offset), weight, Load<align>(dst + offset)));
+            return _mm256_max_ps(src0, src1);
         }
 
-        template <bool align> void SynetEltwiseLayerForwardSum(float const * const * src, const float * weight, size_t count, size_t size, float * dst)
+        template <> SIMD_INLINE __m256 SynetEltwiseLayerForward<SimdSynetEltwiseOperationMin>(__m256 src0, __m256 src1)
+        {
+            return _mm256_min_ps(src0, src1);
+        }
+
+        template <SimdSynetEltwiseOperationType type, bool align> SIMD_INLINE void SynetEltwiseLayerForward(const float* src0, const float* src1, float* dst, size_t offset)
+        {
+            Store<align>(dst + offset, SynetEltwiseLayerForward<type>(Load<align>(src0 + offset), Load<align>(src1 + offset)));
+        }
+
+        template <SimdSynetEltwiseOperationType type, bool align> void SynetEltwiseLayerForward(float const* const* src, size_t count, size_t size, float* dst)
         {
             size_t aligned = AlignLo(size, QF);
             size_t partial = AlignLo(size, F);
-            const float * src0 = src[0];
-            const float * src1 = src[1];
+            const float* src0 = src[0];
+            const float* src1 = src[1];
+            size_t j = 0;
+            if (partial)
+            {
+                for (; j < aligned; j += QF)
+                {
+                    SynetEltwiseLayerForward<type, align>(src0, src1, dst, j + F * 0);
+                    SynetEltwiseLayerForward<type, align>(src0, src1, dst, j + F * 1);
+                    SynetEltwiseLayerForward<type, align>(src0, src1, dst, j + F * 2);
+                    SynetEltwiseLayerForward<type, align>(src0, src1, dst, j + F * 3);
+                }
+                for (; j < partial; j += F)
+                    SynetEltwiseLayerForward<type, align>(src0, src1, dst, j);
+            }
+            for (; j < size; ++j)
+                dst[j] = Base::SynetEltwiseLayerForward<type>(src0[j], src1[j]);
+            for (size_t i = 2; i < count; ++i)
+            {
+                const float* srci = src[i];
+                size_t j = 0;
+                if (partial)
+                {
+                    for (; j < aligned; j += QF)
+                    {
+                        SynetEltwiseLayerForward<type, align>(dst, srci, dst, j + F * 0);
+                        SynetEltwiseLayerForward<type, align>(dst, srci, dst, j + F * 1);
+                        SynetEltwiseLayerForward<type, align>(dst, srci, dst, j + F * 2);
+                        SynetEltwiseLayerForward<type, align>(dst, srci, dst, j + F * 3);
+                    }
+                    for (; j < partial; j += F)
+                        SynetEltwiseLayerForward<type, align>(dst, srci, dst, j);
+                }
+                for (; j < size; ++j)
+                    dst[j] = Base::SynetEltwiseLayerForward<type>(dst[j], srci[j]);
+            }
+        }
+
+        template <bool align> void SynetEltwiseLayerForwardSum(const float* src0, const __m256& weight0, const float* src1, const __m256& weight1, float* dst, size_t offset)
+        {
+            Store<align>(dst + offset, _mm256_fmadd_ps(Load<align>(src0 + offset), weight0, _mm256_mul_ps(Load<align>(src1 + offset), weight1)));
+        }
+
+        template <bool align> void SynetEltwiseLayerForwardSum(const float* src, const __m256& weight, float* dst, size_t offset)
+        {
+            Store<align>(dst + offset, _mm256_fmadd_ps(Load<align>(src + offset), weight, Load<align>(dst + offset)));
+        }
+
+        template <bool align> void SynetEltwiseLayerForwardSum(float const* const* src, const float* weight, size_t count, size_t size, float* dst)
+        {
+            size_t aligned = AlignLo(size, QF);
+            size_t partial = AlignLo(size, F);
+            const float* src0 = src[0];
+            const float* src1 = src[1];
             __m256 weight0 = _mm256_set1_ps(weight[0]);
             __m256 weight1 = _mm256_set1_ps(weight[1]);
             size_t j = 0;
@@ -74,7 +137,7 @@ namespace Simd
                 dst[j] = src0[j] * weight[0] + src1[j] * weight[1];
             for (size_t i = 2; i < count; ++i)
             {
-                const float * srci = src[i];
+                const float* srci = src[i];
                 __m256 weighti = _mm256_set1_ps(weight[i]);
                 size_t j = 0;
                 if (partial)
@@ -94,22 +157,40 @@ namespace Simd
             }
         }
 
-        void SynetEltwiseLayerForward(float const * const * src, const float * weight, size_t count, size_t size, SimdSynetEltwiseOperationType type, float * dst)
+        template <bool align> void SynetEltwiseLayerForward(float const* const* src, const float* weight, size_t count, size_t size, SimdSynetEltwiseOperationType type, float* dst)
         {
-            if (type != SimdSynetEltwiseOperationSum)
+            switch (type)
             {
-                Avx::SynetEltwiseLayerForward(src, weight, count, size, type, dst);
-                return;
+            case SimdSynetEltwiseOperationProduct:
+                SynetEltwiseLayerForward<SimdSynetEltwiseOperationProduct, align>(src, count, size, dst);
+                break;
+            case SimdSynetEltwiseOperationSum:
+                SynetEltwiseLayerForwardSum<align>(src, weight, count, size, dst);
+                break;
+            case SimdSynetEltwiseOperationMax:
+                SynetEltwiseLayerForward<SimdSynetEltwiseOperationMax, align>(src, count, size, dst);
+                break;
+            case SimdSynetEltwiseOperationMin:
+                SynetEltwiseLayerForward<SimdSynetEltwiseOperationMin, align>(src, count, size, dst);
+                break;
+            default:
+                assert(0);
             }
+        }
+
+        void SynetEltwiseLayerForward(float const* const* src, const float* weight, size_t count, size_t size, SimdSynetEltwiseOperationType type, float* dst)
+        {
             assert(count >= 2);
             bool aligned = Aligned(dst) && Aligned(src[0]) && Aligned(src[1]);
             for (size_t i = 2; i < count; ++i)
                 aligned = aligned && Aligned(src[i]);
             if (aligned)
-                SynetEltwiseLayerForwardSum<true>(src, weight, count, size, dst);
+                SynetEltwiseLayerForward<true>(src, weight, count, size, type, dst);
             else
-                SynetEltwiseLayerForwardSum<false>(src, weight, count, size, dst);
+                SynetEltwiseLayerForward<false>(src, weight, count, size, type, dst);
         }
+
+        //-------------------------------------------------------------------------------------------------
 
         SIMD_INLINE __m256 Tail(size_t tail)
         {
@@ -162,7 +243,7 @@ namespace Simd
                 w0 = _mm256_and_ps(tail, _mm256_loadu_ps(W0 + k));
                 d00 = _mm256_fmadd_ps(s0, w0, d00);
             }
-            D[0] = Avx::ExtractSum(d00) + B[0];
+            D[0] = ExtractSum(d00) + B[0];
         }
 
         void SynetInnerProductLayerForward4(const float * S0, const float * W, const float * B, size_t K, float * D)
@@ -238,7 +319,7 @@ namespace Simd
                 w0 = _mm256_and_ps(tail, _mm256_loadu_ps(W3 + k + 0 * F));
                 d30 = _mm256_fmadd_ps(s0, w0, d30);
             }
-            _mm_storeu_ps(D, _mm_add_ps(Avx::Extract4Sums(d00, d10, d20, d30), _mm_loadu_ps(B)));
+            _mm_storeu_ps(D, _mm_add_ps(Extract4Sums(d00, d10, d20, d30), _mm_loadu_ps(B)));
         }
 
         void SynetInnerProductLayerForward(const float * src, const float * weight, const float * bias, size_t count, size_t size, float * dst)
@@ -470,20 +551,20 @@ namespace Simd
 
         SIMD_INLINE __m256 NoseSquareSum(const float * src)
         {
-            return _mm256_add_ps(_mm256_add_ps(Avx::Square(LoadAtEdge<-2>(src)), Avx::Square(LoadAtEdge<-1>(src))),
-                _mm256_add_ps(Avx::Square(_mm256_loadu_ps(src)), _mm256_add_ps(Avx::Square(_mm256_loadu_ps(src + 1)), Avx::Square(_mm256_loadu_ps(src + 2)))));
+            return _mm256_add_ps(_mm256_add_ps(Square(LoadAtEdge<-2>(src)), Square(LoadAtEdge<-1>(src))),
+                _mm256_add_ps(Square(_mm256_loadu_ps(src)), _mm256_add_ps(Square(_mm256_loadu_ps(src + 1)), Square(_mm256_loadu_ps(src + 2)))));
         }
 
         SIMD_INLINE __m256 BodySquareSum(const float * src)
         {
-            return _mm256_add_ps(_mm256_add_ps(Avx::Square(_mm256_loadu_ps(src - 2)), Avx::Square(_mm256_loadu_ps(src - 1))),
-                _mm256_add_ps(Avx::Square(_mm256_loadu_ps(src)), _mm256_add_ps(Avx::Square(_mm256_loadu_ps(src + 1)), Avx::Square(_mm256_loadu_ps(src + 2)))));
+            return _mm256_add_ps(_mm256_add_ps(Square(_mm256_loadu_ps(src - 2)), Square(_mm256_loadu_ps(src - 1))),
+                _mm256_add_ps(Square(_mm256_loadu_ps(src)), _mm256_add_ps(Square(_mm256_loadu_ps(src + 1)), Square(_mm256_loadu_ps(src + 2)))));
         }
 
         SIMD_INLINE __m256 TailSquareSum(const float * src)
         {
-            return _mm256_add_ps(_mm256_add_ps(Avx::Square(LoadAtEdge<2>(src)), Avx::Square(LoadAtEdge<1>(src))),
-                _mm256_add_ps(Avx::Square(_mm256_loadu_ps(src)), _mm256_add_ps(Avx::Square(_mm256_loadu_ps(src - 1)), Avx::Square(_mm256_loadu_ps(src - 2)))));
+            return _mm256_add_ps(_mm256_add_ps(Square(LoadAtEdge<2>(src)), Square(LoadAtEdge<1>(src))),
+                _mm256_add_ps(Square(_mm256_loadu_ps(src)), _mm256_add_ps(Square(_mm256_loadu_ps(src - 1)), Square(_mm256_loadu_ps(src - 2)))));
         }
 
         template<bool align> void SynetLrnLayerCrossChannelsNchw(const float * src, size_t half, size_t channels, size_t spatial, const float * k, float * dst)
@@ -500,8 +581,8 @@ namespace Simd
                 size_t s = 0;
                 for (; s < aligned; s += F)
                 {
-                    __m256 _pos = Avx::Load<align>(pos + s);
-                    Avx::Store<true>(sum.data + s, _mm256_add_ps(Avx::Load<true>(sum.data + s), _mm256_mul_ps(_pos, _pos)));
+                    __m256 _pos = Load<align>(pos + s);
+                    Store<true>(sum.data + s, _mm256_add_ps(Load<true>(sum.data + s), _mm256_mul_ps(_pos, _pos)));
                 }
                 for (; s < spatial; ++s)
                     sum[s] += Simd::Square(pos[s]);
@@ -513,13 +594,13 @@ namespace Simd
                 size_t s = 0;
                 for (; s < aligned; s += F)
                 {
-                    __m256 _pos = Avx::Load<align>(pos + s);
-                    __m256 _neg = Avx::Load<align>(neg + s);
-                    __m256 _sum = Avx::Load<true>(sum.data + s);
+                    __m256 _pos = Load<align>(pos + s);
+                    __m256 _neg = Load<align>(neg + s);
+                    __m256 _sum = Load<true>(sum.data + s);
                     _sum = _mm256_add_ps(_sum, _mm256_sub_ps(_mm256_mul_ps(_pos, _pos), _mm256_mul_ps(_neg, _neg)));
-                    __m256 _src = Avx::Load<align>(src + s);
-                    Avx::Store<true>(sum.data + s, _sum);
-                    Avx::Store<align>(dst + s, _mm256_mul_ps(_src, pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, _sum)), k2)));
+                    __m256 _src = Load<align>(src + s);
+                    Store<true>(sum.data + s, _sum);
+                    Store<align>(dst + s, _mm256_mul_ps(_src, pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, _sum)), k2)));
                 }
                 for (; s < spatial; ++s)
                 {
@@ -549,16 +630,16 @@ namespace Simd
             size_t aligned = AlignLo(channels - half, F);
             for (size_t s = 0; s < spatial; ++s)
             {
-                Avx::Store<align>(dst + 0, _mm256_mul_ps(Avx::Load<align>(src + 0), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, NoseSquareSum(src + 0))), k2)));
+                Store<align>(dst + 0, _mm256_mul_ps(Load<align>(src + 0), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, NoseSquareSum(src + 0))), k2)));
                 for (size_t c = F; c < aligned; c += F)
-                    Avx::Store<align>(dst + c, _mm256_mul_ps(Avx::Load<align>(src + c), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, BodySquareSum(src + c))), k2)));
+                    Store<align>(dst + c, _mm256_mul_ps(Load<align>(src + c), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, BodySquareSum(src + c))), k2)));
                 if (aligned != channels - half)
                 {
                     size_t c = channels - half - F;
-                    Avx::Store<false>(dst + c, _mm256_mul_ps(Avx::Load<false>(src + c), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, BodySquareSum(src + c))), k2)));
+                    Store<false>(dst + c, _mm256_mul_ps(Load<false>(src + c), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, BodySquareSum(src + c))), k2)));
                 }
                 size_t c = channels - F;
-                Avx::Store<false>(dst + c, _mm256_mul_ps(Avx::Load<false>(src + c), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, TailSquareSum(src + c))), k2)));
+                Store<false>(dst + c, _mm256_mul_ps(Load<false>(src + c), pow(_mm256_add_ps(k0, _mm256_mul_ps(k1, TailSquareSum(src + c))), k2)));
                 src += channels;
                 dst += channels;
             }
@@ -583,6 +664,132 @@ namespace Simd
                 SynetLrnLayerCrossChannelsNchw(src, half, channels, spatial, k, dst);
             else if (format == SimdTensorFormatNhwc)
                 SynetLrnLayerCrossChannelsNhwc(src, half, channels, spatial, k, dst);
+            else
+                assert(0);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        void SynetShuffleLayerForward(const float* src0, const float* src1, size_t channels0, size_t channels1, size_t spatial, float* dst0, float* dst1, SimdTensorFormatType format, int type)
+        {
+            if (format == SimdTensorFormatNchw)
+                Base::SynetShuffleLayerForward(src0, src1, channels0, channels1, spatial, dst0, dst1, format, type);
+            else if (format == SimdTensorFormatNhwc)
+            {
+                size_t channels = (channels0 + channels1) / 2;
+                size_t channels0F = AlignLo(channels0, F);
+                size_t channels0DF = AlignLo(channels0, DF);
+                size_t channels1F = AlignLo(channels1, F);
+                size_t channels1DF = AlignLo(channels1, DF);
+                if (type == 0)
+                {
+                    for (size_t s = 0; s < spatial; ++s)
+                    {
+                        size_t cd = 0, cs0 = 0, cs1 = 0;
+                        for (; cs0 < channels0DF; cs0 += DF, cd += F)
+                        {
+                            __m256 s0 = _mm256_loadu_ps(src0 + cs0 + 0);
+                            __m256 s1 = _mm256_loadu_ps(src0 + cs0 + F);
+                            __m256 p0 = _mm256_permute2f128_ps(s0, s1, 0x20);
+                            __m256 p1 = _mm256_permute2f128_ps(s0, s1, 0x31);
+                            _mm256_storeu_ps(dst0 + cd, _mm256_shuffle_ps(p0, p1, 0x88));
+                            _mm256_storeu_ps(dst1 + cd, _mm256_shuffle_ps(p0, p1, 0xDD));
+                        }
+                        for (; cs0 < channels0F; cs0 += F, cd += HF)
+                        {
+                            __m128 s0 = _mm_loadu_ps(src0 + cs0 + 00);
+                            __m128 s1 = _mm_loadu_ps(src0 + cs0 + HF);
+                            _mm_storeu_ps(dst0 + cd, _mm_shuffle_ps(s0, s1, 0x88));
+                            _mm_storeu_ps(dst1 + cd, _mm_shuffle_ps(s0, s1, 0xDD));
+                        }
+                        for (; cs0 < channels0; cs0 += 2, cd += 1)
+                        {
+                            dst0[cd] = src0[cs0 + 0];
+                            dst1[cd] = src0[cs0 + 1];
+                        }
+                        for (; cs1 < channels1DF; cs1 += DF, cd += F)
+                        {
+                            __m256 s0 = _mm256_loadu_ps(src1 + cs1 + 0);
+                            __m256 s1 = _mm256_loadu_ps(src1 + cs1 + F);
+                            __m256 p0 = _mm256_permute2f128_ps(s0, s1, 0x20);
+                            __m256 p1 = _mm256_permute2f128_ps(s0, s1, 0x31);
+                            _mm256_storeu_ps(dst0 + cd, _mm256_shuffle_ps(p0, p1, 0x88));
+                            _mm256_storeu_ps(dst1 + cd, _mm256_shuffle_ps(p0, p1, 0xDD));
+                        }
+                        for (; cs1 < channels1F; cs1 += F, cd += HF)
+                        {
+                            __m128 s0 = _mm_loadu_ps(src1 + cs1 + 00);
+                            __m128 s1 = _mm_loadu_ps(src1 + cs1 + HF);
+                            _mm_storeu_ps(dst0 + cd, _mm_shuffle_ps(s0, s1, 0x88));
+                            _mm_storeu_ps(dst1 + cd, _mm_shuffle_ps(s0, s1, 0xDD));
+                        }
+                        for (; cs1 < channels1; cs1 += 2, cd += 1)
+                        {
+                            dst0[cd] = src1[cs1 + 0];
+                            dst1[cd] = src1[cs1 + 1];
+                        }
+                        src0 += channels0;
+                        src1 += channels1;
+                        dst0 += channels;
+                        dst1 += channels;
+                    }
+                }
+                else if (type == 1)
+                {
+                    for (size_t s = 0; s < spatial; ++s)
+                    {
+                        size_t cs = 0, cd0 = 0, cd1 = 0;
+                        for (; cd0 < channels0DF; cd0 += DF, cs += F)
+                        {
+                            __m256 s0 = _mm256_loadu_ps(src0 + cs);
+                            __m256 s1 = _mm256_loadu_ps(src1 + cs);
+                            __m256 u0 = _mm256_unpacklo_ps(s0, s1);
+                            __m256 u1 = _mm256_unpackhi_ps(s0, s1);
+                            _mm256_storeu_ps(dst0 + cd0 + 0, _mm256_permute2f128_ps(u0, u1, 0x20));
+                            _mm256_storeu_ps(dst0 + cd0 + F, _mm256_permute2f128_ps(u0, u1, 0x31));
+                        }
+                        for (; cd0 < channels0F; cd0 += F, cs += HF)
+                        {
+                            __m128 s0 = _mm_loadu_ps(src0 + cs);
+                            __m128 s1 = _mm_loadu_ps(src1 + cs);
+                            _mm_storeu_ps(dst0 + cd0 + 00, _mm_unpacklo_ps(s0, s1));
+                            _mm_storeu_ps(dst0 + cd0 + HF, _mm_unpackhi_ps(s0, s1));
+                        }
+                        for (; cd0 < channels0; cd0 += 2, cs += 1)
+                        {
+                            dst0[cd0 + 0] = src0[cs];
+                            dst0[cd0 + 1] = src1[cs];
+                        }
+                        for (; cd1 < channels1DF; cd1 += DF, cs += F)
+                        {
+                            __m256 s0 = _mm256_loadu_ps(src0 + cs);
+                            __m256 s1 = _mm256_loadu_ps(src1 + cs);
+                            __m256 u0 = _mm256_unpacklo_ps(s0, s1);
+                            __m256 u1 = _mm256_unpackhi_ps(s0, s1);
+                            _mm256_storeu_ps(dst1 + cd1 + 0, _mm256_permute2f128_ps(u0, u1, 0x20));
+                            _mm256_storeu_ps(dst1 + cd1 + F, _mm256_permute2f128_ps(u0, u1, 0x31));
+                        }
+                        for (; cd1 < channels1F; cd1 += F, cs += HF)
+                        {
+                            __m128 s0 = _mm_loadu_ps(src0 + cs);
+                            __m128 s1 = _mm_loadu_ps(src1 + cs);
+                            _mm_storeu_ps(dst1 + cd1 + 00, _mm_unpacklo_ps(s0, s1));
+                            _mm_storeu_ps(dst1 + cd1 + HF, _mm_unpackhi_ps(s0, s1));
+                        }
+                        for (; cd1 < channels1; cd1 += 2, cs += 1)
+                        {
+                            dst1[cd1 + 0] = src0[cs];
+                            dst1[cd1 + 1] = src1[cs];
+                        }
+                        src0 += channels;
+                        src1 += channels;
+                        dst0 += channels0;
+                        dst1 += channels1;
+                    }
+                }
+                else
+                    assert(0);
+            }
             else
                 assert(0);
         }

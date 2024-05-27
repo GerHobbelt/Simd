@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -86,8 +86,8 @@ namespace Simd
     }
 #endif//SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
         SIMD_INLINE float ExtractValue(__m256 a, int i)
         {
@@ -113,13 +113,8 @@ namespace Simd
         {
             __m256 b = _mm256_hadd_ps(_mm256_hadd_ps(a0, a1), _mm256_hadd_ps(a2, a3));
             return _mm_add_ps(_mm256_castps256_ps128(b), _mm256_extractf128_ps(b, 1));
-        }
-    }
-#endif//SIMD_AVX_ENABLE
-
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
+        }        
+        
         template <class T> SIMD_INLINE T Extract(__m256i a, size_t index)
         {
             const size_t size = A / sizeof(T);
@@ -269,21 +264,6 @@ namespace Simd
     }
 #endif//SIMD_AVX512BW_ENABLE
 
-#ifdef SIMD_VMX_ENABLE
-    namespace Vmx
-    {
-        SIMD_INLINE uint32_t ExtractSum(v128_u32 a)
-        {
-            return vec_extract(a, 0) + vec_extract(a, 1) + vec_extract(a, 2) + vec_extract(a, 3);
-        }
-
-        SIMD_INLINE float ExtractSum(v128_f32 a)
-        {
-            return vec_extract(a, 0) + vec_extract(a, 1) + vec_extract(a, 2) + vec_extract(a, 3);
-        }
-    }
-#endif// SIMD_VMX_ENABLE
-
 #ifdef SIMD_NEON_ENABLE
     namespace Neon
     {
@@ -292,7 +272,7 @@ namespace Simd
             return vgetq_lane_u32(a, 0) + vgetq_lane_u32(a, 1) + vgetq_lane_u32(a, 2) + vgetq_lane_u32(a, 3);
         }
 
-        SIMD_INLINE int32_t ExtractSum32s(const int32x4_t& a)
+        SIMD_INLINE int32_t ExtractSum32i(const int32x4_t& a)
         {
             return vgetq_lane_s32(a, 0) + vgetq_lane_s32(a, 1) + vgetq_lane_s32(a, 2) + vgetq_lane_s32(a, 3);
         }
@@ -312,7 +292,7 @@ namespace Simd
             return vgetq_lane_f32(a, 0) + vgetq_lane_f32(a, 1) + vgetq_lane_f32(a, 2) + vgetq_lane_f32(a, 3);
         }
 
-        SIMD_INLINE float32x4_t Extract4Sums(const float32x4_t a[4])
+        SIMD_INLINE float32x4_t Extract4Sums32f(const float32x4_t a[4])
         {
             float32x4x2_t b0 = vzipq_f32(a[0], a[2]);
             float32x4x2_t b1 = vzipq_f32(a[1], a[3]);
@@ -321,7 +301,7 @@ namespace Simd
             return vaddq_f32(vaddq_f32(c0.val[0], c0.val[1]), vaddq_f32(c1.val[0], c1.val[1]));
         }
 
-        SIMD_INLINE float32x4_t Extract4Sums(const float32x4_t & a0, const float32x4_t & a1, const float32x4_t & a2, const float32x4_t & a3)
+        SIMD_INLINE float32x4_t Extract4Sums32f(const float32x4_t & a0, const float32x4_t & a1, const float32x4_t & a2, const float32x4_t & a3)
         {
             float32x4x2_t b0 = vzipq_f32(a0, a2);
             float32x4x2_t b1 = vzipq_f32(a1, a3);
@@ -330,7 +310,7 @@ namespace Simd
             return vaddq_f32(vaddq_f32(c0.val[0], c0.val[1]), vaddq_f32(c1.val[0], c1.val[1]));
         }
 
-        SIMD_INLINE uint32x4_t Extract4Sums(const uint32x4_t& a0, const uint32x4_t& a1, const uint32x4_t& a2, const uint32x4_t& a3)
+        SIMD_INLINE uint32x4_t Extract4Sums32u(const uint32x4_t& a0, const uint32x4_t& a1, const uint32x4_t& a2, const uint32x4_t& a3)
         {
             uint32x4x2_t b0 = vzipq_u32(a0, a2);
             uint32x4x2_t b1 = vzipq_u32(a1, a3);

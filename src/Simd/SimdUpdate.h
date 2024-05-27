@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2022-2022 Souriya Trinh.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -97,29 +97,24 @@ namespace Simd
     }
 #endif//SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
-        template <UpdateType update, bool align> SIMD_INLINE void Update(float  * p, __m256 a)
+        template <UpdateType update, bool align> SIMD_INLINE void Update(float* p, __m256 a)
         {
             Store<align>(p, a);
         }
 
-        template <> SIMD_INLINE void Update<UpdateAdd, false>(float  * p, __m256 a)
+        template <> SIMD_INLINE void Update<UpdateAdd, false>(float* p, __m256 a)
         {
             Store<false>(p, _mm256_add_ps(Load<false>(p), a));
         }
 
-        template <> SIMD_INLINE void Update<UpdateAdd, true>(float  * p, __m256 a)
+        template <> SIMD_INLINE void Update<UpdateAdd, true>(float* p, __m256 a)
         {
             Store<true>(p, _mm256_add_ps(Load<true>(p), a));
         }
-    }
-#endif//SIMD_AVX_ENABLE
 
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
         template <UpdateType update, bool align> SIMD_INLINE void Update(int32_t  * p, __m256i a)
         {
             Store<align>((__m256i*)p, a);

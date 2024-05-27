@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2014-2016 Antonenka Mikhail.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -112,11 +112,6 @@ namespace Test
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Avx512bw::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Vmx::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Neon::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
@@ -206,11 +201,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Avx512bw::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::HA)
-            result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Vmx::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
@@ -306,11 +296,6 @@ namespace Test
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx512bw::ConditionalSum), FUNC_S(SimdConditionalSum));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && ConditionalSumAutoTest(FUNC_S(Simd::Vmx::ConditionalSum), FUNC_S(SimdConditionalSum));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Neon::ConditionalSum), FUNC_S(SimdConditionalSum));
@@ -340,11 +325,6 @@ namespace Test
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx512bw::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && ConditionalSumAutoTest(FUNC_S(Simd::Vmx::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Neon::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
@@ -372,11 +352,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx512bw::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A + 2)
-            result = result && ConditionalSumAutoTest(FUNC_S(Simd::Vmx::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
@@ -472,11 +447,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && ConditionalFillAutoTest(FUNC_F(Simd::Avx512bw::ConditionalFill), FUNC_F(SimdConditionalFill));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && ConditionalFillAutoTest(FUNC_F(Simd::Vmx::ConditionalFill), FUNC_F(SimdConditionalFill));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE

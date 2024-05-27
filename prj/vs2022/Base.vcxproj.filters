@@ -79,9 +79,6 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseDetection.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseEdgeBackground.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseFill.cpp">
       <Filter>Base</Filter>
     </ClCompile>
@@ -106,16 +103,10 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseHog.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseHogLite.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseInt16ToGray.cpp">
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseIntegral.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseInterference.cpp">
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseInterleave.cpp">
@@ -160,9 +151,6 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseReorder.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseResizeBilinear.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseResizer.cpp">
       <Filter>Base</Filter>
     </ClCompile>
@@ -187,9 +175,6 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseStretchGray2x2.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseSvm.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseSynet.cpp">
       <Filter>Base</Filter>
     </ClCompile>
@@ -206,9 +191,6 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetDeconvolution32f.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseSynetFused.cpp">
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetMergedConvolution32f.cpp">
@@ -344,6 +326,12 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetGridSample2d32fBlZ.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseGrayToY.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseYToGray.cpp">
       <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
@@ -571,6 +559,12 @@
       <Filter>Inc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Simd\SimdSynetGridSample.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdGrayToY.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdShuffle.h">
       <Filter>Inc</Filter>
     </ClInclude>
   </ItemGroup>

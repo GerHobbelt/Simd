@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -224,11 +224,6 @@ namespace Test
             result = result && ReduceGrayAutoTest(FUNC_RG1(Simd::Avx512bw::ReduceGray2x2), FUNC_RG1(SimdReduceGray2x2));
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && ReduceGrayAutoTest(FUNC_RG1(Simd::Vmx::ReduceGray2x2), FUNC_RG1(SimdReduceGray2x2));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && ReduceGrayAutoTest(FUNC_RG1(Simd::Neon::ReduceGray2x2), FUNC_RG1(SimdReduceGray2x2));
@@ -268,14 +263,6 @@ namespace Test
         }
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-        {
-            result = result && ReduceGrayAutoTest(FUNC_RG2(Simd::Vmx::ReduceGray3x3, true), FUNC_RG2(SimdReduceGray3x3, true));
-            result = result && ReduceGrayAutoTest(FUNC_RG2(Simd::Vmx::ReduceGray3x3, false), FUNC_RG2(SimdReduceGray3x3, false));
-        }
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
         {
@@ -307,11 +294,6 @@ namespace Test
         if (Simd::Avx512bw::Enable && W > Simd::Avx512bw::DA)
             result = result && ReduceGrayAutoTest(FUNC_RG1(Simd::Avx512bw::ReduceGray4x4), FUNC_RG1(SimdReduceGray4x4));
 #endif
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W > Simd::Vmx::DA)
-            result = result && ReduceGrayAutoTest(FUNC_RG1(Simd::Vmx::ReduceGray4x4), FUNC_RG1(SimdReduceGray4x4));
-#endif 
 
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W > Simd::Neon::DA)
@@ -349,14 +331,6 @@ namespace Test
         {
             result = result && ReduceGrayAutoTest(FUNC_RG2(Simd::Avx512bw::ReduceGray5x5, true), FUNC_RG2(SimdReduceGray5x5, true));
             result = result && ReduceGrayAutoTest(FUNC_RG2(Simd::Avx512bw::ReduceGray5x5, false), FUNC_RG2(SimdReduceGray5x5, false));
-        }
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-        {
-            result = result && ReduceGrayAutoTest(FUNC_RG2(Simd::Vmx::ReduceGray5x5, true), FUNC_RG2(SimdReduceGray5x5, true));
-            result = result && ReduceGrayAutoTest(FUNC_RG2(Simd::Vmx::ReduceGray5x5, false), FUNC_RG2(SimdReduceGray5x5, false));
         }
 #endif 
 

@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -253,11 +253,6 @@ namespace Test
             result = result && FillBgraAutoTest(FUNC_BGRA(Simd::Avx512bw::FillBgra), FUNC_BGRA(SimdFillBgra));
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::F)
-            result = result && FillBgraAutoTest(FUNC_BGRA(Simd::Vmx::FillBgra), FUNC_BGRA(SimdFillBgra));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::F)
             result = result && FillBgraAutoTest(FUNC_BGRA(Simd::Neon::FillBgra), FUNC_BGRA(SimdFillBgra));
@@ -341,11 +336,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && FillBgrAutoTest(FUNC_BGR(Simd::Avx512bw::FillBgr), FUNC_BGR(SimdFillBgr));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && FillBgrAutoTest(FUNC_BGR(Simd::Vmx::FillBgr), FUNC_BGR(SimdFillBgr));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
@@ -511,9 +501,9 @@ namespace Test
             result = result && Fill32fAutoTest(FUNC_32F(Simd::Sse41::Fill32f), FUNC_32F(SimdFill32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && Fill32fAutoTest(FUNC_32F(Simd::Avx::Fill32f), FUNC_32F(SimdFill32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && Fill32fAutoTest(FUNC_32F(Simd::Avx2::Fill32f), FUNC_32F(SimdFill32f));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE

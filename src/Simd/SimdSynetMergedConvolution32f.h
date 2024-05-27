@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -439,14 +439,14 @@ namespace Simd
     }
 #endif//SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE    
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE    
+    namespace Avx2
     {
         class SynetMergedConvolution32fCdc : public Sse41::SynetMergedConvolution32fCdc
         {
         public:
             SynetMergedConvolution32fCdc(const MergConvParam32f & p);
-            virtual String Ext() const { return "Avx"; }
+            virtual String Ext() const { return "Avx2"; }
 
             static void Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
@@ -455,46 +455,12 @@ namespace Simd
         {
         public:
             SynetMergedConvolution32fCd(const MergConvParam32f& p);
-            virtual String Ext() const { return "Avx"; }
+            virtual String Ext() const { return "Avx2"; }
 
             static void Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         class SynetMergedConvolution32fDc : public Sse41::SynetMergedConvolution32fDc
-        {
-        public:
-            SynetMergedConvolution32fDc(const MergConvParam32f& p);
-            virtual String Ext() const { return "Avx"; }
-
-            static void Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
-        };
-
-        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
-    }
-#endif//SIMD_AVX_ENABLE
-
-#ifdef SIMD_AVX2_ENABLE    
-    namespace Avx2
-    {
-        class SynetMergedConvolution32fCdc : public Avx::SynetMergedConvolution32fCdc
-        {
-        public:
-            SynetMergedConvolution32fCdc(const MergConvParam32f & p);
-            virtual String Ext() const { return "Avx2"; }
-
-            static void Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
-        };
-
-        class SynetMergedConvolution32fCd : public Avx::SynetMergedConvolution32fCd
-        {
-        public:
-            SynetMergedConvolution32fCd(const MergConvParam32f& p);
-            virtual String Ext() const { return "Avx2"; }
-
-            static void Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
-        };
-
-        class SynetMergedConvolution32fDc : public Avx::SynetMergedConvolution32fDc
         {
         public:
             SynetMergedConvolution32fDc(const MergConvParam32f& p);

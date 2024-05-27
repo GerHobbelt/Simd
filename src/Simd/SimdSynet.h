@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -182,44 +182,6 @@ namespace Simd
             return src >= 0.0f ? src : alpha * (::exp(src) - 1.0f);
         }
 
-        SIMD_INLINE float SynetFusedLayerForward0(float x, float s)
-        {
-            return (x - Simd::Abs(x))*s + Simd::Max(0.0f, x);
-        }
-
-        SIMD_INLINE float SynetFusedLayerForward1(float x, float s, float b)
-        {
-            return Simd::Max(0.0f, -x)*s + b + Simd::Max(0.0f, x);
-        }
-
-        SIMD_INLINE float SynetFusedLayerForward2(float src, float scale, float bias, float slope)
-        {
-            float x = src * scale + bias;
-            return Simd::Max(0.0f, x) + Simd::Min(0.0f, x)*slope;
-        }
-
-        SIMD_INLINE float SynetFusedLayerForward3(float x, float s)
-        {
-            return Simd::Max(0.0f, x) + Simd::Min(x, 0.0f) * s;
-        }
-
-        SIMD_INLINE void SynetFusedLayerForward4(float src, float bias0, float scale1, float bias1, float * dst0, float * dst1)
-        {
-            float x = src + bias0;
-            dst0[0] = Simd::Max(0.0f, x);
-            dst1[0] = Simd::Max(0.0f, x*scale1 + bias1);
-        }
-
-        SIMD_INLINE float SynetFusedLayerForward8(float src0, float src1, float src2)
-        {
-            return src0 + src1 * src2;
-        }
-
-        SIMD_INLINE float SynetFusedLayerForward9(float src, float scale, float bias)
-        {
-            return Simd::Max(0.0f, src * scale + bias);
-        }
-
         SIMD_INLINE float SynetHardSigmoid32f(float value, float scale, float shift)
         {
             return Simd::Max(0.0f, Simd::Min(value * scale + shift, 1.0f));
@@ -269,6 +231,12 @@ namespace Simd
             return value > 0 ? value : -value;
         }
 
+        template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fCeil>(float value)
+        {
+            float fiv = float(int(value));
+            return fiv + (fiv < value ? 1.0f : 0.0f);
+        }
+
         template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fErf>(float value)
         {
             return ::erf(value);
@@ -277,6 +245,12 @@ namespace Simd
         template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fExp>(float value)
         {
             return ::exp(value);
+        }
+
+        template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fFloor>(float value)
+        {
+            float fiv = float(int(value));
+            return fiv - (fiv > value ? 1.0f : 0.0f);
         }
 
         template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fLog>(float value)
@@ -368,8 +342,8 @@ namespace Simd
     }
 #endif//SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
         SIMD_INLINE __m256 SynetHardSigmoid32f(__m256 value, __m256 scale, __m256 shift)
         {
@@ -386,13 +360,8 @@ namespace Simd
             __m256 positive = _mm256_max_ps(_mm256_setzero_ps(), value);
             __m256 negative = _mm256_min_ps(_mm256_setzero_ps(), value);
             return _mm256_add_ps(positive, _mm256_mul_ps(slope, negative));
-        }
-    }
-#endif//SIMD_AVX_ENABLE
-
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
+        }        
+        
         SIMD_INLINE __m256i Set4(const uint8_t* src)
         {
             return _mm256_set1_epi32(*(int32_t*)src);

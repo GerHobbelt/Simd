@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -30,15 +30,6 @@ namespace Simd
 {
 #ifdef SIMD_SSE41_ENABLE
     namespace Sse41
-    {
-        bool GetEnable();
-
-        const bool Enable = GetEnable();
-    }
-#endif
-
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
     {
         bool GetEnable();
 
@@ -95,24 +86,6 @@ namespace Simd
     }
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-    namespace Vmx
-    {
-        bool GetEnable();
-
-        const bool Enable = GetEnable();
-    }
-#endif
-
-#ifdef SIMD_VSX_ENABLE
-    namespace Vsx
-    {
-        bool GetEnable();
-
-        const bool Enable = GetEnable();
-    }
-#endif
-
 #ifdef SIMD_NEON_ENABLE
     namespace Neon
     {
@@ -129,12 +102,6 @@ namespace Simd
 #define SIMD_SSE41_FUNC(func) Simd::Sse41::Enable ? Simd::Sse41::func : 
 #else
 #define SIMD_SSE41_FUNC(func) 
-#endif
-
-#ifdef SIMD_AVX_ENABLE
-#define SIMD_AVX_FUNC(func) Simd::Avx::Enable ? Simd::Avx::func : 
-#else
-#define SIMD_AVX_FUNC(func)
 #endif
 
 #ifdef SIMD_AVX2_ENABLE
@@ -165,18 +132,6 @@ namespace Simd
 #define SIMD_AMXBF16_FUNC(func) Simd::AmxBf16::Enable ? Simd::AmxBf16::func : 
 #else
 #define SIMD_AMXBF16_FUNC(func)
-#endif
-
-#ifdef SIMD_VMX_ENABLE
-#define SIMD_VMX_FUNC(func) Simd::Vmx::Enable ? Simd::Vmx::func : 
-#else
-#define SIMD_VMX_FUNC(func)
-#endif
-
-#ifdef SIMD_VSX_ENABLE
-#define SIMD_VSX_FUNC(func) Simd::Vsx::Enable ? Simd::Vsx::func : 
-#else
-#define SIMD_VSX_FUNC(func)
 #endif
 
 #ifdef SIMD_NEON_ENABLE

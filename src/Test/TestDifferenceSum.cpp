@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -208,11 +208,6 @@ namespace Test
             result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Avx512bw::SquaredDifferenceSum), FUNC_S(SimdSquaredDifferenceSum), 1);
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Vmx::SquaredDifferenceSum), FUNC_S(SimdSquaredDifferenceSum), 1);
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Neon::SquaredDifferenceSum), FUNC_S(SimdSquaredDifferenceSum), 1);
@@ -240,11 +235,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Avx512bw::SquaredDifferenceSumMasked), FUNC_M(SimdSquaredDifferenceSumMasked), 1);
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Vmx::SquaredDifferenceSumMasked), FUNC_M(SimdSquaredDifferenceSumMasked), 1);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
@@ -276,11 +266,6 @@ namespace Test
             result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Avx512bw::AbsDifferenceSum), FUNC_S(SimdAbsDifferenceSum), 1);
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Vmx::AbsDifferenceSum), FUNC_S(SimdAbsDifferenceSum), 1);
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)
             result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Neon::AbsDifferenceSum), FUNC_S(SimdAbsDifferenceSum), 1);
@@ -308,11 +293,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Avx512bw::AbsDifferenceSumMasked), FUNC_M(SimdAbsDifferenceSumMasked), 1);
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Vmx::AbsDifferenceSumMasked), FUNC_M(SimdAbsDifferenceSumMasked), 1);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
@@ -344,11 +324,6 @@ namespace Test
             result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Avx512bw::AbsDifferenceSums3x3), FUNC_S(SimdAbsDifferenceSums3x3), 9);
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A + 2)
-            result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Vmx::AbsDifferenceSums3x3), FUNC_S(SimdAbsDifferenceSums3x3), 9);
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A + 2)
             result = result && DifferenceSumsAutoTest(FUNC_S(Simd::Neon::AbsDifferenceSums3x3), FUNC_S(SimdAbsDifferenceSums3x3), 9);
@@ -378,11 +353,6 @@ namespace Test
             result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Avx512bw::AbsDifferenceSums3x3Masked), FUNC_M(SimdAbsDifferenceSums3x3Masked), 9);
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A + 2)
-            result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Vmx::AbsDifferenceSums3x3Masked), FUNC_M(SimdAbsDifferenceSums3x3Masked), 9);
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A + 2)
             result = result && DifferenceSumsMaskedAutoTest(FUNC_M(Simd::Neon::AbsDifferenceSums3x3Masked), FUNC_M(SimdAbsDifferenceSums3x3Masked), 9);
@@ -402,20 +372,15 @@ namespace Test
             result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Sse41::SquaredDifferenceSum32f), FUNC_F(SimdSquaredDifferenceSum32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Avx::SquaredDifferenceSum32f), FUNC_F(SimdSquaredDifferenceSum32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Avx2::SquaredDifferenceSum32f), FUNC_F(SimdSquaredDifferenceSum32f));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Avx512bw::SquaredDifferenceSum32f), FUNC_F(SimdSquaredDifferenceSum32f));
 #endif
-
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-            result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Vsx::SquaredDifferenceSum32f), FUNC_F(SimdSquaredDifferenceSum32f));
-#endif 
 
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
@@ -436,20 +401,15 @@ namespace Test
             result = result && DifferenceSum32fAutoTest(EPS*EPS, FUNC_F(Simd::Sse41::SquaredDifferenceKahanSum32f), FUNC_F(SimdSquaredDifferenceKahanSum32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && DifferenceSum32fAutoTest(EPS*EPS, FUNC_F(Simd::Avx::SquaredDifferenceKahanSum32f), FUNC_F(SimdSquaredDifferenceKahanSum32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && DifferenceSum32fAutoTest(EPS*EPS, FUNC_F(Simd::Avx2::SquaredDifferenceKahanSum32f), FUNC_F(SimdSquaredDifferenceKahanSum32f));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && DifferenceSum32fAutoTest(EPS*EPS, FUNC_F(Simd::Avx512bw::SquaredDifferenceKahanSum32f), FUNC_F(SimdSquaredDifferenceKahanSum32f));
 #endif
-
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-            result = result && DifferenceSum32fAutoTest(EPS*EPS, FUNC_F(Simd::Vsx::SquaredDifferenceKahanSum32f), FUNC_F(SimdSquaredDifferenceKahanSum32f));
-#endif 
 
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
@@ -468,11 +428,6 @@ namespace Test
 #ifdef SIMD_SSE41_ENABLE
         if (Simd::Sse41::Enable)
             result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Sse41::CosineDistance32f), FUNC_F(SimdCosineDistance32f));
-#endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && DifferenceSum32fAutoTest(EPS, FUNC_F(Simd::Avx::CosineDistance32f), FUNC_F(SimdCosineDistance32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE

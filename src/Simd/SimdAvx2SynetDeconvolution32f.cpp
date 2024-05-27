@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace Simd
     namespace Avx2
     {
         SynetDeconvolution32fGemmNN::SynetDeconvolution32fGemmNN(const DeconvParam32f & p)
-            : Avx::SynetDeconvolution32fGemmNN(p)
+            : Sse41::SynetDeconvolution32fGemmNN(p)
         {
             _gemm.Init(InitGemmFuncs(Avx2::Gemm32fNN, "Avx2"));
             if (_param.trans && _param.group == 1)
@@ -210,7 +210,7 @@ namespace Simd
         }
 
         SynetDeconvolution32fNhwcDirect2x2::SynetDeconvolution32fNhwcDirect2x2(const DeconvParam32f & p)
-            : Avx::SynetDeconvolution32fNhwcDirect2x2(p)
+            : Sse41::SynetDeconvolution32fNhwcDirect2x2(p)
         {
             if (p.dstC > HF)
             {

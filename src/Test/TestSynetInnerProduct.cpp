@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -196,11 +196,6 @@ namespace Test
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Sse41::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Avx::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
-#endif 
-
 #ifdef SIMD_AVX2_ENABLE
         if (Simd::Avx2::Enable)
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Avx2::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
@@ -295,11 +290,6 @@ namespace Test
         if (Simd::Sse41::Enable)
             result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Sse41::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
 #endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Avx::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
-#endif
 
 #ifdef SIMD_AVX2_ENABLE
         if (Simd::Avx2::Enable)

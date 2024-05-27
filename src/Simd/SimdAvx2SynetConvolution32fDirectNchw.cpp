@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 #include "Simd/SimdSynetConvolution32fCommon.h"
 #include "Simd/SimdSet.h"
 #include "Simd/SimdLoad.h"
-#include "Simd/SimdAvx1.h"
 #include "Simd/SimdAvx2.h"
 #include "Simd/SimdGemm.h"
 #include "Simd/SimdSynet.h"
@@ -36,7 +35,7 @@ namespace Simd
     namespace Avx2
     {
         SynetConvolution32fDirectNchw::SynetConvolution32fDirectNchw(const ConvParam32f & p)
-            : Avx::SynetConvolution32fDirectNchw(p)
+            : Sse41::SynetConvolution32fDirectNchw(p)
         {
             _convolutionBiasActivation = SetConvolutionBiasActivation();
         }
@@ -131,7 +130,7 @@ namespace Simd
         {
             static SIMD_INLINE __m256 Gather(const float * src)
             {
-                return _mm256_shuffle_ps(Avx::Load<false>(src + 0, src + 12), Avx::Load<false>(src + 6, src + 18), 0xCC);
+                return _mm256_shuffle_ps(Load<false>(src + 0, src + 12), Load<false>(src + 6, src + 18), 0xCC);
             }
 
             static SIMD_INLINE __m256 RowConv(const float * src, const __m256  * weight)
@@ -181,7 +180,7 @@ namespace Simd
 
         template<> SIMD_INLINE __m256 Activate<::SimdConvolutionActivationHswish>(__m256 value, const __m256 * params)
         {
-            return Avx2::SynetHswish32f(value, params[0], params[1]);
+            return SynetHswish32f(value, params[0], params[1]);
         }
 
         template<> SIMD_INLINE __m256 Activate<::SimdConvolutionActivationMish>(__m256 value, const __m256* params)
@@ -191,7 +190,7 @@ namespace Simd
 
         template<> SIMD_INLINE __m256 Activate<::SimdConvolutionActivationHardSigmoid>(__m256 value, const __m256* params)
         {
-            return Avx::SynetHardSigmoid32f(value, params[0], params[1]);
+            return SynetHardSigmoid32f(value, params[0], params[1]);
         }
 
         template<> SIMD_INLINE __m256 Activate<::SimdConvolutionActivationSwish>(__m256 value, const __m256* params)

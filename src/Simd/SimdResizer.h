@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -321,6 +321,15 @@ namespace Simd
         public:
             ResizerShortBilinear(const ResParam& param);
         };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerFloatBilinear : public Base::ResizerFloatBilinear
+        {
+            virtual void Run(const float* src, size_t srcStride, float* dst, size_t dstStride);
+        public:
+            ResizerFloatBilinear(const ResParam& param);
+        };
         
         //-------------------------------------------------------------------------------------------------
 
@@ -372,22 +381,6 @@ namespace Simd
     }
 #endif //SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE    
-    namespace Avx
-    {
-        class ResizerFloatBilinear : public Base::ResizerFloatBilinear
-        {
-            virtual void Run(const float * src, size_t srcStride, float * dst, size_t dstStride);
-        public:
-            ResizerFloatBilinear(const ResParam & param);
-        };
-
-        //-------------------------------------------------------------------------------------------------
-
-        void * ResizerInit(size_t srcX, size_t srcY, size_t dstX, size_t dstY, size_t channels, SimdResizeChannelType type, SimdResizeMethodType method);
-    }
-#endif //SIMD_AVX_ENABLE 
-
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
     {
@@ -437,7 +430,7 @@ namespace Simd
             ResizerShortBilinear(const ResParam& param);
         };
 
-        class ResizerFloatBilinear : public Base::ResizerFloatBilinear
+        class ResizerFloatBilinear : public Sse41::ResizerFloatBilinear
         {
             virtual void Run(const float * src, size_t srcStride, float * dst, size_t dstStride);
         public:

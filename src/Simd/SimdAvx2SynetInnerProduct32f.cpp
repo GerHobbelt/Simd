@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ namespace Simd
     namespace Avx2
     {
         SynetInnerProduct32fGemm::SynetInnerProduct32fGemm(const InnerProductParam32f& p)
-            : Avx::SynetInnerProduct32fGemm(p)
+            : Sse41::SynetInnerProduct32fGemm(p)
         {
             _biasAndActivation = Avx2::ConvolutionBiasAndActivation;
             if (_param.transpose)
@@ -101,7 +101,7 @@ namespace Simd
                 w0 = _mm256_loadu_ps(weight0 + off);
                 d00 = _mm256_fmadd_ps(w0, s0, d00);
             }
-            Avx::Store(dst + 0 * F, d00, tail);
+            Store(dst + 0 * F, d00, tail);
         }
 
         void InnerProductKxKNr1x4(size_t K, const float* src, const float* weight0, const float* bias, float* dst)
@@ -374,11 +374,11 @@ namespace Simd
         }
 
         SynetInnerProduct32fProd::SynetInnerProduct32fProd(const InnerProductParam32f& p)
-            : Avx::SynetInnerProduct32fProd(p)
+            : Sse41::SynetInnerProduct32fProd(p)
         {
             if (_param.output > Sse41::F)
             {
-                SetSize(Avx::F);
+                SetSize(F);
                 _prod = InnerProductKxKNr;
             }
         }

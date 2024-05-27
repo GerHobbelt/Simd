@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -98,11 +98,6 @@ namespace Test
             result = result && AnyToBayerAutoTest(View::Bgr24, FUNC(Simd::Avx512bw::BgrToBayer), FUNC(SimdBgrToBayer));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && AnyToBayerAutoTest(View::Bgr24, FUNC(Simd::Vmx::BgrToBayer), FUNC(SimdBgrToBayer));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)
             result = result && AnyToBayerAutoTest(View::Bgr24, FUNC(Simd::Neon::BgrToBayer), FUNC(SimdBgrToBayer));
@@ -126,11 +121,6 @@ namespace Test
         if (Simd::Avx512bw::Enable)
             result = result && AnyToBayerAutoTest(View::Bgra32, FUNC(Simd::Avx512bw::BgraToBayer), FUNC(SimdBgraToBayer));
 #endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable && W >= Simd::Vmx::A)
-            result = result && AnyToBayerAutoTest(View::Bgra32, FUNC(Simd::Vmx::BgraToBayer), FUNC(SimdBgraToBayer));
-#endif
 
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable && W >= Simd::Neon::A)

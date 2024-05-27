@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2014-2017 Antonenka Mikhail,
 *               2019-2019 Facundo Galan.
 *
@@ -96,9 +96,11 @@ namespace Test
     TEST_ADD_GROUP_A0(BgrToHsv);
     TEST_ADD_GROUP_A0(BgrToRgb);
     TEST_ADD_GROUP_A0(GrayToBgr);
+    TEST_ADD_GROUP_A0(GrayToY);
     TEST_ADD_GROUP_A0(Int16ToGray);
     TEST_ADD_GROUP_A0(RgbToGray);
     TEST_ADD_GROUP_A0(RgbaToGray);
+    TEST_ADD_GROUP_A0(YToGray);
     TEST_ADD_GROUP_0S(ConvertImage);
 
     TEST_ADD_GROUP_A0(BgraToBayer);
@@ -108,20 +110,13 @@ namespace Test
     TEST_ADD_GROUP_A0(GrayToBgra);
     TEST_ADD_GROUP_A0(RgbToBgra);
 
-    TEST_ADD_GROUP_A0(BgraToYuv420p);
     TEST_ADD_GROUP_A0(BgraToYuv420pV2);
-    TEST_ADD_GROUP_A0(BgraToYuv422p);
     TEST_ADD_GROUP_A0(BgraToYuv422pV2);
-    TEST_ADD_GROUP_A0(BgraToYuv444p);
     TEST_ADD_GROUP_A0(BgraToYuv444pV2);
-    TEST_ADD_GROUP_A0(BgrToYuv420p);
     TEST_ADD_GROUP_A0(BgrToYuv420pV2);
-    TEST_ADD_GROUP_A0(BgrToYuv422p);
     TEST_ADD_GROUP_A0(BgrToYuv422pV2);
-    TEST_ADD_GROUP_A0(BgrToYuv444p);
     TEST_ADD_GROUP_A0(BgrToYuv444pV2);
     TEST_ADD_GROUP_A0(Uyvy422ToYuv420p);
-    TEST_ADD_GROUP_A0(BgraToYuva420p);
     TEST_ADD_GROUP_A0(BgraToYuva420pV2);
 
     TEST_ADD_GROUP_A0(BackgroundGrowRangeSlow);
@@ -203,14 +198,6 @@ namespace Test
 
     TEST_ADD_GROUP_0S(FontDraw);
 
-    TEST_ADD_GROUP_A0(EdgeBackgroundGrowRangeSlow);
-    TEST_ADD_GROUP_A0(EdgeBackgroundGrowRangeFast);
-    TEST_ADD_GROUP_A0(EdgeBackgroundIncrementCount);
-    TEST_ADD_GROUP_A0(EdgeBackgroundAdjustRange);
-    TEST_ADD_GROUP_A0(EdgeBackgroundAdjustRangeMasked);
-    TEST_ADD_GROUP_A0(EdgeBackgroundShiftRange);
-    TEST_ADD_GROUP_A0(EdgeBackgroundShiftRangeMasked);
-
     TEST_ADD_GROUP_A0(Fill);
     TEST_ADD_GROUP_A0(FillFrame);
     TEST_ADD_GROUP_A0(FillBgra);
@@ -268,22 +255,9 @@ namespace Test
     TEST_ADD_GROUP_A0(HogDeinterleave);
     TEST_ADD_GROUP_A0(HogFilterSeparable);
 
-    TEST_ADD_GROUP_A0(HogLiteExtractFeatures);
-    TEST_ADD_GROUP_A0(HogLiteFilterFeatures);
-    TEST_ADD_GROUP_A0(HogLiteResizeFeatures);
-    TEST_ADD_GROUP_A0(HogLiteCompressFeatures);
-    TEST_ADD_GROUP_A0(HogLiteFilterSeparable);
-    TEST_ADD_GROUP_A0(HogLiteFindMax7x7);
-    TEST_ADD_GROUP_A0(HogLiteCreateMask);
-
     TEST_ADD_GROUP_0S(ImageMatcher);
 
     TEST_ADD_GROUP_A0(Integral);
-
-    TEST_ADD_GROUP_A0(InterferenceIncrement);
-    TEST_ADD_GROUP_A0(InterferenceIncrementMasked);
-    TEST_ADD_GROUP_A0(InterferenceDecrement);
-    TEST_ADD_GROUP_A0(InterferenceDecrementMasked);
 
     TEST_ADD_GROUP_A0(InterleaveUv);
     TEST_ADD_GROUP_A0(InterleaveBgr);
@@ -296,10 +270,7 @@ namespace Test
     TEST_ADD_GROUP_A0(NeuralAddVectorMultipliedByValue);
     TEST_ADD_GROUP_A0(NeuralAddVector);
     TEST_ADD_GROUP_A0(NeuralAddValue);
-    TEST_ADD_GROUP_A0(NeuralRoughSigmoid);
-    TEST_ADD_GROUP_A0(NeuralRoughSigmoid2);
     TEST_ADD_GROUP_A0(NeuralDerivativeSigmoid);
-    TEST_ADD_GROUP_A0(NeuralRoughTanh);
     TEST_ADD_GROUP_A0(NeuralDerivativeTanh);
     TEST_ADD_GROUP_A0(NeuralDerivativeRelu);
     TEST_ADD_GROUP_A0(NeuralPow);
@@ -339,11 +310,8 @@ namespace Test
     TEST_ADD_GROUP_A0(Reorder32bit);
     TEST_ADD_GROUP_A0(Reorder64bit);
 
-    TEST_ADD_GROUP_AS(ResizeBilinear);
     TEST_ADD_GROUP_A0(Resizer);
     TEST_ADD_GROUP_0S(ResizeYuv420p);
-    TEST_ADD_GROUP_0S(ResizeAreaGray);
-    TEST_ADD_GROUP_0S(ResizeArea);
 
     TEST_ADD_GROUP_A0(SegmentationShrinkRegion);
     TEST_ADD_GROUP_A0(SegmentationFillSingleHoles);
@@ -371,8 +339,6 @@ namespace Test
     TEST_ADD_GROUP_A0(CorrelationSum);
 
     TEST_ADD_GROUP_A0(StretchGray2x2);
-
-    TEST_ADD_GROUP_A0(SvmSumLinear);
 
 #if defined(SIMD_SYNET_ENABLE)
     TEST_ADD_GROUP_A0(SynetAddBias);
@@ -403,14 +369,6 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetConvolution32fForward);
 
     TEST_ADD_GROUP_A0(SynetDeconvolution32fForward);
-
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward0);
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward1);
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward2);
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward3);
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward4);
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward8);
-    TEST_ADD_GROUP_A0(SynetFusedLayerForward9);
 
     TEST_ADD_GROUP_A0(SynetGridSample2d);
 
@@ -487,31 +445,23 @@ namespace Test
     TEST_ADD_GROUP_0S(WinogradKernel3x3Block4x4);
 #endif
 
-    TEST_ADD_GROUP_A0(Yuv444pToBgr);
     TEST_ADD_GROUP_A0(Yuv444pToBgrV2);
-    TEST_ADD_GROUP_A0(Yuv422pToBgr);
     TEST_ADD_GROUP_A0(Yuv422pToBgrV2);
-    TEST_ADD_GROUP_AS(Yuv420pToBgr);
     TEST_ADD_GROUP_A0(Yuv420pToBgrV2);
     TEST_ADD_GROUP_A0(Yuv444pToHsl);
     TEST_ADD_GROUP_A0(Yuv444pToHsv);
     TEST_ADD_GROUP_A0(Yuv444pToHue);
     TEST_ADD_GROUP_A0(Yuv420pToHue);
-    TEST_ADD_GROUP_A0(Yuv444pToRgb);
     TEST_ADD_GROUP_A0(Yuv444pToRgbV2);
-    TEST_ADD_GROUP_A0(Yuv422pToRgb);
     TEST_ADD_GROUP_A0(Yuv422pToRgbV2);
-    TEST_ADD_GROUP_A0(Yuv420pToRgb);
     TEST_ADD_GROUP_AS(Yuv420pToRgbV2);
     TEST_ADD_GROUP_A0(Yuv420pToUyvy422);
 
-    TEST_ADD_GROUP_A0(Yuva420pToBgra);
+    TEST_ADD_GROUP_A0(Yuva420pToBgraV2);
+    TEST_ADD_GROUP_A0(Yuva422pToBgraV2);
     TEST_ADD_GROUP_A0(Yuva444pToBgraV2);
-    TEST_ADD_GROUP_A0(Yuv444pToBgra);
     TEST_ADD_GROUP_A0(Yuv444pToBgraV2);
-    TEST_ADD_GROUP_A0(Yuv422pToBgra);
     TEST_ADD_GROUP_A0(Yuv422pToBgraV2);
-    TEST_ADD_GROUP_A0(Yuv420pToBgra);
     TEST_ADD_GROUP_A0(Yuv420pToBgraV2);
 
     class Task

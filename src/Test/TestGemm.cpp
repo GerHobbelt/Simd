@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -221,11 +221,6 @@ namespace Test
             result = result && Gemm32fNNAutoTest(FUNC_GEMM32F(Simd::Sse41::Gemm32fNN), FUNC_GEMM32F(SimdGemm32fNN));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && Gemm32fNNAutoTest(FUNC_GEMM32F(Simd::Avx::Gemm32fNN), FUNC_GEMM32F(SimdGemm32fNN));
-#endif 
-
 #ifdef SIMD_AVX2_ENABLE
         if (Simd::Avx2::Enable)
             result = result && Gemm32fNNAutoTest(FUNC_GEMM32F(Simd::Avx2::Gemm32fNN), FUNC_GEMM32F(SimdGemm32fNN));
@@ -296,11 +291,6 @@ namespace Test
 #ifdef SIMD_SSE41_ENABLE
         if (Simd::Sse41::Enable)
             result = result && Gemm32fNTAutoTest(FUNC_GEMM32F(Simd::Sse41::Gemm32fNT), FUNC_GEMM32F(SimdGemm32fNT));
-#endif 
-
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && Gemm32fNTAutoTest(FUNC_GEMM32F(Simd::Avx::Gemm32fNT), FUNC_GEMM32F(SimdGemm32fNT));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE

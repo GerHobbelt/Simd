@@ -2,7 +2,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2014-2019 Antonenka Mikhail,
 *               2019-2019 Facundo Galan,
 *               2022-2022 Souriya Trinh.
@@ -62,11 +62,8 @@ namespace Simd
         os << (SimdCpuInfo(SimdCpuInfoAvx512bf16) ? " AVX-512BF16" : "");
         os << (SimdCpuInfo(SimdCpuInfoAvx512vnni) ? " AVX-512VNNI" : "");
         os << (SimdCpuInfo(SimdCpuInfoAvx512bw) ? " AVX-512BW AVX-512F" : "");
-        os << (SimdCpuInfo(SimdCpuInfoAvx2) ? " AVX2 FMA" : "");
-        os << (SimdCpuInfo(SimdCpuInfoAvx) ? " AVX" : "");
+        os << (SimdCpuInfo(SimdCpuInfoAvx2) ? " AVX2 FMA AVX" : "");
         os << (SimdCpuInfo(SimdCpuInfoSse41) ? " SSE4.1 SSSE3 SSE3 SSE2 SSE" : "");
-        os << (SimdCpuInfo(SimdCpuInfoVmx) ? " Altivec" : "");
-        os << (SimdCpuInfo(SimdCpuInfoVsx) ? " VSX" : "");
         os << (SimdCpuInfo(SimdCpuInfoNeon) ? " NEON" : "");
         os << std::endl;
     }
@@ -1765,226 +1762,6 @@ namespace Simd
         SimdDeinterleaveBgra(rgba.data, rgba.stride, rgba.width, rgba.height, r.data, r.stride, g.data, g.stride, b.data, b.stride, NULL, 0);
     }
 
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundGrowRangeSlow(const View<A>& value, View<A>& background)
-
-        \short Performs edge background update (initial grow, slow mode).
-
-        All images must have the same width, height and format (8-bit gray).
-
-        For every point:
-        \verbatim
-        background[i] += value[i] > background[i] ? 1 : 0;
-        \endverbatim
-
-        This function is used for edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundGrowRangeSlow.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in] value - a current feature value.
-        \param [in, out] background - a feature value of edge dynamic background.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundGrowRangeSlow(const View<A>& value, View<A>& background)
-    {
-        assert(Compatible(value, background) && value.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundGrowRangeSlow(value.data, value.stride, value.width, value.height, background.data, background.stride);
-    }
-
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundGrowRangeFast(const View<A>& value, View<A>& background)
-
-        \short Performs edge background update (initial grow, fast mode).
-
-        All images must have the same width, height and format (8-bit gray).
-
-        For every point:
-        \verbatim
-        background[i] = value[i] > background[i] ? value[i] : background[i];
-        \endverbatim
-
-        This function is used for edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundGrowRangeFast.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in] value - a current feature value.
-        \param [in, out] background - a feature value of edge dynamic background.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundGrowRangeFast(const View<A>& value, View<A>& background)
-    {
-        assert(Compatible(value, background) && value.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundGrowRangeFast(value.data, value.stride, value.width, value.height, background.data, background.stride);
-    }
-
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundIncrementCount(const View<A>& value, const View<A>& backgroundValue, View<A>& backgroundCount)
-
-        \short Performs collection of edge background statistic.
-
-        All images must have the same width, height and format (8-bit gray).
-
-        Updates background statistic counters for every point:
-        \verbatim
-        backgroundCount[i] += (value[i] > backgroundValue[i] && backgroundCount[i] < 255) ? 1 : 0;
-        \endverbatim
-
-        This function is used for edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundIncrementCount.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in] value - a current feature value.
-        \param [in] backgroundValue - a value of feature of edge dynamic background.
-        \param [in, out] backgroundCount - a count of feature of edge dynamic background.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundIncrementCount(const View<A>& value, const View<A>& backgroundValue, View<A>& backgroundCount)
-    {
-        assert(Compatible(value, backgroundValue, backgroundCount) && value.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundIncrementCount(value.data, value.stride, value.width, value.height,
-            backgroundValue.data, backgroundValue.stride, backgroundCount.data, backgroundCount.stride);
-    }
-
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundAdjustRange(View<A>& backgroundCount, View<A>& backgroundValue, uint8_t threshold)
-
-        \short Performs adjustment of edge background range.
-
-        All images must have the same width, height and format (8-bit gray).
-
-        Adjusts edge background range for every point:
-        \verbatim
-        backgroundValue[i] += (backgroundCount[i] > threshold && backgroundValue[i] < 255) ? 1 : 0;
-        backgroundValue[i] -= (backgroundCount[i] < threshold && backgroundValue[i] > 0) ? 1 : 0;
-        backgroundCount[i] = 0;
-        \endverbatim
-
-        This function is used for edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundAdjustRange.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in, out] backgroundCount - a count of feature of edge dynamic background.
-        \param [in, out] backgroundValue - a value of feature of edge dynamic background.
-        \param [in] threshold - a count threshold.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundAdjustRange(View<A>& backgroundCount, View<A>& backgroundValue, uint8_t threshold)
-    {
-        assert(Compatible(backgroundCount, backgroundValue) && backgroundCount.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundAdjustRange(backgroundCount.data, backgroundCount.stride, backgroundCount.width, backgroundCount.height,
-            backgroundValue.data, backgroundValue.stride, threshold);
-    }
-
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundAdjustRange(View<A>& backgroundCount, View<A>& backgroundValue, uint8_t threshold, const View<A>& mask)
-
-        \short Performs adjustment of edge background range with using adjust range mask.
-
-        All images must have the same width, height and format (8-bit gray).
-
-        Adjusts edge background range for every point:
-        \verbatim
-        if(mask[i])
-        {
-            backgroundValue[i] += (backgroundCount[i] > threshold && backgroundValue[i] < 255) ? 1 : 0;
-            backgroundValue[i] -= (backgroundCount[i] < threshold && backgroundValue[i] > 0) ? 1 : 0;
-            backgroundCount[i] = 0;
-        }
-        \endverbatim
-
-        This function is used for edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundAdjustRangeMasked.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in, out] backgroundCount - a count of feature of edge dynamic background.
-        \param [in, out] backgroundValue - a value of feature of edge dynamic background.
-        \param [in] threshold - a count threshold.
-        \param [in] mask - an adjust range mask.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundAdjustRange(View<A>& backgroundCount, View<A>& backgroundValue, uint8_t threshold, const View<A>& mask)
-    {
-        assert(Compatible(backgroundCount, backgroundValue, mask) && backgroundCount.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundAdjustRangeMasked(backgroundCount.data, backgroundCount.stride, backgroundCount.width, backgroundCount.height,
-            backgroundValue.data, backgroundValue.stride, threshold, mask.data, mask.stride);
-    }
-
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundShiftRange(const View<A>& value, View<A>& background)
-
-        \short Shifts edge background range.
-
-        All images must have the same width, height and format (8-bit gray).
-
-        For every point:
-        \verbatim
-        background[i] = value[i];
-        \endverbatim
-
-        This function is used for fast edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundShiftRange.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in] value - a current feature value.
-        \param [in, out] background - a feature of the edge dynamic background.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundShiftRange(const View<A>& value, View<A>& background)
-    {
-        assert(Compatible(value, background) && value.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundShiftRange(value.data, value.stride, value.width, value.height, background.data, background.stride);
-    }
-
-    /*! @ingroup edge_background
-
-        \fn void EdgeBackgroundShiftRange(const View<A>& value, View<A>& background, const View<A>& mask)
-
-        \short Shifts edge background range with using shift range mask.
-
-        All images must have the same width, height and format (8-bit gray).
-
-        For every point:
-        \verbatim
-        if(mask[i]])
-            background[i] = value[i];
-        \endverbatim
-
-        This function is used for fast edge background updating in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdEdgeBackgroundShiftRangeMasked.
-
-        \warning This functionality is deprecated and can be removed in the future.
-
-        \param [in] value - a current feature value.
-        \param [in, out] background - a feature of the edge dynamic background.
-        \param [in] mask - a shift range mask.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void EdgeBackgroundShiftRange(const View<A>& value, View<A>& background, const View<A>& mask)
-    {
-        assert(Compatible(value, background, mask) && value.format == View<A>::Gray8);
-
-        SimdEdgeBackgroundShiftRangeMasked(value.data, value.stride, value.width, value.height,
-            background.data, background.stride, mask.data, mask.stride);
-    }
-
     /*! @ingroup filling
 
         \fn void Fill(View<A>& dst, uint8_t value)
@@ -2184,6 +1961,26 @@ namespace Simd
         assert(EqualSize(gray, rgba) && rgba.format == View<A>::Rgba32 && gray.format == View<A>::Gray8);
 
         SimdGrayToBgra(gray.data, gray.width, gray.height, gray.stride, rgba.data, rgba.stride, alpha);
+    }
+
+    /*! @ingroup gray_conversion
+
+        \fn void GrayToY(const View<A>& gray, View<A>& y)
+
+        \short Converts 8-bit gray image to 8-bit Y plane of YUV image.
+
+        All images must have the same width and height.
+
+        \note This function is a C++ wrapper for function ::SimdGrayToY.
+
+        \param [in] gray - an input 8-bit gray image.
+        \param [out] y - an output 8-bit Y plane of YUV image.
+    */
+    template<template<class> class A> SIMD_INLINE void GrayToY(const View<A>& gray, View<A>& y)
+    {
+        assert(Compatible(gray, y) && gray.format == View<A>::Gray8);
+
+        SimdGrayToY(gray.data, gray.stride, gray.width, gray.height, y.data, y.stride);
     }
 
     /*! @ingroup histogram
@@ -2441,29 +2238,6 @@ namespace Simd
         SimdHogExtractFeatures(src.data, src.stride, src.width, src.height, features);
     }
 
-    /*! @ingroup hog
-
-        \fn void HogLiteExtractFeatures(const View<A> & src, size_t cell, float * features, size_t featuresStride)
-
-        \short Extracts lite HOG features for 8-bit gray image.
-
-        Extracts lite (for 8 directions) HOG features 8-bit gray image. 16 features are extracted for 8x8 or 4x4 cell size and 2x2 block size.
-
-        \note This function is a C++ wrapper for function ::SimdHogLiteExtractFeatures.
-
-        \param [in] src - an input 8-bit gray image. Its width and height must be a multiple of cell and greater or equal to cell*3.
-        \param [in] cell - a size of cell. It must be 4 or 8.
-        \param [out] features - a pointer to buffer with features. Array must has size grater or equal to (height/cell - 2)*featuresStride.
-        \param [in] featuresStride - a row size of the buffer with features. It must be grater or equal to (width/cell - 2)*16.
-    */
-    template<template<class> class A> SIMD_INLINE void HogLiteExtractFeatures(const View<A> & src, size_t cell, float * features, size_t featuresStride)
-    {
-        assert((cell == 4 || cell == 8) && featuresStride >= (src.width / cell - 2) * 16);
-        assert(src.format == View<A>::Gray8 && src.width >= cell * 3 && src.height >= cell * 3);
-
-        SimdHogLiteExtractFeatures(src.data, src.stride, src.width, src.height, cell, features, featuresStride);
-    }
-
     /*! @ingroup other_conversion
 
         \fn void Int16ToGray(const View<A> & src, View<A> & dst)
@@ -2559,126 +2333,6 @@ namespace Simd
 
         SimdIntegral(src.data, src.stride, src.width, src.height, sum.data, sum.stride, sqsum.data, sqsum.stride, tilted.data, tilted.stride,
             (SimdPixelFormatType)sum.format, (SimdPixelFormatType)sqsum.format);
-    }
-
-    /*! @ingroup interference
-
-        \fn void InterferenceIncrement(View<A> & dst, uint8_t increment, int16_t saturation)
-
-        \short Increments statistic of interference detector.
-
-        For every point:
-        \verbatim
-        statistic[i] = min(statistic[i] + increment, saturation);
-        \endverbatim
-
-        This function is used for interference detection in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdInterferenceIncrement.
-
-        \warning This function is deprecated and can be removed in the future.
-
-        \param [in, out] dst - a 16-bit signed integer image with statistic.
-        \param [in] increment - an increment of statistic.
-        \param [in] saturation - an upper saturation of statistic.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceIncrement(View<A> & dst, uint8_t increment, int16_t saturation)
-    {
-        assert(dst.format == View<A>::Int16);
-
-        SimdInterferenceIncrement(dst.data, dst.stride, dst.width, dst.height, increment, saturation);
-    }
-
-    /*! @ingroup interference
-
-        \fn void InterferenceIncrementMasked(View<A> & dst, uint8_t increment, int16_t saturation, const View<A>& mask, uint8_t index)
-
-        \short Increments statistic of interference detector with using segmentation mask.
-
-        For every point:
-        \verbatim
-        if(mask[i] == index)
-            statistic[i] = min(statistic[i] + increment, saturation);
-        \endverbatim
-
-        All images must have the same width, height.
-        This function is used for interference detection in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdInterferenceIncrementMasked.
-
-        \warning This function is deprecated and can be removed in the future.
-
-        \param [in, out] dst - a 16-bit signed integer image with statistic.
-        \param [in] increment - an increment of statistic.
-        \param [in] saturation - an upper saturation of statistic.
-        \param [in] mask - a 8-bit gray image with mask.
-        \param [in] index - an index of mask.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceIncrementMasked(View<A> & dst, uint8_t increment, int16_t saturation, const View<A>& mask, uint8_t index)
-    {
-        assert(dst.format == View<A>::Int16 && mask.format == View<A>::Gray8 && EqualSize(dst, mask));
-
-        SimdInterferenceIncrementMasked(dst.data, dst.stride, dst.width, dst.height, increment, saturation, mask.data, mask.stride, index);
-    }
-
-    /*! @ingroup interference
-
-        \fn void InterferenceDecrement(View<A> & dst, uint8_t decrement, int16_t saturation)
-
-        \short Decrements statistic of interference detector.
-
-        For every point:
-        \verbatim
-        statistic[i] = max(statistic[i] - decrement, saturation);
-        \endverbatim
-
-        This function is used for interference detection in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdInterferenceDecrement.
-
-        \warning This function is deprecated and can be removed in the future.
-
-        \param [in, out] dst - a 16-bit signed integer image with statistic.
-        \param [in] decrement - a decrement of statistic.
-        \param [in] saturation - a lower saturation of statistic.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceDecrement(View<A> & dst, uint8_t decrement, int16_t saturation)
-    {
-        assert(dst.format == View<A>::Int16);
-
-        SimdInterferenceDecrement(dst.data, dst.stride, dst.width, dst.height, decrement, saturation);
-    }
-
-    /*! @ingroup interference
-
-        \fn void InterferenceDecrementMasked(View<A> & dst, uint8_t decrement, int16_t saturation, const View<A>& mask, uint8_t index)
-
-        \short Decrements statistic of interference detector with using segmentation mask.
-
-        For every point:
-        \verbatim
-        if(mask[i] == index)
-            statistic[i] = max(statistic[i] - decrement, saturation);
-        \endverbatim
-
-        All images must have the same width, height.
-        This function is used for interference detection in motion detection algorithm.
-
-        \note This function is a C++ wrapper for function ::SimdInterferenceDecrementMasked.
-
-        \warning This function is deprecated and can be removed in the future.
-
-        \param [in, out] dst - a 16-bit signed integer image with statistic.
-        \param [in] decrement - a decrement of statistic.
-        \param [in] saturation - a lower saturation of statistic.
-        \param [in] mask - a 8-bit gray image with mask.
-        \param [in] index - an index of mask.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceDecrementMasked(View<A> & dst, uint8_t decrement, int16_t saturation, const View<A>& mask, uint8_t index)
-    {
-        assert(dst.format == View<A>::Int16 && mask.format == View<A>::Gray8 && EqualSize(dst, mask));
-
-        SimdInterferenceDecrementMasked(dst.data, dst.stride, dst.width, dst.height, decrement, saturation, mask.data, mask.stride, index);
     }
 
     /*! @ingroup interleave_conversion
@@ -3266,119 +2920,6 @@ namespace Simd
         assert(src.format == dst.format && Scale(src.Size()) == dst.Size() && src.ChannelSize() == 1);
 
         SimdReduceColor2x2(src.data, src.width, src.height, src.stride, dst.data, dst.width, dst.height, dst.stride, src.ChannelCount());
-    }
-
-    /*! @ingroup resizing_old
-
-        \fn void ResizeBilinear(const View<A>& src, View<A>& dst)
-
-        \short Performs resizing of input image with using bilinear interpolation.
-
-        All images must have the same format (8-bit gray, 16-bit UV, 24-bit BGR or 32-bit BGRA).
-
-        \note This function is a C++ wrapper for function ::SimdResizeBilinear.
-
-        \warning This function is deprecated and can be removed in the future. Use function Simd::Resize instead this one.
-
-        \param [in] src - an original input image.
-        \param [out] dst - a resized output image.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void ResizeBilinear(const View<A> & src, View<A> & dst)
-    {
-        assert(src.format == dst.format && src.ChannelSize() == 1);
-
-        if (EqualSize(src, dst))
-        {
-            Copy(src, dst);
-        }
-        else
-        {
-            SimdResizeBilinear(src.data, src.width, src.height, src.stride,
-                dst.data, dst.width, dst.height, dst.stride, src.ChannelCount());
-        }
-    }
-
-    /*! @ingroup resizing_old
-
-        \fn void ResizeAreaGray(const View<A> & src, View<A> & dst)
-
-        \short Performs resizing of input image with using area interpolation.
-
-        All images must have the same format (8-bit gray).
-
-        \warning This function is deprecated and can be removed in the future. Use function Simd::Resize instead this one.
-
-        \param [in] src - an original input image.
-        \param [out] dst - a resized output image.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void ResizeAreaGray(const View<A> & src, View<A> & dst)
-    {
-        assert(src.format == dst.format && src.format == View<A>::Gray8);
-
-        if (EqualSize(src, dst))
-        {
-            Copy(src, dst);
-        }
-        else
-        {
-            size_t level = 0;
-            for (; (dst.width << (level + 1)) < (size_t)src.width; level++);
-            Point<ptrdiff_t> size = src.Size() << level;
-            if (level)
-            {
-                Pyramid<A> pyramid(size, level + 1);
-                Simd::ResizeBilinear(src, pyramid[0]);
-                for (size_t i = 0; i < level; ++i)
-                    Simd::ReduceGray(pyramid.At(i), pyramid.At(i + 1), ::SimdReduce2x2);
-                Simd::Copy(pyramid[level], dst);
-            }
-            else
-                Simd::ResizeBilinear(src, dst);
-        }
-    }
-
-    /*! @ingroup resizing_old
-
-        \fn void ResizeArea(const View<A> & src, View<A> & dst)
-
-        \short Performs resizing of input image with using area interpolation.
-
-        All images must have the same format.
-
-        \warning This function is deprecated and can be removed in the future. Use function Simd::Resize instead this one.
-
-        \param [in] src - an original input image.
-        \param [out] dst - a resized output image.
-    */
-    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void ResizeArea(const View<A> & src, View<A> & dst)
-    {
-        assert(src.format == dst.format);
-
-        if (EqualSize(src, dst))
-        {
-            Copy(src, dst);
-        }
-        else
-        {
-            size_t level = 0;
-            for (; (dst.width << (level + 1)) < (size_t)src.width; level++);
-            Point<ptrdiff_t> size = src.Size() << level;
-            if (level)
-            {
-                std::vector<View<A> > pyramid(level);
-                pyramid[0].Recreate(size, src.format);
-                Simd::ResizeBilinear(src, pyramid[0]);
-                for (size_t i = 1; i < level; ++i)
-                {
-                    size = Simd::Scale(size);
-                    pyramid[i].Recreate(size, src.format);
-                    Simd::Reduce2x2(pyramid[i - 1], pyramid[i]);
-                }
-                Simd::Reduce2x2(pyramid[level - 1], dst);
-            }
-            else
-                Simd::ResizeBilinear(src, dst);
-        }
     }
 
     /*! @ingroup resizing
@@ -4665,29 +4206,104 @@ namespace Simd
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuva420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra)
+        \fn void YToGray(const View<A>& y, View<A>& gray)
+
+        \short Converts 8-bit Y plane of YUV image to 8-bit gray image.
+
+        All images must have the same width and height.
+
+        \note This function is a C++ wrapper for function ::SimdYToGray.
+
+        \param [in] y - an input 8-bit Y plane of YUV image.
+        \param [out] gray - an output 8-bit gray image.
+    */
+    template<template<class> class A> SIMD_INLINE void YToGray(const View<A>& y, View<A>& gray)
+    {
+        assert(Compatible(y, gray) && y.format == View<A>::Gray8);
+
+        SimdYToGray(y.data, y.stride, y.width, y.height, gray.data, gray.stride);
+    }
+
+    /*! @ingroup yuv_conversion
+
+        \fn void Yuva420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUVA420P image to 32-bit BGRA image.
 
-        The input Y, A and output BGRA images must have the same width and height.
-        The input U and V images must have the same width and height (half size relative to Y component).
+        The input Y, A and output BGR images must have the same width and height.
+        The input U and V images must have the same width and height (their width is equal to half width of Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuva420pToBgra.
+        \note This function is a C++ wrapper for function ::SimdYuva420pToBgraV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [in] a - an input 8-bit image with alpha channel.
         \param [out] bgra - an output 32-bit BGRA image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuva420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra)
+    template<template<class> class A> SIMD_INLINE void Yuva420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == 2 * v.height && y.format == v.format);
         assert(Compatible(y, a) && EqualSize(y, bgra));
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdYuva420pToBgra(y.data, y.stride, u.data, u.stride, v.data, v.stride, a.data, a.stride, y.width, y.height, bgra.data, bgra.stride);
+        SimdYuva420pToBgraV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, a.data, a.stride, y.width, y.height, bgra.data, bgra.stride, yuvType);
+    }
+
+    /*! @ingroup yuv_conversion
+
+        \fn void Yuva422pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra, SimdYuvType yuvType = SimdYuvBt601)
+
+        \short Converts YUVA422P image to 32-bit BGRA image.
+
+        The input Y, A and output BGR images must have the same width and height.
+        The input U and V images must have the same width and height (their width is equal to half width of Y component).
+
+        \note This function is a C++ wrapper for function ::SimdYuva422pToBgraV2.
+
+        \param [in] y - an input 8-bit image with Y color plane.
+        \param [in] u - an input 8-bit image with U color plane.
+        \param [in] v - an input 8-bit image with V color plane.
+        \param [in] a - an input 8-bit image with alpha channel.
+        \param [out] bgra - an output 32-bit BGRA image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
+    */
+    template<template<class> class A> SIMD_INLINE void Yuva422pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra, SimdYuvType yuvType = SimdYuvBt601)
+    {
+        assert(y.width == 2 * u.width && y.height == u.height && y.format == u.format);
+        assert(y.width == 2 * v.width && y.height == v.height && y.format == v.format);
+        assert(Compatible(y, a) && EqualSize(y, bgra));
+        assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
+
+        SimdYuva422pToBgraV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, a.data, a.stride, y.width, y.height, bgra.data, bgra.stride, yuvType);
+    }
+
+
+    /*! @ingroup yuv_conversion
+
+        \fn void Yuva444pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra, SimdYuvType yuvType = SimdYuvBt601)
+
+        \short Converts YUVA444P image to 32-bit BGRA image.
+
+        The input Y, U, V, A and output BGRA images must have the same width and height.
+
+        \note This function is a C++ wrapper for function ::SimdYuva444pToBgraV2.
+
+        \param [in] y - an input 8-bit image with Y color plane.
+        \param [in] u - an input 8-bit image with U color plane.
+        \param [in] v - an input 8-bit image with V color plane.
+        \param [in] a - an input 8-bit image with alpha channel.
+        \param [out] bgra - an output 32-bit BGRA image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
+    */
+    template<template<class> class A> SIMD_INLINE void Yuva444pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, const View<A>& a, View<A>& bgra, SimdYuvType yuvType = SimdYuvBt601)
+    {
+        assert(Compatible(y, u) && Compatible(y, v) && Compatible(y, a) && EqualSize(y, bgra));
+        assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
+
+        SimdYuva444pToBgraV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, a.data, a.stride, y.width, y.height, bgra.data, bgra.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion
@@ -4706,7 +4322,7 @@ namespace Simd
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgr - an output 24-bit BGR image.
         \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
-        */
+    */
     template<template<class> class A> SIMD_INLINE void Yuv420pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);

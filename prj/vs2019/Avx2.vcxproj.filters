@@ -28,9 +28,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgraToGray.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2BgraToYuv.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToBgra.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
@@ -38,9 +35,6 @@
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToRgb.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2BgrToYuv.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Binarization.cpp">
@@ -53,9 +47,6 @@
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Detection.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2EdgeBackground.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Fill.cpp">
@@ -82,16 +73,10 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2Hog.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2HogLite.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Int16ToGray.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Integral.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2Interference.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Interleave.cpp">
@@ -131,9 +116,6 @@
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Reorder.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2ResizeBilinear.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Resizer.cpp">
@@ -188,12 +170,6 @@
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2Texture.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToBgr.cpp">
-      <Filter>Avx2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToBgra.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2YuvToHue.cpp">
@@ -368,6 +344,21 @@
       <Filter>Avx2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetConvolution32fNhwcGrouped.cpp">
+      <Filter>Avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx2YToGray.cpp">
+      <Filter>Avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx2GrayToY.cpp">
+      <Filter>Avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx2Winograd1.cpp">
+      <Filter>Avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx2Winograd2.cpp">
+      <Filter>Avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx2Winograd3.cpp">
       <Filter>Avx2</Filter>
     </ClCompile>
   </ItemGroup>
@@ -618,6 +609,15 @@
       <Filter>Inc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Simd\SimdSynetGridSample.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdGrayToY.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdShuffle.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdWinograd.h">
       <Filter>Inc</Filter>
     </ClInclude>
   </ItemGroup>

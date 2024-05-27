@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -120,9 +120,11 @@ namespace Test
     {
         bool result = true;
 
+#ifdef NDEBUG
         result = result && SynetPermuteAutoTest(Shp(333, 444), Shp(1, 0), f1, f2);
         result = result && SynetPermuteAutoTest(Shp(33, 66, 99), Shp(0, 2, 1), f1, f2);
         result = result && SynetPermuteAutoTest(Shp(11, 19, 25, 33), Shp(0, 3, 1, 2), f1, f2);
+#endif
         result = result && SynetPermuteAutoTest(Shp(11, 19, 25, 9, 5), Shp(0, 3, 1, 2, 4), f1, f2);
 
         return result;

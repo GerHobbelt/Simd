@@ -34,9 +34,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonBgraToGray.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonBgraToYuv.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToBayer.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
@@ -49,9 +46,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToRgb.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonBgrToYuv.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonBinarization.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
@@ -62,9 +56,6 @@
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonDetection.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonEdgeBackground.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonFill.cpp">
@@ -88,13 +79,7 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonHog.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonHogLite.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonInt16ToGray.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonInterference.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonInterleave.cpp">
@@ -136,9 +121,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonReorder.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonResizeBilinear.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonResizer.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
@@ -161,9 +143,6 @@
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonStretchGray2x2.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonSvm.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonSynet.cpp">
@@ -196,9 +175,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetDeconvolution32f.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonSynetFused.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetPooling.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
@@ -206,12 +182,6 @@
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonTransform.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonYuvToBgr.cpp">
-      <Filter>Neon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdNeonYuvToBgra.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetMergedConvolution32fCdc.cpp">

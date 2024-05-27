@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ namespace Simd
         virtual void Forward(const float * src, float * dst) = 0;
 
 #if defined(SIMD_PERFORMANCE_STATISTIC) && (defined(NDEBUG) || defined(SIMD_PERF_STAT_IN_DEBUG))
-        Base::PerformanceMeasurer* Perf(const String& func);
+        Base::PerformanceMeasurer* Perf(const char* func);
 #endif
 
     protected:
@@ -193,33 +193,10 @@ namespace Simd
     }
 #endif//SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE    
-    namespace Avx
-    {
-        class SynetInnerProduct32fGemm : public Sse41::SynetInnerProduct32fGemm
-        {
-        public:
-            SynetInnerProduct32fGemm(const InnerProductParam32f& p);
-
-            virtual String Ext() const { return "Avx"; }
-        };
-
-        class SynetInnerProduct32fProd : public Sse41::SynetInnerProduct32fProd
-        {
-        public:
-            SynetInnerProduct32fProd(const InnerProductParam32f& p);
-
-            virtual String Ext() const { return "Avx"; }
-        };
-
-        void* SynetInnerProduct32fInit(size_t batch, size_t input, size_t output, SimdBool transpose, SimdConvolutionActivationType activation);
-    }
-#endif//SIMD_AVX_ENABLE
-
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
     {
-        class SynetInnerProduct32fGemm : public Avx::SynetInnerProduct32fGemm
+        class SynetInnerProduct32fGemm : public Sse41::SynetInnerProduct32fGemm
         {
         public:
             SynetInnerProduct32fGemm(const InnerProductParam32f& p);
@@ -227,7 +204,7 @@ namespace Simd
             virtual String Ext() const { return "Avx2"; }
         };
 
-        class SynetInnerProduct32fProd : public Avx::SynetInnerProduct32fProd
+        class SynetInnerProduct32fProd : public Sse41::SynetInnerProduct32fProd
         {
         public:
             SynetInnerProduct32fProd(const InnerProductParam32f& p);

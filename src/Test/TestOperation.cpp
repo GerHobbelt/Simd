@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -196,11 +196,6 @@ namespace Test
             result = result && OperationBinary8uAutoTest(FUNC_OB8U(Simd::Avx512bw::OperationBinary8u), FUNC_OB8U(SimdOperationBinary8u));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && OperationBinary8uAutoTest(FUNC_OB8U(Simd::Vmx::OperationBinary8u), FUNC_OB8U(SimdOperationBinary8u));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && OperationBinary8uAutoTest(FUNC_OB8U(Simd::Neon::OperationBinary8u), FUNC_OB8U(SimdOperationBinary8u));
@@ -267,11 +262,6 @@ namespace Test
             result = result && OperationBinary16iAutoTest(FUNC_OB16I(Simd::Avx512bw::OperationBinary16i), FUNC_OB16I(SimdOperationBinary16i));
 #endif 
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && OperationBinary16iAutoTest(FUNC_OB16I(Simd::Vmx::OperationBinary16i), FUNC_OB16I(SimdOperationBinary16i));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && OperationBinary16iAutoTest(FUNC_OB16I(Simd::Neon::OperationBinary16i), FUNC_OB16I(SimdOperationBinary16i));
@@ -332,11 +322,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && VectorProductAutoTest(ARGS_VP(Simd::Avx512bw::VectorProduct), ARGS_VP(SimdVectorProduct));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && VectorProductAutoTest(ARGS_VP(Simd::Vmx::VectorProduct), ARGS_VP(SimdVectorProduct));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE

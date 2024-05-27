@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ namespace Simd
                     _h = vmlaq_s32(_h, d1, _i);
                     _i = vsubq_s32(_i, _4);
                 }
-                int l = ExtractSum32s(_l), h = ExtractSum32s(_h);
+                int l = ExtractSum32i(_l), h = ExtractSum32i(_h);
                 for (; i < n; ++i)
                 {
                     l += data[b + i];

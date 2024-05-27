@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -153,9 +153,13 @@ namespace Test
     {
         bool result = true;
 
+#ifdef NDEBUG
         result = result && SynetGridSample2dAutoTest(Shp(8, 32, 20, 20), Shp(8, 300, 4, 2), f1, f2);
         result = result && SynetGridSample2dAutoTest(Shp(8, 32, 40, 40), Shp(8, 300, 4, 2), f1, f2);
         result = result && SynetGridSample2dAutoTest(Shp(8, 32, 80, 80), Shp(8, 300, 4, 2), f1, f2);
+#else
+        result = result && SynetGridSample2dAutoTest(Shp(4, 16, 20, 20), Shp(4, 100, 4, 2), f1, f2);
+#endif
 
         return result;
     }

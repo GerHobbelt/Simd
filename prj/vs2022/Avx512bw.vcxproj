@@ -23,13 +23,11 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgraToBayer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgraToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgraToGray.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgraToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgraToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToBayer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToRgb.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwBinarization.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwConditional.cpp" />
@@ -41,7 +39,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrIntDec.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrIntEnc.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwDetection.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwEdgeBackground.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwFill.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwFloat16.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwFloat32.cpp" />
@@ -51,16 +48,15 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwGemm32fPack.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwGrayToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwGrayToBgra.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwGrayToY.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwHistogram.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwHog.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwHogLite.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwImageLoad.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwImageSave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwImageSaveJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwImageSavePng.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwInt16ToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwIntegral.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwInterference.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwInterleave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwLaplace.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwLbp.cpp" />
@@ -75,7 +71,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwReduceGray4x4.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwReduceGray5x5.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwReorder.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwResizeBilinear.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwResizer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwResizerArea.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwResizerBicubic.cpp" />
@@ -88,7 +83,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwStatistic.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwStatisticMoments.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwStretchGray2x2.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwSvm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynet.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetActivation.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetAdd.cpp" />
@@ -106,7 +100,6 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetConvolution8iDirect1x1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetConvolution8iDirectAny.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetDeconvolution32f.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetFused.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetInnerProduct32f.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetMergedConvolution32f.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwSynetMergedConvolution32fBf16Depthwise.cpp" />
@@ -134,9 +127,9 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwWinograd1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwWinograd2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwWinograd3.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYToGray.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvaToBgraV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToBgraV2.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToBgr.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToBgrV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToHue.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToUyvy.cpp" />
@@ -171,6 +164,7 @@
     <ClInclude Include="..\..\src\Simd\SimdFmadd.h" />
     <ClInclude Include="..\..\src\Simd\SimdGaussianBlur.h" />
     <ClInclude Include="..\..\src\Simd\SimdGemm.h" />
+    <ClInclude Include="..\..\src\Simd\SimdGrayToY.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageLoad.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageSave.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageSaveJpeg.h" />
@@ -197,6 +191,7 @@
     <ClInclude Include="..\..\src\Simd\SimdResizerCommon.h" />
     <ClInclude Include="..\..\src\Simd\SimdRuntime.h" />
     <ClInclude Include="..\..\src\Simd\SimdSet.h" />
+    <ClInclude Include="..\..\src\Simd\SimdShuffle.h" />
     <ClInclude Include="..\..\src\Simd\SimdSse41.h" />
     <ClInclude Include="..\..\src\Simd\SimdStore.h" />
     <ClInclude Include="..\..\src\Simd\SimdStream.h" />

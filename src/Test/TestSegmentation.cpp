@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -101,11 +101,6 @@ namespace Test
             result = result && SegmentationShrinkRegionAutoTest(FUNC_SR(Simd::Avx512bw::SegmentationShrinkRegion), FUNC_SR(SimdSegmentationShrinkRegion));
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && SegmentationShrinkRegionAutoTest(FUNC_SR(Simd::Vmx::SegmentationShrinkRegion), FUNC_SR(SimdSegmentationShrinkRegion));
-#endif
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && SegmentationShrinkRegionAutoTest(FUNC_SR(Simd::Neon::SegmentationShrinkRegion), FUNC_SR(SimdSegmentationShrinkRegion));
@@ -188,11 +183,6 @@ namespace Test
             result = result && SegmentationFillSingleHolesAutoTest(FUNC_FSH(Simd::Avx512bw::SegmentationFillSingleHoles), FUNC_FSH(SimdSegmentationFillSingleHoles));
 #endif
 
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && SegmentationFillSingleHolesAutoTest(FUNC_FSH(Simd::Vmx::SegmentationFillSingleHoles), FUNC_FSH(SimdSegmentationFillSingleHoles));
-#endif
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && SegmentationFillSingleHolesAutoTest(FUNC_FSH(Simd::Neon::SegmentationFillSingleHoles), FUNC_FSH(SimdSegmentationFillSingleHoles));
@@ -273,11 +263,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && SegmentationChangeIndexAutoTest(FUNC_CI(Simd::Avx512bw::SegmentationChangeIndex), FUNC_CI(SimdSegmentationChangeIndex));
-#endif
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && SegmentationChangeIndexAutoTest(FUNC_CI(Simd::Vmx::SegmentationChangeIndex), FUNC_CI(SimdSegmentationChangeIndex));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
@@ -368,11 +353,6 @@ namespace Test
 #ifdef SIMD_AVX512BW_ENABLE
         if (Simd::Avx512bw::Enable)
             result = result && SegmentationPropagate2x2AutoTest(FUNC_P(Simd::Avx512bw::SegmentationPropagate2x2), FUNC_P(SimdSegmentationPropagate2x2));
-#endif
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && SegmentationPropagate2x2AutoTest(FUNC_P(Simd::Vmx::SegmentationPropagate2x2), FUNC_P(SimdSegmentationPropagate2x2));
 #endif
 
 #ifdef SIMD_NEON_ENABLE

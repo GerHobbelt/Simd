@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -92,108 +92,6 @@ namespace Test
         return result;
     }
 
-    bool Yuv444pToBgrAutoTest()
-    {
-        bool result = true;
-
-        result = result && YuvToAnyAutoTest(1, 1, View::Bgr24, FUNC(Simd::Base::Yuv444pToBgr), FUNC(SimdYuv444pToBgr));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Bgr24, FUNC(Simd::Sse41::Yuv444pToBgr), FUNC(SimdYuv444pToBgr));
-#endif 
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Bgr24, FUNC(Simd::Avx2::Yuv444pToBgr), FUNC(SimdYuv444pToBgr));
-#endif 
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Bgr24, FUNC(Simd::Avx512bw::Yuv444pToBgr), FUNC(SimdYuv444pToBgr));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Bgr24, FUNC(Simd::Vmx::Yuv444pToBgr), FUNC(SimdYuv444pToBgr));
-#endif 
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Bgr24, FUNC(Simd::Neon::Yuv444pToBgr), FUNC(SimdYuv444pToBgr));
-#endif
-
-        return result;
-    }
-
-    bool Yuv422pToBgrAutoTest()
-    {
-        bool result = true;
-
-        result = result && YuvToAnyAutoTest(2, 1, View::Bgr24, FUNC(Simd::Base::Yuv422pToBgr), FUNC(SimdYuv422pToBgr));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Bgr24, FUNC(Simd::Sse41::Yuv422pToBgr), FUNC(SimdYuv422pToBgr));
-#endif 
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Bgr24, FUNC(Simd::Avx2::Yuv422pToBgr), FUNC(SimdYuv422pToBgr));
-#endif 
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && W > Simd::Avx512bw::DA)
-            result = result && YuvToAnyAutoTest(2, 1, View::Bgr24, FUNC(Simd::Avx512bw::Yuv422pToBgr), FUNC(SimdYuv422pToBgr));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Bgr24, FUNC(Simd::Vmx::Yuv422pToBgr), FUNC(SimdYuv422pToBgr));
-#endif 
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Bgr24, FUNC(Simd::Neon::Yuv422pToBgr), FUNC(SimdYuv422pToBgr));
-#endif
-
-        return result;
-    }
-
-    bool Yuv420pToBgrAutoTest()
-    {
-        bool result = true;
-
-        result = result && YuvToAnyAutoTest(2, 2, View::Bgr24, FUNC(Simd::Base::Yuv420pToBgr), FUNC(SimdYuv420pToBgr));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Bgr24, FUNC(Simd::Sse41::Yuv420pToBgr), FUNC(SimdYuv420pToBgr));
-#endif 
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Bgr24, FUNC(Simd::Avx2::Yuv420pToBgr), FUNC(SimdYuv420pToBgr));
-#endif 
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && W > Simd::Avx512bw::DA)
-            result = result && YuvToAnyAutoTest(2, 2, View::Bgr24, FUNC(Simd::Avx512bw::Yuv420pToBgr), FUNC(SimdYuv420pToBgr));
-#endif 
-
-#ifdef SIMD_VMX_ENABLE
-        if (Simd::Vmx::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Bgr24, FUNC(Simd::Vmx::Yuv420pToBgr), FUNC(SimdYuv420pToBgr));
-#endif 
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Bgr24, FUNC(Simd::Neon::Yuv420pToBgr), FUNC(SimdYuv420pToBgr));
-#endif
-
-        return result;
-    }
-
     bool Yuv444pToHslAutoTest()
     {
         bool result = true;
@@ -239,11 +137,6 @@ namespace Test
             result = result && YuvToAnyAutoTest(1, 1, View::Gray8, FUNC(Simd::Avx512bw::Yuv444pToHue), FUNC(SimdYuv444pToHue));
 #endif
 
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Gray8, FUNC(Simd::Vsx::Yuv444pToHue), FUNC(SimdYuv444pToHue));
-#endif 
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && YuvToAnyAutoTest(1, 1, View::Gray8, FUNC(Simd::Neon::Yuv444pToHue), FUNC(SimdYuv444pToHue), MAX_DIFFERECE);
@@ -273,101 +166,9 @@ namespace Test
             result = result && YuvToAnyAutoTest(2, 2, View::Gray8, FUNC(Simd::Avx512bw::Yuv420pToHue), FUNC(SimdYuv420pToHue));
 #endif
 
-#ifdef SIMD_VSX_ENABLE
-        if (Simd::Vsx::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Gray8, FUNC(Simd::Vsx::Yuv420pToHue), FUNC(SimdYuv420pToHue));
-#endif
-
 #ifdef SIMD_NEON_ENABLE
         if (Simd::Neon::Enable)
             result = result && YuvToAnyAutoTest(2, 2, View::Gray8, FUNC(Simd::Neon::Yuv420pToHue), FUNC(SimdYuv420pToHue), MAX_DIFFERECE);
-#endif
-
-        return result;
-    }
-
-    bool Yuv444pToRgbAutoTest()
-    {
-        bool result = true;
-
-        result = result && YuvToAnyAutoTest(1, 1, View::Rgb24, FUNC(Simd::Base::Yuv444pToRgb), FUNC(SimdYuv444pToRgb));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Rgb24, FUNC(Simd::Sse41::Yuv444pToRgb), FUNC(SimdYuv444pToRgb));
-#endif 
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Rgb24, FUNC(Simd::Avx2::Yuv444pToRgb), FUNC(SimdYuv444pToRgb));
-#endif 
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Rgb24, FUNC(Simd::Avx512bw::Yuv444pToRgb), FUNC(SimdYuv444pToRgb));
-#endif 
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && YuvToAnyAutoTest(1, 1, View::Rgb24, FUNC(Simd::Neon::Yuv444pToRgb), FUNC(SimdYuv444pToRgb));
-#endif
-
-        return result;
-    }
-
-    bool Yuv422pToRgbAutoTest()
-    {
-        bool result = true;
-
-        result = result && YuvToAnyAutoTest(2, 1, View::Rgb24, FUNC(Simd::Base::Yuv422pToRgb), FUNC(SimdYuv422pToRgb));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Rgb24, FUNC(Simd::Sse41::Yuv422pToRgb), FUNC(SimdYuv422pToRgb));
-#endif 
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Rgb24, FUNC(Simd::Avx2::Yuv422pToRgb), FUNC(SimdYuv422pToRgb));
-#endif 
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && W > Simd::Avx512bw::DA)
-            result = result && YuvToAnyAutoTest(2, 1, View::Rgb24, FUNC(Simd::Avx512bw::Yuv422pToRgb), FUNC(SimdYuv422pToRgb));
-#endif 
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && YuvToAnyAutoTest(2, 1, View::Rgb24, FUNC(Simd::Neon::Yuv422pToRgb), FUNC(SimdYuv422pToRgb));
-#endif
-
-        return result;
-    }
-
-    bool Yuv420pToRgbAutoTest()
-    {
-        bool result = true;
-
-        result = result && YuvToAnyAutoTest(2, 2, View::Rgb24, FUNC(Simd::Base::Yuv420pToRgb), FUNC(SimdYuv420pToRgb));
-
-#ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Rgb24, FUNC(Simd::Sse41::Yuv420pToRgb), FUNC(SimdYuv420pToRgb));
-#endif 
-
-#ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Rgb24, FUNC(Simd::Avx2::Yuv420pToRgb), FUNC(SimdYuv420pToRgb));
-#endif 
-
-#ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && W > Simd::Avx512bw::DA)
-            result = result && YuvToAnyAutoTest(2, 2, View::Rgb24, FUNC(Simd::Avx512bw::Yuv420pToRgb), FUNC(SimdYuv420pToRgb));
-#endif 
-
-#ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
-            result = result && YuvToAnyAutoTest(2, 2, View::Rgb24, FUNC(Simd::Neon::Yuv420pToRgb), FUNC(SimdYuv420pToRgb));
 #endif
 
         return result;
@@ -635,36 +436,6 @@ namespace Test
         if (Simd::Neon::Enable)
             result = result && YuvToBgr2AutoTest(FUNC_YUV2(Simd::Neon::Yuv444pToRgbV2), FUNC_YUV2(SimdYuv444pToRgbV2), 1, 1);
 #endif 
-
-        return result;
-    }
-
-    //-------------------------------------------------------------------------------------------------
-
-    bool Yuv420pToBgrSpecialTest()
-    {
-        bool result = true;
-
-        std::ostringstream os;
-        Simd::PrintInfo(os);
-        std::cout << os.str();
-
-        const size_t h = 720, w = 1280;
-        uint8_t* y = (uint8_t*)SimdAllocate(w * h, SimdAlignment());
-        uint8_t* u = (uint8_t*)SimdAllocate(w * h, SimdAlignment());
-        uint8_t* v = (uint8_t*)SimdAllocate(w * h, SimdAlignment());
-        uint8_t* bgr = (uint8_t*)SimdAllocate(w * h * 3, SimdAlignment());
-
-        SimdYuv420pToBgr(y, w, u, w / 2, v, w / 2, w, h, bgr, w * 3);
-        //_mm_empty();
-
-        SimdFree(y);
-        SimdFree(u);
-        SimdFree(v);
-        SimdFree(bgr);
-
-        std::vector<int> assignments(2, -1);
-        std::unordered_set<int> assigned_detections(assignments.cbegin(), assignments.cend());
 
         return result;
     }

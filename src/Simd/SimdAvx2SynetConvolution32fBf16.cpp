@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -662,12 +662,12 @@ namespace Simd
             if (p.Is1x1() || a.mode)
             {
                 convolutions[TermLast] = ConvolutionBf16NhwcGemm_2<TermLast, type>;
-                convolutions[TermInterim] = ConvolutionBf16NhwcGemm_2<TermInterim, type>;
+                convolutions[TermInterim] = ConvolutionBf16NhwcGemm_2<TermInterim, SimdConvolutionActivationIdentity>;
             }
             else
             {
                 convolutions[TermLast] = ConvolutionBf16NhwcConv_2<TermLast, type>;
-                convolutions[TermInterim] = ConvolutionBf16NhwcConv_2<TermInterim, type>;
+                convolutions[TermInterim] = ConvolutionBf16NhwcConv_2<TermInterim, SimdConvolutionActivationIdentity>;
             }
         }
 

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2022-2022 Souriya Trinh.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,11 +41,7 @@
 #include <cmath>
 #include <limits>
 
-#if defined(SIMD_SSE41_DISABLE) && !defined(SIMD_AVX_DISABLE)
-#define SIMD_AVX_DISABLE
-#endif
-
-#if defined(SIMD_AVX_DISABLE) && !defined(SIMD_AVX2_DISABLE)
+#if defined(SIMD_SSE41_DISABLE) && !defined(SIMD_AVX2_DISABLE)
 #define SIMD_AVX2_DISABLE
 #endif
 
@@ -63,10 +59,6 @@
 
 #if defined(SIMD_AVX512BF16_DISABLE) && !defined(SIMD_AMXBF16_DISABLE)
 #define SIMD_AMXBF16_DISABLE
-#endif
-
-#if defined(SIMD_VMX_DISABLE) && !defined(SIMD_VSX_DISABLE)
-#define SIMD_VSX_DISABLE
 #endif
 
 #if !defined(SIMD_SYNET_DISABLE)
@@ -103,10 +95,6 @@
 
 #if !defined(SIMD_SSE41_DISABLE) && _MSC_VER >= 1500
 #define SIMD_SSE41_ENABLE
-#endif
-
-#if !defined(SIMD_AVX_DISABLE) && _MSC_FULL_VER >= 160040219
-#define SIMD_AVX_ENABLE
 #endif
 
 #if !defined(SIMD_AVX2_DISABLE) && _MSC_VER >= 1700
@@ -179,7 +167,7 @@
 #define SIMD_X64_ENABLE
 #endif
 
-#if defined(_BIG_ENDIAN) && !defined(_LITTLE_ENDIAN) || defined(__BIG_ENDIAN__) && !defined(__LITTLE_ENDIAN__)
+#if (defined(_BIG_ENDIAN) && !defined(_LITTLE_ENDIAN)) || (defined(__BIG_ENDIAN__) && !defined(__LITTLE_ENDIAN__))
 #define SIMD_BIG_ENDIAN
 #elif defined(__GLIBC__) || (defined(__GNUC__) && !defined(__llvm__) && !defined(__MINGW32__) && !defined(__FreeBSD__) && defined(__BYTE_ORDER__))
   #include <endian.h>
@@ -189,14 +177,6 @@
 #elif defined(__sparc) || defined(__sparc__) || defined(_POWER) || defined(__powerpc__) || defined(__ppc__) ||         \
     defined(__hpux) || defined(_MIPSEB) || defined(_POWER) || defined(__s390__)
   #define SIMD_BIG_ENDIAN
-#endif
-
-#ifdef __powerpc__
-#define SIMD_PPC_ENABLE
-#endif
-
-#ifdef __powerpc64__
-#define SIMD_PPC64_ENABLE
 #endif
 
 #if defined __arm__
@@ -213,11 +193,7 @@
 #define SIMD_SSE41_ENABLE
 #endif
 
-#if !defined(SIMD_AVX_DISABLE) && defined(__AVX__)
-#define SIMD_AVX_ENABLE
-#endif
-
-#if !defined(SIMD_AVX2_DISABLE) && defined(__AVX2__)
+#if !defined(SIMD_AVX2_DISABLE) && defined(__AVX__) && defined(__AVX2__)
 #define SIMD_AVX2_ENABLE
 #endif
 
@@ -240,18 +216,6 @@
 #endif
 
 #endif//defined(SIMD_X86_ENABLE) || defined(SIMD_X64_ENABLE)
-
-#if defined(SIMD_PPC_ENABLE) || defined(SIMD_PPC64_ENABLE)
-
-#if !defined(SIMD_VMX_DISABLE) && defined(__ALTIVEC__)
-#define SIMD_VMX_ENABLE
-#endif
-
-#if !defined(SIMD_VSX_DISABLE) && defined(__VSX__)
-#define SIMD_VSX_ENABLE
-#endif
-
-#endif//defined(SIMD_PPC_ENABLE) || defined(SIMD_PPC64_ENABLE)
 
 #if defined(SIMD_ARM_ENABLE) || defined(SIMD_ARM64_ENABLE)
 
@@ -290,20 +254,10 @@
 #include <nmmintrin.h>
 #endif
 
-#if defined(SIMD_AVX_ENABLE) || defined(SIMD_AVX2_ENABLE) \
+#if defined(SIMD_AVX2_ENABLE) \
     || defined(SIMD_AVX512BW_ENABLE) || defined(SIMD_AVX512VNNI_ENABLE) || defined(SIMD_AVX512BF16_ENABLE) \
     || defined(SIMD_AMXBF16_ENABLE)
 #include <immintrin.h>
-#endif
-
-#if defined(SIMD_VMX_ENABLE) || defined(SIMD_VSX_ENABLE)
-#include <altivec.h>
-#include <vec_types.h>
-#ifdef __cplusplus
-#undef vector
-#undef pixel
-#undef bool
-#endif
 #endif
 
 #if defined(SIMD_NEON_ENABLE)
@@ -312,13 +266,12 @@
 
 #if defined(SIMD_AVX512BW_ENABLE) || defined(SIMD_AVX512VNNI_ENABLE) || defined(SIMD_AVX512BF16_ENABLE) || defined(SIMD_AMXBF16_ENABLE)
 #define SIMD_ALIGN 64
-#elif defined(SIMD_AVX_ENABLE) || defined(SIMD_AVX2_ENABLE)
+#elif defined(SIMD_AVX2_ENABLE)
 #define SIMD_ALIGN 32
 #elif defined(SIMD_SSE41_ENABLE) \
-    || defined(SIMD_VMX_ENABLE) || defined(SIMD_VSX_ENABLE) \
 	|| defined(SIMD_NEON_ENABLE)
 #define SIMD_ALIGN 16
-#elif defined (SIMD_X64_ENABLE) || defined(SIMD_PPC64_ENABLE) || defined(SIMD_ARM64_ENABLE)
+#elif defined (SIMD_X64_ENABLE) || defined(SIMD_ARM64_ENABLE)
 #define SIMD_ALIGN 8
 #else
 #define SIMD_ALIGN 4

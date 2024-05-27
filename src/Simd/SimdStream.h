@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -79,36 +79,31 @@ namespace Simd
     }
 #endif//SIMD_SSE41_ENABLE
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
-    {
-        template <bool align, bool stream> SIMD_INLINE void Stream(float  * p, __m256 a);
-
-        template <> SIMD_INLINE void Stream<false, false>(float  * p, __m256 a)
-        {
-            _mm256_storeu_ps(p, a);
-        }
-
-        template <> SIMD_INLINE void Stream<false, true>(float  * p, __m256 a)
-        {
-            _mm256_storeu_ps(p, a);
-        }
-
-        template <> SIMD_INLINE void Stream<true, false>(float  * p, __m256 a)
-        {
-            _mm256_store_ps(p, a);
-        }
-
-        template <> SIMD_INLINE void Stream<true, true>(float  * p, __m256 a)
-        {
-            _mm256_stream_ps(p, a);
-        }
-    }
-#endif//SIMD_AVX_ENABLE
-
 #ifdef SIMD_AVX2_ENABLE
     namespace Avx2
     {
+        template <bool align, bool stream> SIMD_INLINE void Stream(float* p, __m256 a);
+
+        template <> SIMD_INLINE void Stream<false, false>(float* p, __m256 a)
+        {
+            _mm256_storeu_ps(p, a);
+        }
+
+        template <> SIMD_INLINE void Stream<false, true>(float* p, __m256 a)
+        {
+            _mm256_storeu_ps(p, a);
+        }
+
+        template <> SIMD_INLINE void Stream<true, false>(float* p, __m256 a)
+        {
+            _mm256_store_ps(p, a);
+}
+
+        template <> SIMD_INLINE void Stream<true, true>(float* p, __m256 a)
+        {
+            _mm256_stream_ps(p, a);
+        }
+
         template <bool align, bool stream> SIMD_INLINE void Stream(__m256i  * p, __m256i a);
 
         template <> SIMD_INLINE void Stream<false, false>(__m256i  * p, __m256i a)

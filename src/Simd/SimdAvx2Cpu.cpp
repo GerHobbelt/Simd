@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ namespace Simd
                 Base::CheckBit(7, 0, Cpuid::Ebx, Cpuid::BMI1) &&
                 Base::CheckBit(7, 0, Cpuid::Ebx, Cpuid::BMI2) &&
                 Base::CheckBit(1, 0, Cpuid::Ecx, Cpuid::OSXSAVE) &&
+                Base::CheckBit(1, 0, Cpuid::Ecx, Cpuid::AVX) &&
                 Base::CheckBit(1, 0, Cpuid::Ecx, Cpuid::FMA) &&
                 Base::CheckBit(1, 0, Cpuid::Ecx, Cpuid::F16C);
         }

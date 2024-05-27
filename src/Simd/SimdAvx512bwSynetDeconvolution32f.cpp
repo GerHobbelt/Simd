@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ namespace Simd
             assert(p.trans && p.group == 1);
             if (p.IsPad(0) && p.IsDilation(1) && p.kernelY == p.strideX && p.kernelX == p.strideX)
             {
-                Avx::SynetDeconvolution32fGemmNN::RowToImg(src, dst);
+                Avx2::SynetDeconvolution32fGemmNN::RowToImg(src, dst);
                 return;
             }
             else

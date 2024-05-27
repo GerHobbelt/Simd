@@ -34,13 +34,11 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonBgraToBayer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgraToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgraToGray.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonBgraToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgraToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToBayer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToRgb.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonBgrToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonBinarization.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonConditional.cpp" />
@@ -52,7 +50,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonDescrIntDec.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonDescrIntEnc.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonDetection.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonEdgeBackground.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonFill.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonFloat16.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonFloat32.cpp" />
@@ -64,13 +61,11 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonGrayToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonHistogram.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonHog.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonHogLite.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonImageLoad.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonImageSave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonImageSaveJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonImageSavePng.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonInt16ToGray.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonInterference.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonInterleave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonLaplace.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonLbp.cpp" />
@@ -85,7 +80,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonReduceGray4x4.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonReduceGray5x5.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonReorder.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonResizeBilinear.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonResizer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonResizerArea.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonResizerBilinear.cpp" />
@@ -96,7 +90,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonStatistic.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonStatisticMoments.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonStretchGray2x2.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonSvm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynet.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetActivation.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetAdd.cpp" />
@@ -110,7 +103,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetConvolution32fNhwcDirect4r.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetConvolution8i.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetDeconvolution32f.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonSynetFused.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetInnerProduct32f.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetMergedConvolution32fCd.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonSynetMergedConvolution32fCdc.cpp" />
@@ -125,8 +117,6 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonWinograd1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonWinograd2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonWinograd3.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonYuvToBgr.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdNeonYuvToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonYuvToBgraV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonYuvToBgrV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdNeonYuvToHue.cpp" />

@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -250,7 +250,7 @@ namespace Test
 #endif
 #else
         //result = result && SynetConvolution8iForwardAutoTest(e, Param(1, 2000, 30, 30, 64, _1, _1, _1, _0, _0, 1, aRe, t1, f32, u8), 0, c, f1, f2);
-        result = result && SynetConvolution8iForwardAutoTest(e, Param(1, 386, 50, 70, 76, _3, _1, _1, _1, _1, 1, aPr, t1, u8, u8), 1, c, f1, f2);
+        result = result && SynetConvolution8iForwardAutoTest(e, Param(1, 128, 30, 40, 76, _3, _1, _1, _1, _1, 1, aPr, t1, u8, u8), 1, c, f1, f2);
 #endif
 
         return result;

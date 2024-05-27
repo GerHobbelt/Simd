@@ -23,13 +23,11 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41BgraToBayer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgraToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgraToGray.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41BgraToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgraToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgrToBayer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgrToBgra.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgrToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgrToRgb.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41BgrToYuv.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41BgrToYuvV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Binarization.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Conditional.cpp" />
@@ -42,7 +40,6 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41DescrIntCdd.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41DescrIntCdu.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Detection.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41EdgeBackground.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Fill.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Float16.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Float32.cpp" />
@@ -53,9 +50,9 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41Gemm32fPack.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41GrayToBgr.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41GrayToBgra.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdSse41GrayToY.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Histogram.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Hog.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41HogLite.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ImageLoad.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ImageLoadJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ImageLoadPng.cpp" />
@@ -63,7 +60,6 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41ImageSaveJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ImageSavePng.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Int16ToGray.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41Interference.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Interleave.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Laplace.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Lbp.cpp" />
@@ -79,7 +75,6 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41ReduceGray4x4.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ReduceGray5x5.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Reorder.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41ResizeBilinear.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Resizer.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ResizerArea.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41ResizerBicubic.cpp" />
@@ -92,7 +87,6 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41Statistic.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41StatisticMoments.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41StretchGray2x2.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41Svm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Synet.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetActivation.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetAdd.cpp" />
@@ -110,7 +104,6 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution8iNhwcDirect1x1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution8iNhwcDirectAny.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetDeconvolution32f.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41SynetFused.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetGridSample.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetGridSample2d32fBlZ.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetInnerProduct32f.cpp" />
@@ -140,8 +133,7 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41Winograd1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Winograd2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Winograd3.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41YuvToBgr.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41YuvToBgra.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdSse41YToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41YuvToBgraV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41YuvToBgrV2.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41YuvToHue.cpp" />
@@ -176,6 +168,7 @@
     <ClInclude Include="..\..\src\Simd\SimdGather.h" />
     <ClInclude Include="..\..\src\Simd\SimdGaussianBlur.h" />
     <ClInclude Include="..\..\src\Simd\SimdGemm.h" />
+    <ClInclude Include="..\..\src\Simd\SimdGrayToY.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageLoad.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageLoadJpeg.h" />
     <ClInclude Include="..\..\src\Simd\SimdImageSave.h" />
@@ -202,6 +195,7 @@
     <ClInclude Include="..\..\src\Simd\SimdResizerCommon.h" />
     <ClInclude Include="..\..\src\Simd\SimdRuntime.h" />
     <ClInclude Include="..\..\src\Simd\SimdSet.h" />
+    <ClInclude Include="..\..\src\Simd\SimdShuffle.h" />
     <ClInclude Include="..\..\src\Simd\SimdSse41.h" />
     <ClInclude Include="..\..\src\Simd\SimdStore.h" />
     <ClInclude Include="..\..\src\Simd\SimdStream.h" />

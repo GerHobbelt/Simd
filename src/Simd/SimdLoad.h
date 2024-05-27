@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -113,42 +113,39 @@ namespace Simd
     }
 #endif
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
-        template <bool align> SIMD_INLINE __m256 Load(const float * p);
+        template <bool align> SIMD_INLINE __m256 Load(const float* p);
 
-        template <> SIMD_INLINE __m256 Load<false>(const float * p)
+        template <> SIMD_INLINE __m256 Load<false>(const float* p)
         {
             return _mm256_loadu_ps(p);
         }
 
-        template <> SIMD_INLINE __m256 Load<true>(const float * p)
+        template <> SIMD_INLINE __m256 Load<true>(const float* p)
         {
+#ifdef _MSC_VER
+            return _mm256_castsi256_ps(_mm256_load_si256((__m256i*)p));
+#else
             return _mm256_load_ps(p);
+#endif
         }
 
-        template<bool align> SIMD_INLINE __m256 Load(const float * p0, const float * p1)
+        template<bool align> SIMD_INLINE __m256 Load(const float* p0, const float* p1)
         {
             return _mm256_insertf128_ps(_mm256_castps128_ps256(Sse41::Load<align>(p0)), Sse41::Load<align>(p1), 1);
         }
 
-        SIMD_INLINE __m256 Load(const float * p0, const float * p1, const float * p2, const float * p3)
+        SIMD_INLINE __m256 Load(const float* p0, const float* p1, const float* p2, const float* p3)
         {
             return _mm256_insertf128_ps(_mm256_castps128_ps256(Sse41::Load(p0, p1)), Sse41::Load(p2, p3), 1);
         }
 
-        SIMD_INLINE __m256 Load(const float * ptr, __m256i mask)
+        SIMD_INLINE __m256 Load(const float* ptr, __m256i mask)
         {
             return _mm256_maskload_ps(ptr, mask);
         }
-    }
-#endif//SIMD_AVX_ENABLE
-
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
-        using namespace Avx;
 
         template <bool align> SIMD_INLINE __m256i Load(const __m256i * p);
 
@@ -254,22 +251,6 @@ namespace Simd
             __m128i secondHi = LoadHalfAfterLast<step>(firstHi);
             second = _mm256_inserti128_si256(_mm256_castsi128_si256(secondLo), secondHi, 0x1);
         }
-
-        template <bool align> SIMD_INLINE __m256 Load(const float * p);
-
-        template <> SIMD_INLINE __m256 Load<false>(const float * p)
-        {
-            return _mm256_loadu_ps(p);
-        }
-
-        template <> SIMD_INLINE __m256 Load<true>(const float * p)
-        {
-#ifdef _MSC_VER
-            return _mm256_castsi256_ps(_mm256_load_si256((__m256i*)p));
-#else
-            return _mm256_load_ps(p);
-#endif
-        }
     }
 #endif//SIMD_AVX2_ENABLE
 
@@ -309,7 +290,7 @@ namespace Simd
 
         template<bool align> SIMD_INLINE __m512 Load(const float* p0, const float* p1)
         {
-            return _mm512_castpd_ps(_mm512_insertf64x4(_mm512_castps_pd(_mm512_castps256_ps512(Avx::Load<align>(p0))), _mm256_castps_pd(Avx::Load<align>(p1)), 1));
+            return _mm512_castpd_ps(_mm512_insertf64x4(_mm512_castps_pd(_mm512_castps256_ps512(Avx2::Load<align>(p0))), _mm256_castps_pd(Avx2::Load<align>(p1)), 1));
         }
 
         template<bool align> SIMD_INLINE __m512 Load(const float* p0, const float* p1, const float* p2, const float* p3)
@@ -470,196 +451,6 @@ namespace Simd
         }
     }
 #endif//SIMD_AVX512BW_ENABLE
-
-#ifdef SIMD_VMX_ENABLE
-    namespace Vmx
-    {
-        template <bool align> SIMD_INLINE v128_u8 Load(const uint8_t * p);
-
-        template <> SIMD_INLINE v128_u8 Load<false>(const uint8_t * p)
-        {
-            v128_u8 lo = vec_ld(0, p);
-            v128_u8 hi = vec_ld(A, p);
-            return vec_perm(lo, hi, vec_lvsl(0, p));
-        }
-
-        template <> SIMD_INLINE v128_u8 Load<true>(const uint8_t * p)
-        {
-            return vec_ld(0, p);
-        }
-
-        template <bool align> SIMD_INLINE v128_u16 Load(const uint16_t * p)
-        {
-            return (v128_u16)Load<align>((const uint8_t*)p);
-        }
-
-        template <bool align> SIMD_INLINE v128_s16 Load(const int16_t * p)
-        {
-            return (v128_s16)Load<align>((const uint8_t*)p);
-        }
-
-        template <bool align> SIMD_INLINE v128_u32 Load(const uint32_t * p)
-        {
-            return (v128_u32)Load<align>((const uint8_t*)p);
-        }
-
-        template <bool align> SIMD_INLINE v128_f32 Load(const float * p)
-        {
-            return (v128_f32)Load<align>((const uint8_t*)p);
-        }
-
-        template <bool align> SIMD_INLINE v128_u8 LoadMaskU8(const uint8_t * p, v128_u8 index)
-        {
-            return (v128_u8)vec_cmpeq(Load<align>(p), index);
-        }
-
-        template <size_t count> SIMD_INLINE v128_u8 LoadBeforeFirst(v128_u8 first);
-
-        template <> SIMD_INLINE v128_u8 LoadBeforeFirst<1>(v128_u8 first)
-        {
-            return vec_perm(first, first, K8_PERM_LOAD_BEFORE_FIRST_1);
-        }
-
-        template <> SIMD_INLINE v128_u8 LoadBeforeFirst<2>(v128_u8 first)
-        {
-            return vec_perm(first, first, K8_PERM_LOAD_BEFORE_FIRST_2);
-        }
-
-        template <> SIMD_INLINE v128_u8 LoadBeforeFirst<3>(v128_u8 first)
-        {
-            return vec_perm(first, first, K8_PERM_LOAD_BEFORE_FIRST_3);
-        }
-
-        template <> SIMD_INLINE v128_u8 LoadBeforeFirst<4>(v128_u8 first)
-        {
-            return vec_perm(first, first, K8_PERM_LOAD_BEFORE_FIRST_4);
-        }
-
-        template <size_t count> SIMD_INLINE v128_u8 LoadAfterLast(v128_u8 last);
-
-        template <> SIMD_INLINE v128_u8 LoadAfterLast<1>(v128_u8 last)
-        {
-            return vec_perm(last, last, K8_PERM_LOAD_AFTER_LAST_1);
-        }
-
-        template <> SIMD_INLINE v128_u8 LoadAfterLast<2>(v128_u8 last)
-        {
-            return vec_perm(last, last, K8_PERM_LOAD_AFTER_LAST_2);
-        }
-
-        template <> SIMD_INLINE v128_u8 LoadAfterLast<3>(v128_u8 last)
-        {
-            return vec_perm(last, last, K8_PERM_LOAD_AFTER_LAST_3);
-        }
-
-        template <> SIMD_INLINE v128_u8 LoadAfterLast<4>(v128_u8 last)
-        {
-            return vec_perm(last, last, K8_PERM_LOAD_AFTER_LAST_4);
-        }
-
-        template <bool align> struct Loader;
-
-        template <> struct Loader<true>
-        {
-            template <class T> Loader(const T * ptr)
-                :_ptr((const uint8_t*)ptr)
-            {
-            }
-
-            SIMD_INLINE v128_u8 First() const
-            {
-                return vec_ld(0, _ptr);
-            }
-
-            SIMD_INLINE v128_u8 Next() const
-            {
-                _ptr += A;
-                return vec_ld(0, _ptr);
-            }
-
-        private:
-            mutable const uint8_t * _ptr;
-        };
-
-        template <> struct Loader<false>
-        {
-            template <class T> SIMD_INLINE Loader(const T * ptr)
-                :_ptr((const uint8_t*)ptr)
-            {
-                _perm = vec_lvsl(0, _ptr);
-            }
-
-            SIMD_INLINE v128_u8 First() const
-            {
-                return vec_perm(vec_ld(0, _ptr), vec_ld(A, _ptr), _perm);
-            }
-
-            SIMD_INLINE v128_u8 Next() const
-            {
-                _ptr += A;
-                return vec_perm(vec_ld(0, _ptr), vec_ld(A, _ptr), _perm);
-            }
-
-        private:
-            mutable const uint8_t * _ptr;
-            v128_u8 _perm;
-        };
-
-        template <bool align, bool first> v128_u8 Load(const Loader<align> & loader);
-
-        template <> SIMD_INLINE v128_u8 Load<true, true>(const Loader<true> & loader)
-        {
-            return loader.First();
-        }
-
-        template <> SIMD_INLINE v128_u8 Load<false, true>(const Loader<false> & loader)
-        {
-            return loader.First();
-        }
-
-        template <> SIMD_INLINE v128_u8 Load<true, false>(const Loader<true> & loader)
-        {
-            return loader.Next();
-        }
-
-        template <> SIMD_INLINE v128_u8 Load<false, false>(const Loader<false> & loader)
-        {
-            return loader.Next();
-        }
-
-        template <int part> v128_u16 UnpackU8(v128_u8 a, v128_u8 b = K8_00);
-
-        template <> SIMD_INLINE v128_u16 UnpackU8<0>(v128_u8 a, v128_u8 b)
-        {
-            return (v128_u16)vec_perm(a, b, K8_PERM_UNPACK_LO_U8);
-        }
-
-        template <> SIMD_INLINE v128_u16 UnpackU8<1>(v128_u8 a, v128_u8 b)
-        {
-            return (v128_u16)vec_perm(a, b, K8_PERM_UNPACK_HI_U8);
-        }
-
-        SIMD_INLINE v128_u16 UnpackLoU8(v128_u8 a, v128_u8 b = K8_00)
-        {
-            return (v128_u16)vec_perm(a, b, K8_PERM_UNPACK_LO_U8);
-        }
-
-        SIMD_INLINE v128_u16 UnpackHiU8(v128_u8 a, v128_u8 b = K8_00)
-        {
-            return (v128_u16)vec_perm(a, b, K8_PERM_UNPACK_HI_U8);
-        }
-
-        SIMD_INLINE v128_u32 UnpackLoU16(v128_u16 a, v128_u16 b = K16_0000)
-        {
-            return (v128_u32)vec_perm(a, b, K8_PERM_UNPACK_LO_U16);
-        }
-
-        SIMD_INLINE v128_u32 UnpackHiU16(v128_u16 a, v128_u16 b = K16_0000)
-        {
-            return (v128_u32)vec_perm(a, b, K8_PERM_UNPACK_HI_U16);
-        }
-    }
-#endif//SIMD_VMX_ENABLE
 
 #ifdef SIMD_NEON_ENABLE
     namespace Neon

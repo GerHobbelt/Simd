@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -45,24 +45,9 @@ namespace Simd
             return sizeof(__m256i);
         else
 #endif
-#ifdef SIMD_AVX_ENABLE
-        if (Avx::Enable)
-            return sizeof(__m256);
-        else
-#endif
 #ifdef SIMD_SSE41_ENABLE
         if (Sse41::Enable)
             return sizeof(__m128i);
-        else
-#endif
-#ifdef SIMD_VSX_ENABLE
-        if (Vsx::Enable)
-            return sizeof(__vector uint8_t);
-        else
-#endif
-#ifdef SIMD_VMX_ENABLE
-        if (Vmx::Enable)
-            return sizeof(__vector uint8_t);
         else
 #endif
 #ifdef SIMD_NEON_ENABLE

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -1067,7 +1067,7 @@ namespace Simd
             {
                 model.roiMask.Recreate(model.frameSize, model.levelCount);
                 if (_model.mask.format == View::Gray8)
-                    Simd::ResizeBilinear(_model.mask, model.roiMask[0]);
+                    Simd::Resize(_model.mask, model.roiMask[0]);
                 else
                 {
                     Simd::Fill(model.roiMask, Motion::Model::EMPTY);

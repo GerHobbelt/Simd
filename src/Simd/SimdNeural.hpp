@@ -130,7 +130,7 @@ namespace Simd
                     \verbatim
                     df(y) = 1 - y*y;
                     \endverbatim
-                    See implementation details: ::SimdNeuralRoughTanh and ::SimdNeuralDerivativeTanh.
+                    See implementation details: ::SimdSynetTanh32f and ::SimdNeuralDerivativeTanh.
                 */
                 Tanh,
                 /*! Sigmoid:
@@ -140,7 +140,7 @@ namespace Simd
                     \verbatim
                     df(y) = (1 - y)*y;
                     \endverbatim
-                    See implementation details: ::SimdNeuralRoughSigmoid2 and ::SimdNeuralDerivativeSigmoid.
+                    See implementation details: ::SimdSynetSigmoid32f and ::SimdNeuralDerivativeSigmoid.
                 */
                 Sigmoid,
                 /*! ReLU (Rectified Linear Unit):
@@ -232,7 +232,7 @@ namespace Simd
             static SIMD_INLINE void TanhFunction(const float * src, size_t size, float * dst)
             {
                 const float slope = 1.0f;
-                ::SimdNeuralRoughTanh(src, size, &slope, dst);
+                ::SimdSynetTanh32f(src, size, &slope, dst);
             }
 
             static SIMD_INLINE void TanhDerivative(const float * src, size_t size, float * dst)
@@ -244,7 +244,7 @@ namespace Simd
             static SIMD_INLINE void SigmoidFunction(const float * src, size_t size, float * dst)
             {
                 const float slope = 1.0f;
-                ::SimdNeuralRoughSigmoid2(src, size, &slope, dst);
+                ::SimdSynetSigmoid32f(src, size, &slope, dst);
             }
 
             static SIMD_INLINE void SigmoidDerivative(const float * src, size_t size, float * dst)
@@ -279,14 +279,7 @@ namespace Simd
 
             static SIMD_INLINE void SoftmaxFunction(const float * src, size_t size, float * dst)
             {
-                float max = -FLT_MAX;
-                for (size_t i = 0; i < size; ++i)
-                    max = std::max(max, src[i]);
-                float sum = 0;
-                for (size_t i = 0; i < size; ++i)
-                    sum += ::exp(src[i] - max);
-                for (size_t i = 0; i < size; ++i)
-                    dst[i] = ::exp(src[i] - max) / sum;
+                ::SimdSynetSoftmaxLayerForward(src, 1, size, 1, dst);
             }
 
             static SIMD_INLINE void SoftmaxDerivative(const float * src, size_t size, float * dst)

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -90,10 +90,10 @@ namespace Simd
         SIMD_INLINE void JpegDctH(const float* src, size_t srcStride, const float* fdt, int* dst)
         {
             __m256 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-            __m256 d0 = Avx::Load<false>(src + 0 * srcStride, src + 4 * srcStride);
-            __m256 d1 = Avx::Load<false>(src + 1 * srcStride, src + 5 * srcStride);
-            __m256 d2 = Avx::Load<false>(src + 2 * srcStride, src + 6 * srcStride);
-            __m256 d3 = Avx::Load<false>(src + 3 * srcStride, src + 7 * srcStride);
+            __m256 d0 = Avx2::Load<false>(src + 0 * srcStride, src + 4 * srcStride);
+            __m256 d1 = Avx2::Load<false>(src + 1 * srcStride, src + 5 * srcStride);
+            __m256 d2 = Avx2::Load<false>(src + 2 * srcStride, src + 6 * srcStride);
+            __m256 d3 = Avx2::Load<false>(src + 3 * srcStride, src + 7 * srcStride);
             tmp0 = _mm256_unpacklo_ps(d0, d2);
             tmp1 = _mm256_unpackhi_ps(d0, d2);
             tmp2 = _mm256_unpacklo_ps(d1, d3);
@@ -104,10 +104,10 @@ namespace Simd
             d3 = _mm256_unpackhi_ps(tmp1, tmp3);
 
             src += 4;
-            __m256 d4 = Avx::Load<false>(src + 0 * srcStride, src + 4 * srcStride);
-            __m256 d5 = Avx::Load<false>(src + 1 * srcStride, src + 5 * srcStride);
-            __m256 d6 = Avx::Load<false>(src + 2 * srcStride, src + 6 * srcStride);
-            __m256 d7 = Avx::Load<false>(src + 3 * srcStride, src + 7 * srcStride);
+            __m256 d4 = Avx2::Load<false>(src + 0 * srcStride, src + 4 * srcStride);
+            __m256 d5 = Avx2::Load<false>(src + 1 * srcStride, src + 5 * srcStride);
+            __m256 d6 = Avx2::Load<false>(src + 2 * srcStride, src + 6 * srcStride);
+            __m256 d7 = Avx2::Load<false>(src + 3 * srcStride, src + 7 * srcStride);
             tmp0 = _mm256_unpacklo_ps(d4, d6);
             tmp1 = _mm256_unpackhi_ps(d4, d6);
             tmp2 = _mm256_unpacklo_ps(d5, d7);

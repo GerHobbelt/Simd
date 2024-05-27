@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -267,9 +267,9 @@ namespace Test
             result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Sse41::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Avx::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Avx2::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -354,9 +354,9 @@ namespace Test
             result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Sse41::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Avx::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Avx2::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -537,9 +537,9 @@ namespace Test
             result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Sse41::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Avx::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Avx2::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -620,9 +620,9 @@ namespace Test
             result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Sse41::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Avx::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Avx2::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
@@ -704,9 +704,9 @@ namespace Test
             result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Sse41::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 #endif 
 
-#ifdef SIMD_AVX_ENABLE
-        if (Simd::Avx::Enable)
-            result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Avx::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable)
+            result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Avx2::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE

@@ -58,9 +58,6 @@
     <ClCompile Include="..\..\src\Test\TestDrawing.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Test\TestEdgeBackground.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Test\TestFill.cpp">
       <Filter>Test</Filter>
     </ClCompile>
@@ -100,16 +97,10 @@
     <ClCompile Include="..\..\src\Test\TestHog.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Test\TestHogLite.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Test\TestImageMatcher.cpp">
       <Filter>Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Test\TestIntegral.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Test\TestInterference.cpp">
       <Filter>Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Test\TestInterleave.cpp">
@@ -145,9 +136,6 @@
     <ClCompile Include="..\..\src\Test\TestStretchGray.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Test\TestSvm.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Test\TestSynet.cpp">
       <Filter>Test</Filter>
     </ClCompile>
@@ -164,9 +152,6 @@
       <Filter>Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Test\TestSynetDeconvolution32f.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Test\TestSynetFused.cpp">
       <Filter>Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Test\TestSynetMergedConvolution32f.cpp">

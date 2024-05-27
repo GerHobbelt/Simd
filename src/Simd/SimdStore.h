@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -121,17 +121,17 @@ namespace Simd
     }
 #endif
 
-#ifdef SIMD_AVX_ENABLE
-    namespace Avx
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
     {
-        template <bool align> SIMD_INLINE void Store(float * p, __m256 a);
+        template <bool align> SIMD_INLINE void Store(float* p, __m256 a);
 
-        template <> SIMD_INLINE void Store<false>(float * p, __m256 a)
+        template <> SIMD_INLINE void Store<false>(float* p, __m256 a)
         {
             _mm256_storeu_ps(p, a);
         }
 
-        template <> SIMD_INLINE void Store<true>(float * p, __m256 a)
+        template <> SIMD_INLINE void Store<true>(float* p, __m256 a)
         {
             _mm256_store_ps(p, a);
         }
@@ -144,13 +144,13 @@ namespace Simd
                 ptr[i] = buf[i];
         }
 
-        template <bool align> SIMD_INLINE void Store(float * p0, float * p1, __m256 a)
+        template <bool align> SIMD_INLINE void Store(float* p0, float* p1, __m256 a)
         {
             Sse41::Store<align>(p0, _mm256_extractf128_ps(a, 0));
             Sse41::Store<align>(p1, _mm256_extractf128_ps(a, 1));
         }
 
-        template <bool align> SIMD_INLINE void StoreMasked(float * p, __m256 value, __m256 mask)
+        template <bool align> SIMD_INLINE void StoreMasked(float* p, __m256 value, __m256 mask)
         {
             __m256 old = Load<align>(p);
             Store<align>(p, _mm256_blendv_ps(old, value, mask));
@@ -177,13 +177,6 @@ namespace Simd
             for (size_t i = 0; i < size; ++i)
                 ptr[i * step] = buf[i];
         }
-    }
-#endif
-
-#ifdef SIMD_AVX2_ENABLE
-    namespace Avx2
-    {
-        using namespace Avx;
 
         template <bool align> SIMD_INLINE void Store(__m256i * p, __m256i a);
 
@@ -281,8 +274,8 @@ namespace Simd
 
         template <bool align> SIMD_INLINE void Store(float* p0, float* p1, __m512 a)
         {
-            Avx::Store<align>(p0, _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(a), 0)));
-            Avx::Store<align>(p1, _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(a), 1)));
+            Store<align>(p0, _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(a), 0)));
+            Store<align>(p1, _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(a), 1)));
         }
 
         template <bool align> SIMD_INLINE void Store(float* p0, float* p1, float* p2, float* p3, __m512 a)
@@ -429,172 +422,6 @@ namespace Simd
         }
     }
 #endif//SIMD_AVX512BW_ENABLE
-
-#ifdef SIMD_VMX_ENABLE
-    namespace Vmx
-    {
-        template <bool align> SIMD_INLINE void Store(uint8_t * p, v128_u8 a);
-
-        template <> SIMD_INLINE void Store<false>(uint8_t * p, v128_u8 a)
-        {
-            v128_u8 lo = vec_ld(0, p);
-            v128_u8 hi = vec_ld(A, p);
-            v128_u8 perm = vec_lvsr(0, p);
-            v128_u8 mask = vec_perm(K8_00, K8_FF, perm);
-            v128_u8 value = vec_perm(a, a, perm);
-            vec_st(vec_sel(lo, value, mask), 0, p);
-            vec_st(vec_sel(value, hi, mask), A, p);
-        }
-
-        template <> SIMD_INLINE void Store<true>(uint8_t * p, v128_u8 a)
-        {
-            vec_st(a, 0, p);
-        }
-
-        template <bool align> SIMD_INLINE void Store(uint16_t * p, v128_u16 a)
-        {
-            Store<align>((uint8_t*)p, (v128_u8)a);
-        }
-
-        template <bool align> SIMD_INLINE void Store(uint32_t * p, v128_u32 a)
-        {
-            Store<align>((uint8_t*)p, (v128_u8)a);
-        }
-
-        template <bool align> SIMD_INLINE void Store(int32_t * p, v128_s32 a)
-        {
-            Store<align>((uint8_t*)p, (v128_u8)a);
-        }
-
-        template <bool align> SIMD_INLINE void Store(float * p, v128_f32 a)
-        {
-            Store<align>((uint8_t*)p, (v128_u8)a);
-        }
-
-        template <bool align> struct Storer;
-
-        template <> struct Storer<true>
-        {
-            template <class T> Storer(T * ptr)
-                :_ptr((uint8_t*)ptr)
-            {
-            }
-
-            template <class T> SIMD_INLINE void First(T value)
-            {
-                vec_st((v128_u8)value, 0, _ptr);
-            }
-
-            template <class T> SIMD_INLINE void Next(T value)
-            {
-                _ptr += A;
-                vec_st((v128_u8)value, 0, _ptr);
-            }
-
-            SIMD_INLINE void Flush()
-            {
-            }
-
-        private:
-            uint8_t * _ptr;
-        };
-
-        template <> struct Storer<false>
-        {
-            template <class T> SIMD_INLINE Storer(T * ptr)
-                :_ptr((uint8_t*)ptr)
-            {
-                _perm = vec_lvsr(0, _ptr);
-                _mask = vec_perm(K8_00, K8_FF, _perm);
-            }
-
-            template <class T> SIMD_INLINE void First(T value)
-            {
-                _last = (v128_u8)value;
-                v128_u8 background = vec_ld(0, _ptr);
-                v128_u8 foreground = vec_perm(_last, _last, _perm);
-                vec_st(vec_sel(background, foreground, _mask), 0, _ptr);
-            }
-
-            template <class T> SIMD_INLINE void Next(T value)
-            {
-                _ptr += A;
-                vec_st(vec_perm(_last, (v128_u8)value, _perm), 0, _ptr);
-                _last = (v128_u8)value;
-            }
-
-            SIMD_INLINE void Flush()
-            {
-                v128_u8 background = vec_ld(A, _ptr);
-                v128_u8 foreground = vec_perm(_last, _last, _perm);
-                vec_st(vec_sel(foreground, background, _mask), A, _ptr);
-            }
-
-        private:
-            uint8_t * _ptr;
-            v128_u8 _perm;
-            v128_u8 _mask;
-            v128_u8 _last;
-        };
-
-        template <bool align, bool first> void Store(Storer<align> & storer, v128_u8 value);
-
-        template <> SIMD_INLINE void Store<true, true>(Storer<true> & storer, v128_u8 value)
-        {
-            storer.First(value);
-        }
-
-        template <> SIMD_INLINE void Store<false, true>(Storer<false> & storer, v128_u8 value)
-        {
-            storer.First(value);
-        }
-
-        template <> SIMD_INLINE void Store<true, false>(Storer<true> & storer, v128_u8 value)
-        {
-            storer.Next(value);
-        }
-
-        template <> SIMD_INLINE void Store<false, false>(Storer<false> & storer, v128_u8 value)
-        {
-            storer.Next(value);
-        }
-
-        template <bool align, bool first> void Store(Storer<align> & storer, v128_u16 value)
-        {
-            Store<align, first>(storer, (v128_u8)value);
-        }
-
-        template <bool align, bool first> void Store(Storer<align> & storer, v128_s16 value)
-        {
-            Store<align, first>(storer, (v128_u8)value);
-        }
-
-        template <bool align, bool first> void Store(Storer<align> & storer, v128_f32 value)
-        {
-            Store<align, first>(storer, (v128_u8)value);
-        }
-
-        template <bool align> SIMD_INLINE void Flush(Storer<align> & s0)
-        {
-            s0.Flush();
-        }
-
-        template <bool align> SIMD_INLINE void Flush(Storer<align> & s0, Storer<align> & s1)
-        {
-            s0.Flush(); s1.Flush();
-        }
-
-        template <bool align> SIMD_INLINE void Flush(Storer<align> & s0, Storer<align> & s1, Storer<align> & s2)
-        {
-            s0.Flush(); s1.Flush(); s2.Flush();
-        }
-
-        template <bool align> SIMD_INLINE void Flush(Storer<align> & s0, Storer<align> & s1, Storer<align> & s2, Storer<align> & s3)
-        {
-            s0.Flush(); s1.Flush(); s2.Flush(); s3.Flush();
-        }
-    }
-#endif//SIMD_VMX_ENABLE
 
 #ifdef SIMD_NEON_ENABLE
     namespace Neon
