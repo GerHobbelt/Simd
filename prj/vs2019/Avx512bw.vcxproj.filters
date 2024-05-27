@@ -250,10 +250,7 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwResizerNearest.cpp">
       <Filter>Avx512bw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuv420pToBgraV2.cpp">
-      <Filter>Avx512bw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuv444pToBgraV2.cpp">
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToBgraV2.cpp">
       <Filter>Avx512bw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToUyvy.cpp">
@@ -368,6 +365,27 @@
       <Filter>Avx512bw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrInt.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrIntCdd.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrIntCdu.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrIntDec.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwDescrIntEnc.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwYuvToBgrV2.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgraToYuvV2.cpp">
+      <Filter>Avx512bw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAvx512bwBgrToYuvV2.cpp">
       <Filter>Avx512bw</Filter>
     </ClCompile>
   </ItemGroup>

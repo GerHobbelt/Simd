@@ -42,19 +42,21 @@ namespace Simd
 
     \fn void PrintInfo(std::ostream & os)
 
-    \short Prints information about %Simd Library and CPU properties.
+    \short Prints information about %Simd Library and CPU.
 
     \param [in, out] os - output stream.
     */
     SIMD_INLINE void PrintInfo(std::ostream & os)
     {
         os << "Simd Library: " << SimdVersion();
+        os << "; CPU: " << SimdCpuDesc(SimdCpuDescModel);
         os << "; System Sockets: " << SimdCpuInfo(SimdCpuInfoSockets);
         os << ", Cores: " << SimdCpuInfo(SimdCpuInfoCores);
         os << ", Threads: " << SimdCpuInfo(SimdCpuInfoThreads);
         os << "; Cache L1D: " << SimdCpuInfo(SimdCpuInfoCacheL1) / 1024 << " KB";
         os << ", L2: " << SimdCpuInfo(SimdCpuInfoCacheL2) / 1024 << " KB";
         os << ", L3: " << SimdCpuInfo(SimdCpuInfoCacheL3) / 1024 << " KB";
+        os << ", RAM: " << SimdCpuInfo(SimdCpuInfoRam) / 1024 / 1024 << " MB";
         os << "; Available SIMD:";
         os << (SimdCpuInfo(SimdCpuInfoAmx) ? " AMX" : "");
         os << (SimdCpuInfo(SimdCpuInfoAvx512bf16) ? " AVX-512BF16" : "");
@@ -918,103 +920,107 @@ namespace Simd
 
     /*! @ingroup bgra_conversion
 
-        \fn void BgraToYuv420p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v)
+        \fn void BgraToYuv420p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 32-bit BGRA image to YUV420P.
 
         The input BGRA and output Y images must have the same width and height.
         The input U and V images must have the same width and height (half size relative to Y component).
 
-        \note This function is a C++ wrapper for function ::SimdBgraToYuv420p.
+        \note This function is a C++ wrapper for function ::SimdBgraToYuv420pV2.
 
         \param [in] bgra - an input 32-bit BGRA image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgraToYuv420p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v)
+    template<template<class> class A> SIMD_INLINE void BgraToYuv420p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == 2 * v.height && y.format == v.format);
         assert(y.width == bgra.width && y.height == bgra.height);
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdBgraToYuv420p(bgra.data, bgra.width, bgra.height, bgra.stride, y.data, y.stride, u.data, u.stride, v.data, v.stride);
+        SimdBgraToYuv420pV2(bgra.data, bgra.stride, bgra.width, bgra.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, yuvType);
     }
 
     /*! @ingroup bgra_conversion
 
-        \fn void BgraToYuv422p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v)
+        \fn void BgraToYuv422p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 32-bit BGRA image to YUV422P.
 
         The input BGRA and output Y images must have the same width and height.
         The input U and V images must have the same width and height (their width is equal to half width of Y component).
 
-        \note This function is a C++ wrapper for function ::SimdBgraToYuv422p.
+        \note This function is a C++ wrapper for function ::SimdBgraToYuv422pV2.
 
         \param [in] bgra - an input 32-bit BGRA image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgraToYuv422p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v)
+    template<template<class> class A> SIMD_INLINE void BgraToYuv422p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == v.height && y.format == v.format);
         assert(y.width == bgra.width && y.height == bgra.height);
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdBgraToYuv422p(bgra.data, bgra.width, bgra.height, bgra.stride, y.data, y.stride, u.data, u.stride, v.data, v.stride);
+        SimdBgraToYuv422pV2(bgra.data, bgra.stride, bgra.width, bgra.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, yuvType);
     }
 
     /*! @ingroup bgra_conversion
 
-        \fn void BgraToYuv444p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v)
+        \fn void BgraToYuv444p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 32-bit BGRA image to YUV444P.
 
         The input BGRA and output Y, U and V images must have the same width and height.
 
-        \note This function is a C++ wrapper for function ::SimdBgraToYuv444p.
+        \note This function is a C++ wrapper for function ::SimdBgraToYuv444pV2.
 
         \param [in] bgra - an input 32-bit BGRA image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgraToYuv444p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v)
+    template<template<class> class A> SIMD_INLINE void BgraToYuv444p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(EqualSize(bgra, y) && Compatible(y, u, v));
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdBgraToYuv444p(bgra.data, bgra.width, bgra.height, bgra.stride, y.data, y.stride, u.data, u.stride, v.data, v.stride);
+        SimdBgraToYuv444pV2(bgra.data, bgra.stride, bgra.width, bgra.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, yuvType);
     }
 
     /*! @ingroup bgra_conversion
 
-        \fn void BgraToYuva420p(const View<A> & bgra, View<A> & y, View<A> & u, View<A> & v, View<A> & a)
+        \fn void BgraToYuva420p(const View<A> & bgra, View<A> & y, View<A> & u, View<A> & v, View<A> & a, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 32-bit BGRA image to YUVA420P.
 
         The input BGRA and output Y and A images must have the same width and height.
         The input U and V images must have the same width and height (half size relative to Y component).
 
-        \note This function is a C++ wrapper for function ::SimdBgraToYuva420p.
+        \note This function is a C++ wrapper for function ::SimdBgraToYuva420pV2.
 
         \param [in] bgra - an input 32-bit BGRA image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
         \param [out] a - an output 8-bit image with alpha plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgraToYuva420p(const View<A> & bgra, View<A> & y, View<A> & u, View<A> & v, View<A> & a)
+    template<template<class> class A> SIMD_INLINE void BgraToYuva420p(const View<A> & bgra, View<A> & y, View<A> & u, View<A> & v, View<A> & a, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(Compatible(y, a) && Compatible(u, v) && EqualSize(y, bgra));
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdBgraToYuva420p(bgra.data, bgra.stride, bgra.width, bgra.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, a.data, a.stride);
+        SimdBgraToYuva420pV2(bgra.data, bgra.stride, bgra.width, bgra.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, a.data, a.stride, yuvType);
     }
 
     /*! @ingroup bgr_conversion
@@ -1186,77 +1192,80 @@ namespace Simd
 
     /*! @ingroup bgr_conversion
 
-        \fn void BgrToYuv420p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v)
+        \fn void BgrToYuv420p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 24-bit BGR image to YUV420P.
 
         The input BGR and output Y images must have the same width and height.
         The input U and V images must have the same width and height (half size relative to Y component).
 
-        \note This function is a C++ wrapper for function ::SimdBgrToYuv420p.
+        \note This function is a C++ wrapper for function ::SimdBgrToYuv420pV2.
 
         \param [in] bgr - an input 24-bit BGR image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgrToYuv420p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v)
+    template<template<class> class A> SIMD_INLINE void BgrToYuv420p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == 2 * v.height && y.format == v.format);
         assert(y.width == bgr.width && y.height == bgr.height);
         assert(y.format == View<A>::Gray8 && bgr.format == View<A>::Bgr24);
 
-        SimdBgrToYuv420p(bgr.data, bgr.width, bgr.height, bgr.stride, y.data, y.stride, u.data, u.stride, v.data, v.stride);
+        SimdBgrToYuv420pV2(bgr.data, bgr.stride, bgr.width, bgr.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, yuvType);
     }
 
     /*! @ingroup bgr_conversion
 
-        \fn void BgrToYuv422p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v)
+        \fn void BgrToYuv422p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 24-bit BGR image to YUV422P.
 
         The input BGR and output Y images must have the same width and height.
         The input U and V images must have the same width and height (their width is equal to half width of Y component).
 
-        \note This function is a C++ wrapper for function ::SimdBgrToYuv422p.
+        \note This function is a C++ wrapper for function ::SimdBgrToYuv422pV2.
 
         \param [in] bgr - an input 24-bit BGR image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgrToYuv422p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v)
+    template<template<class> class A> SIMD_INLINE void BgrToYuv422p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == v.height && y.format == v.format);
         assert(y.width == bgr.width && y.height == bgr.height);
         assert(y.format == View<A>::Gray8 && bgr.format == View<A>::Bgr24);
 
-        SimdBgrToYuv422p(bgr.data, bgr.width, bgr.height, bgr.stride, y.data, y.stride, u.data, u.stride, v.data, v.stride);
+        SimdBgrToYuv422pV2(bgr.data, bgr.stride, bgr.width, bgr.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, yuvType);
     }
 
     /*! @ingroup bgr_conversion
 
-        \fn void BgrToYuv444p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v)
+        \fn void BgrToYuv444p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts 24-bit BGR image to YUV444P.
 
         The input BGR and output Y, U and V images must have the same width and height.
 
-        \note This function is a C++ wrapper for function ::SimdBgrToYuv444p.
+        \note This function is a C++ wrapper for function ::SimdBgrToYuv444pV2.
 
         \param [in] bgr - an input 24-bit BGR image.
         \param [out] y - an output 8-bit image with Y color plane.
         \param [out] u - an output 8-bit image with U color plane.
         \param [out] v - an output 8-bit image with V color plane.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void BgrToYuv444p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v)
+    template<template<class> class A> SIMD_INLINE void BgrToYuv444p(const View<A>& bgr, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(EqualSize(bgr, y) && Compatible(y, u, v));
         assert(y.format == View<A>::Gray8 && bgr.format == View<A>::Bgr24);
 
-        SimdBgrToYuv444p(bgr.data, bgr.width, bgr.height, bgr.stride, y.data, y.stride, u.data, u.stride, v.data, v.stride);
+        SimdBgrToYuv444pV2(bgr.data, bgr.stride, bgr.width, bgr.height, y.data, y.stride, u.data, u.stride, v.data, v.stride, yuvType);
     }
 
     /*! @ingroup binarization
@@ -2567,11 +2576,13 @@ namespace Simd
 
         \note This function is a C++ wrapper for function ::SimdInterferenceIncrement.
 
+        \warning This function is deprecated and can be removed in the future.
+
         \param [in, out] dst - a 16-bit signed integer image with statistic.
         \param [in] increment - an increment of statistic.
         \param [in] saturation - an upper saturation of statistic.
     */
-    template<template<class> class A> SIMD_INLINE void InterferenceIncrement(View<A> & dst, uint8_t increment, int16_t saturation)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceIncrement(View<A> & dst, uint8_t increment, int16_t saturation)
     {
         assert(dst.format == View<A>::Int16);
 
@@ -2595,13 +2606,15 @@ namespace Simd
 
         \note This function is a C++ wrapper for function ::SimdInterferenceIncrementMasked.
 
+        \warning This function is deprecated and can be removed in the future.
+
         \param [in, out] dst - a 16-bit signed integer image with statistic.
         \param [in] increment - an increment of statistic.
         \param [in] saturation - an upper saturation of statistic.
         \param [in] mask - a 8-bit gray image with mask.
         \param [in] index - an index of mask.
     */
-    template<template<class> class A> SIMD_INLINE void InterferenceIncrementMasked(View<A> & dst, uint8_t increment, int16_t saturation, const View<A>& mask, uint8_t index)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceIncrementMasked(View<A> & dst, uint8_t increment, int16_t saturation, const View<A>& mask, uint8_t index)
     {
         assert(dst.format == View<A>::Int16 && mask.format == View<A>::Gray8 && EqualSize(dst, mask));
 
@@ -2623,11 +2636,13 @@ namespace Simd
 
         \note This function is a C++ wrapper for function ::SimdInterferenceDecrement.
 
+        \warning This function is deprecated and can be removed in the future.
+
         \param [in, out] dst - a 16-bit signed integer image with statistic.
         \param [in] decrement - a decrement of statistic.
         \param [in] saturation - a lower saturation of statistic.
     */
-    template<template<class> class A> SIMD_INLINE void InterferenceDecrement(View<A> & dst, uint8_t decrement, int16_t saturation)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceDecrement(View<A> & dst, uint8_t decrement, int16_t saturation)
     {
         assert(dst.format == View<A>::Int16);
 
@@ -2651,13 +2666,15 @@ namespace Simd
 
         \note This function is a C++ wrapper for function ::SimdInterferenceDecrementMasked.
 
+        \warning This function is deprecated and can be removed in the future.
+
         \param [in, out] dst - a 16-bit signed integer image with statistic.
         \param [in] decrement - a decrement of statistic.
         \param [in] saturation - a lower saturation of statistic.
         \param [in] mask - a 8-bit gray image with mask.
         \param [in] index - an index of mask.
     */
-    template<template<class> class A> SIMD_INLINE void InterferenceDecrementMasked(View<A> & dst, uint8_t decrement, int16_t saturation, const View<A>& mask, uint8_t index)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void InterferenceDecrementMasked(View<A> & dst, uint8_t decrement, int16_t saturation, const View<A>& mask, uint8_t index)
     {
         assert(dst.format == View<A>::Int16 && mask.format == View<A>::Gray8 && EqualSize(dst, mask));
 
@@ -3251,7 +3268,7 @@ namespace Simd
         SimdReduceColor2x2(src.data, src.width, src.height, src.stride, dst.data, dst.width, dst.height, dst.stride, src.ChannelCount());
     }
 
-    /*! @ingroup resizing
+    /*! @ingroup resizing_old
 
         \fn void ResizeBilinear(const View<A>& src, View<A>& dst)
 
@@ -3261,10 +3278,12 @@ namespace Simd
 
         \note This function is a C++ wrapper for function ::SimdResizeBilinear.
 
+        \warning This function is deprecated and can be removed in the future. Use function Simd::Resize instead this one.
+
         \param [in] src - an original input image.
         \param [out] dst - a resized output image.
     */
-    template<template<class> class A> SIMD_INLINE void ResizeBilinear(const View<A> & src, View<A> & dst)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void ResizeBilinear(const View<A> & src, View<A> & dst)
     {
         assert(src.format == dst.format && src.ChannelSize() == 1);
 
@@ -3279,7 +3298,7 @@ namespace Simd
         }
     }
 
-    /*! @ingroup resizing
+    /*! @ingroup resizing_old
 
         \fn void ResizeAreaGray(const View<A> & src, View<A> & dst)
 
@@ -3287,10 +3306,12 @@ namespace Simd
 
         All images must have the same format (8-bit gray).
 
+        \warning This function is deprecated and can be removed in the future. Use function Simd::Resize instead this one.
+
         \param [in] src - an original input image.
         \param [out] dst - a resized output image.
     */
-    template<template<class> class A> SIMD_INLINE void ResizeAreaGray(const View<A> & src, View<A> & dst)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void ResizeAreaGray(const View<A> & src, View<A> & dst)
     {
         assert(src.format == dst.format && src.format == View<A>::Gray8);
 
@@ -3316,7 +3337,7 @@ namespace Simd
         }
     }
 
-    /*! @ingroup resizing
+    /*! @ingroup resizing_old
 
         \fn void ResizeArea(const View<A> & src, View<A> & dst)
 
@@ -3324,10 +3345,12 @@ namespace Simd
 
         All images must have the same format.
 
+        \warning This function is deprecated and can be removed in the future. Use function Simd::Resize instead this one.
+
         \param [in] src - an original input image.
         \param [out] dst - a resized output image.
     */
-    template<template<class> class A> SIMD_INLINE void ResizeArea(const View<A> & src, View<A> & dst)
+    template<template<class> class A> SIMD_DEPRECATED SIMD_INLINE void ResizeArea(const View<A> & src, View<A> & dst)
     {
         assert(src.format == dst.format);
 
@@ -3343,15 +3366,15 @@ namespace Simd
             if (level)
             {
                 std::vector<View<A> > pyramid(level);
-                pyramid[0].Resize(size, src.format);
+                pyramid[0].Recreate(size, src.format);
                 Simd::ResizeBilinear(src, pyramid[0]);
                 for (size_t i = 1; i < level; ++i)
                 {
                     size = Simd::Scale(size);
-                    pyramid[i].Resize(size, src.format);
-                    Simd::Reduce2x2(pyramid.At(i - 1), pyramid.At(i));
+                    pyramid[i].Recreate(size, src.format);
+                    Simd::Reduce2x2(pyramid[i - 1], pyramid[i]);
                 }
-                Simd::Reduce2x2(pyramid.At(level - 1), dst);
+                Simd::Reduce2x2(pyramid[level - 1], dst);
             }
             else
                 Simd::ResizeBilinear(src, dst);
@@ -4669,153 +4692,159 @@ namespace Simd
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv420pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr)
+        \fn void Yuv420pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV420P image to 24-bit BGR image.
 
         The input Y and output BGR images must have the same width and height.
         The input U and V images must have the same width and height (half size relative to Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuv420pToBgr.
+        \note This function is a C++ wrapper for function ::SimdYuv420pToBgrV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgr - an output 24-bit BGR image.
-    */
-    template<template<class> class A> SIMD_INLINE void Yuv420pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr)
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
+        */
+    template<template<class> class A> SIMD_INLINE void Yuv420pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == 2 * v.height && y.format == v.format);
         assert(y.width == bgr.width && y.height == bgr.height);
         assert(y.format == View<A>::Gray8 && bgr.format == View<A>::Bgr24);
 
-        SimdYuv420pToBgr(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgr.data, bgr.stride);
+        SimdYuv420pToBgrV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgr.data, bgr.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv422pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr)
+        \fn void Yuv422pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV422P image to 24-bit BGR image.
 
         The input Y and output BGR images must have the same width and height.
         The input U and V images must have the same width and height (their width is equal to half width of Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuv422pToBgr.
+        \note This function is a C++ wrapper for function ::SimdYuv422pToBgrV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgr - an output 24-bit BGR image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv422pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr)
+    template<template<class> class A> SIMD_INLINE void Yuv422pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == v.height && y.format == v.format);
         assert(y.width == bgr.width && y.height == bgr.height);
         assert(y.format == View<A>::Gray8 && bgr.format == View<A>::Bgr24);
 
-        SimdYuv422pToBgr(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgr.data, bgr.stride);
+        SimdYuv422pToBgrV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgr.data, bgr.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv444pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr)
+        \fn void Yuv444pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV444P image to 24-bit BGR image.
 
         The input Y, U, V and output BGR images must have the same width and height.
 
-        \note This function is a C++ wrapper for function ::SimdYuv444pToBgr.
+        \note This function is a C++ wrapper for function ::SimdYuv444pToBgrV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgr - an output 24-bit BGR image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv444pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr)
+    template<template<class> class A> SIMD_INLINE void Yuv444pToBgr(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgr, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(Compatible(y, u, v) && EqualSize(y, bgr) && y.format == View<A>::Gray8 && bgr.format == View<A>::Bgr24);
 
-        SimdYuv444pToBgr(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgr.data, bgr.stride);
+        SimdYuv444pToBgrV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgr.data, bgr.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF)
+        \fn void Yuv420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV420P image to 32-bit BGRA image.
 
         The input Y and output BGRA images must have the same width and height.
         The input U and V images must have the same width and height (half size relative to Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuv420pToBgra.
+        \note This function is a C++ wrapper for function ::SimdYuv420pToBgraV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgra - an output 32-bit BGRA image.
         \param [in] alpha - a value of alpha channel. It is equal to 255 by default.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF)
+    template<template<class> class A> SIMD_INLINE void Yuv420pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == 2 * v.height && y.format == v.format);
         assert(y.width == bgra.width && y.height == bgra.height);
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdYuv420pToBgra(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgra.data, bgra.stride, alpha);
+        SimdYuv420pToBgraV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgra.data, bgra.stride, alpha, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv422pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF)
+        \fn void Yuv422pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV422P image to 32-bit BGRA image.
 
         The input Y and output BGRA images must have the same width and height.
         The input U and V images must have the same width and height (their width is equal to half width of Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuv422pToBgra.
+        \note This function is a C++ wrapper for function ::SimdYuv422pToBgraV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgra - an output 32-bit BGRA image.
         \param [in] alpha - a value of alpha channel. It is equal to 255 by default.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv422pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF)
+    template<template<class> class A> SIMD_INLINE void Yuv422pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == v.height && y.format == v.format);
         assert(y.width == bgra.width && y.height == bgra.height);
         assert(y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdYuv422pToBgra(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgra.data, bgra.stride, alpha);
+        SimdYuv422pToBgraV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgra.data, bgra.stride, alpha, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv444pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF)
+        \fn void Yuv444pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV444P image to 32-bit BGRA image.
 
         The input Y, U, V and output BGRA images must have the same width and height.
 
-        \note This function is a C++ wrapper for function ::SimdYuv444pToBgra.
+        \note This function is a C++ wrapper for function ::SimdYuv444pToBgraV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] bgra - an output 32-bit BGRA image.
         \param [in] alpha - a value of alpha channel. It is equal to 255 by default.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv444pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF)
+    template<template<class> class A> SIMD_INLINE void Yuv444pToBgra(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& bgra, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(Compatible(y, u, v) && EqualSize(y, bgra) && y.format == View<A>::Gray8 && bgra.format == View<A>::Bgra32);
 
-        SimdYuv444pToBgra(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgra.data, bgra.stride, alpha);
+        SimdYuv444pToBgraV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, bgra.data, bgra.stride, alpha, yuvType);
     }
 
     /*! @ingroup yuv_conversion
@@ -4911,76 +4940,79 @@ namespace Simd
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv420pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb)
+        \fn void Yuv420pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV420P image to 24-bit RGB image.
 
         The input Y and output RGB images must have the same width and height.
         The input U and V images must have the same width and height (half size relative to Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuv420pToRgb.
+        \note This function is a C++ wrapper for function ::SimdYuv420pToRgbV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] rgb - an output 24-bit RGB image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv420pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb)
+    template<template<class> class A> SIMD_INLINE void Yuv420pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == 2 * u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == 2 * v.height && y.format == v.format);
         assert(y.width == rgb.width && y.height == rgb.height);
         assert(y.format == View<A>::Gray8 && rgb.format == View<A>::Rgb24);
 
-        SimdYuv420pToRgb(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride);
+        SimdYuv420pToRgbV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv422pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb)
+        \fn void Yuv422pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV422P image to 24-bit RGB image.
 
         The input Y and output RGB images must have the same width and height.
         The input U and V images must have the same width and height (their width is equal to half width of Y component).
 
-        \note This function is a C++ wrapper for function ::SimdYuv422pToRgb.
+        \note This function is a C++ wrapper for function ::SimdYuv422pToRgbV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] rgb - an output 24-bit RGB image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv422pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb)
+    template<template<class> class A> SIMD_INLINE void Yuv422pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(y.width == 2 * u.width && y.height == u.height && y.format == u.format);
         assert(y.width == 2 * v.width && y.height == v.height && y.format == v.format);
         assert(y.width == rgb.width && y.height == rgb.height);
         assert(y.format == View<A>::Gray8 && rgb.format == View<A>::Rgb24);
 
-        SimdYuv422pToRgb(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride);
+        SimdYuv422pToRgbV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion
 
-        \fn void Yuv444pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb)
+        \fn void Yuv444pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb, SimdYuvType yuvType = SimdYuvBt601)
 
         \short Converts YUV444P image to 24-bit RGB image.
 
         The input Y, U, V and output RGB images must have the same width and height.
 
-        \note This function is a C++ wrapper for function ::SimdYuv444pToRgb.
+        \note This function is a C++ wrapper for function ::SimdYuv444pToRgbV2.
 
         \param [in] y - an input 8-bit image with Y color plane.
         \param [in] u - an input 8-bit image with U color plane.
         \param [in] v - an input 8-bit image with V color plane.
         \param [out] rgb - an output 24-bit RGB image.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
     */
-    template<template<class> class A> SIMD_INLINE void Yuv444pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb)
+    template<template<class> class A> SIMD_INLINE void Yuv444pToRgb(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgb, SimdYuvType yuvType = SimdYuvBt601)
     {
         assert(Compatible(y, u, v) && EqualSize(y, rgb) && y.format == View<A>::Gray8 && rgb.format == View<A>::Rgb24);
 
-        SimdYuv444pToRgb(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride);
+        SimdYuv444pToRgbV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride, yuvType);
     }
 
     /*! @ingroup yuv_conversion

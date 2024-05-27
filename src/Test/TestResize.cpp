@@ -321,6 +321,8 @@ namespace Test
     {
         bool result = true;
 
+        result = result && ResizerAutoTest(method, type, channels, 530, 404, 96, 96, f1, f2);
+
         result = result && ResizerAutoTest(method, type, channels, 124, 93, 319, 239, f1, f2);
         result = result && ResizerAutoTest(method, type, channels, 249, 187, 319, 239, f1, f2);
         result = result && ResizerAutoTest(method, type, channels, 499, 374, 319, 239, f1, f2);
@@ -344,6 +346,10 @@ namespace Test
     bool ResizerAutoTest(const FuncRS & f1, const FuncRS & f2)
     {
         bool result = true;
+
+        result = result && ResizerAutoTest(SimdResizeMethodAreaFast, SimdResizeChannelByte, 3, 530, 404, 96, 96, f1, f2);
+        //result = result && ResizerAutoTest(SimdResizeMethodBilinear, SimdResizeChannelByte, 4, 100, 1, 200, 10, f1, f2);
+        //result = result && ResizerAutoTest(SimdResizeMethodBicubic, SimdResizeChannelByte, 4, 100, 2, 200, 10, f1, f2);
 
 #if !defined(__aarch64__) || 1  
         std::vector<SimdResizeMethodType> methods = { SimdResizeMethodNearest, SimdResizeMethodBilinear, SimdResizeMethodBicubic, SimdResizeMethodArea, SimdResizeMethodAreaFast };
@@ -562,6 +568,34 @@ namespace Test
         result = result && ResizeYuv420pSpecialTest(SimdResizeMethodArea);
 
         result = result && ResizeYuv420pSpecialTest(SimdResizeMethodAreaFast);
+
+        return result;
+    }
+
+    bool ResizeAreaGraySpecialTest()
+    {
+        bool result = true;
+
+        View src(W, H, View::Gray8);
+        FillRandom(src);
+
+        View dst(W / 7, H / 7, View::Gray8);
+
+        ResizeAreaGray(src, dst);
+
+        return result;
+    }
+
+    bool ResizeAreaSpecialTest()
+    {
+        bool result = true;
+
+        View src(W, H, View::Bgr24);
+        FillRandom(src);
+
+        View dst(W / 7, H / 7, View::Bgr24);
+
+        ResizeArea(src, dst);
 
         return result;
     }

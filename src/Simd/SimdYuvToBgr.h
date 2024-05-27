@@ -31,6 +31,12 @@
 #include "Simd/SimdLog.h"
 #include "Simd/SimdLoad.h"
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900    
+#define SIMD_YUV_TO_BGR_INLINE inline
+#else
+#define SIMD_YUV_TO_BGR_INLINE SIMD_INLINE
+#endif
+
 namespace Simd
 {
     namespace Base
@@ -209,6 +215,13 @@ namespace Simd
             bgra[1] = YuvToGreen<T>(y, u, v);
             bgra[2] = YuvToRed<T>(y, v);
             bgra[3] = alpha;
+        }
+
+        template<class T> SIMD_INLINE void YuvToRgb(int y, int u, int v, uint8_t* rgb)
+        {
+            rgb[0] = YuvToRed<T>(y, v);
+            rgb[1] = YuvToGreen<T>(y, u, v);
+            rgb[2] = YuvToBlue<T>(y, u);
         }
 
         //-------------------------------------------------------------------------------------------------
@@ -674,6 +687,13 @@ namespace Simd
                 BgrToY32<T>(UnpackU16<1>(b16, r16), UnpackU16<1>(g16, K16_0001)))));
         }
 
+        template<class T> SIMD_INLINE __m512i BgrToY16(__m512i b16_r16[2], __m512i g16_1[2])
+        {
+            static const __m512i Y_LO = SIMD_MM512_SET1_EPI16(T::Y_LO);
+            return SaturateI16ToU8(_mm512_add_epi16(Y_LO, _mm512_packs_epi32(
+                BgrToY32<T>(b16_r16[0], g16_1[0]), BgrToY32<T>(b16_r16[1], g16_1[1]))));
+        }
+
         template<class T> SIMD_INLINE __m512i BgrToY8(__m512i b8, __m512i g8, __m512i r8)
         {
             return _mm512_packus_epi16(
@@ -696,6 +716,13 @@ namespace Simd
                 BgrToU32<T>(UnpackU16<1>(b16, r16), UnpackU16<1>(g16, K16_0001)))));
         }
 
+        template<class T> SIMD_INLINE __m512i BgrToU16(__m512i b16_r16[2], __m512i g16_1[2])
+        {
+            static const __m512i UV_Z = SIMD_MM512_SET1_EPI16(T::UV_Z);
+            return SaturateI16ToU8(_mm512_add_epi16(UV_Z, _mm512_packs_epi32(
+                BgrToU32<T>(b16_r16[0], g16_1[0]), BgrToU32<T>(b16_r16[1], g16_1[1]))));
+        }
+
         template<class T> SIMD_INLINE __m512i BgrToU8(__m512i b8, __m512i g8, __m512i r8)
         {
             return _mm512_packus_epi16(
@@ -716,6 +743,13 @@ namespace Simd
             return SaturateI16ToU8(_mm512_add_epi16(UV_Z, _mm512_packs_epi32(
                 BgrToV32<T>(UnpackU16<0>(b16, r16), UnpackU16<0>(g16, K16_0001)),
                 BgrToV32<T>(UnpackU16<1>(b16, r16), UnpackU16<1>(g16, K16_0001)))));
+        }
+
+        template<class T> SIMD_INLINE __m512i BgrToV16(__m512i b16_r16[2], __m512i g16_1[2])
+        {
+            static const __m512i UV_Z = SIMD_MM512_SET1_EPI16(T::UV_Z);
+            return SaturateI16ToU8(_mm512_add_epi16(UV_Z, _mm512_packs_epi32(
+                BgrToV32<T>(b16_r16[0], g16_1[0]), BgrToV32<T>(b16_r16[1], g16_1[1]))));
         }
 
         template<class T> SIMD_INLINE __m512i BgrToV8(__m512i b8, __m512i g8, __m512i r8)
@@ -816,6 +850,15 @@ namespace Simd
             bgr.val[0] = PackSaturatedI16(YuvToBlue<T>(yLo, uLo), YuvToBlue<T>(yHi, uHi));
             bgr.val[1] = PackSaturatedI16(YuvToGreen<T>(yLo, uLo, vLo), YuvToGreen<T>(yHi, uHi, vHi));
             bgr.val[2] = PackSaturatedI16(YuvToRed<T>(yLo, vLo), YuvToRed<T>(yHi, vHi));
+        }
+
+        template <class T> SIMD_INLINE void YuvToRgb(uint8x16_t y, uint8x16_t u, uint8x16_t v, uint8x16x3_t& rgb)
+        {
+            int16x8_t yLo = UnpackY<T, 0>(y), uLo = UnpackUV<T, 0>(u), vLo = UnpackUV<T, 0>(v);
+            int16x8_t yHi = UnpackY<T, 1>(y), uHi = UnpackUV<T, 1>(u), vHi = UnpackUV<T, 1>(v);
+            rgb.val[0] = PackSaturatedI16(YuvToRed<T>(yLo, vLo), YuvToRed<T>(yHi, vHi));
+            rgb.val[1] = PackSaturatedI16(YuvToGreen<T>(yLo, uLo, vLo), YuvToGreen<T>(yHi, uHi, vHi));
+            rgb.val[2] = PackSaturatedI16(YuvToBlue<T>(yLo, uLo), YuvToBlue<T>(yHi, uHi));
         }
 
         //-------------------------------------------------------------------------------------------------

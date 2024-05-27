@@ -66,7 +66,7 @@ namespace Simd
                         if (dy >= noseY && dy < bodyY)
                         {
                             size_t dx = 0;
-                            for (; dx < noseX; ++dx, pd += srcC)
+                            for (; dx < noseX; ++dx, pd += p.dstC)
                             {
                                 __m512 sum = _bias;
                                 for (size_t ky = 0; ky < p.kernelY; ++ky)
@@ -85,7 +85,7 @@ namespace Simd
                                 }
                                 _mm512_mask_storeu_ps(pd, tail, Activate<type>(sum, _params, 0));
                             }
-                            for (; dx < bodyX8; dx += 8, pd += 8 * srcC)
+                            for (; dx < bodyX8; dx += 8, pd += 8 * p.dstC)
                             {
                                 __m512 sum0 = _bias;
                                 __m512 sum1 = _bias;
@@ -113,16 +113,16 @@ namespace Simd
                                         sum7 = _mm512_fmadd_ps(_mm512_loadu_ps(ps + 7 * strideXF), w0, sum7);
                                     }
                                 }
-                                _mm512_mask_storeu_ps(pd + 0 * srcC, tail, Activate<type>(sum0, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 1 * srcC, tail, Activate<type>(sum1, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 2 * srcC, tail, Activate<type>(sum2, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 3 * srcC, tail, Activate<type>(sum3, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 4 * srcC, tail, Activate<type>(sum4, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 5 * srcC, tail, Activate<type>(sum5, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 6 * srcC, tail, Activate<type>(sum6, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 7 * srcC, tail, Activate<type>(sum7, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 0 * p.dstC, tail, Activate<type>(sum0, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 1 * p.dstC, tail, Activate<type>(sum1, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 2 * p.dstC, tail, Activate<type>(sum2, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 3 * p.dstC, tail, Activate<type>(sum3, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 4 * p.dstC, tail, Activate<type>(sum4, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 5 * p.dstC, tail, Activate<type>(sum5, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 6 * p.dstC, tail, Activate<type>(sum6, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 7 * p.dstC, tail, Activate<type>(sum7, _params, 0));
                             }
-                            for (; dx < bodyX4; dx += 4, pd += 4 * srcC)
+                            for (; dx < bodyX4; dx += 4, pd += 4 * p.dstC)
                             {
                                 __m512 sum0 = _bias;
                                 __m512 sum1 = _bias;
@@ -142,12 +142,12 @@ namespace Simd
                                         sum3 = _mm512_fmadd_ps(_mm512_loadu_ps(ps + 3 * strideXF), w0, sum3);
                                     }
                                 }
-                                _mm512_mask_storeu_ps(pd + 0 * srcC, tail, Activate<type>(sum0, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 1 * srcC, tail, Activate<type>(sum1, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 2 * srcC, tail, Activate<type>(sum2, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 3 * srcC, tail, Activate<type>(sum3, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 0 * p.dstC, tail, Activate<type>(sum0, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 1 * p.dstC, tail, Activate<type>(sum1, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 2 * p.dstC, tail, Activate<type>(sum2, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 3 * p.dstC, tail, Activate<type>(sum3, _params, 0));
                             }
-                            for (; dx < bodyX2; dx += 2, pd += 2 * srcC)
+                            for (; dx < bodyX2; dx += 2, pd += 2 * p.dstC)
                             {
                                 __m512 sum0 = _bias;
                                 __m512 sum1 = _bias;
@@ -163,10 +163,10 @@ namespace Simd
                                         sum1 = _mm512_fmadd_ps(_mm512_loadu_ps(ps + 1 * strideXF), w0, sum1);
                                     }
                                 }
-                                _mm512_mask_storeu_ps(pd + 0 * srcC, tail, Activate<type>(sum0, _params, 0));
-                                _mm512_mask_storeu_ps(pd + 1 * srcC, tail, Activate<type>(sum1, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 0 * p.dstC, tail, Activate<type>(sum0, _params, 0));
+                                _mm512_mask_storeu_ps(pd + 1 * p.dstC, tail, Activate<type>(sum1, _params, 0));
                             }
-                            for (; dx < bodyX; ++dx, pd += srcC)
+                            for (; dx < bodyX; ++dx, pd += p.dstC)
                             {
                                 __m512 sum = _bias;
                                 const float* pw = weight;
@@ -182,7 +182,7 @@ namespace Simd
                                 }
                                 _mm512_mask_storeu_ps(pd, tail, Activate<type>(sum, _params, 0));
                             }
-                            for (; dx < p.dstW; ++dx, pd += srcC)
+                            for (; dx < p.dstW; ++dx, pd += p.dstC)
                             {
                                 __m512 sum = _bias;
                                 for (size_t ky = 0; ky < p.kernelY; ++ky)
@@ -204,7 +204,7 @@ namespace Simd
                         }
                         else
                         {
-                            for (size_t dx = 0; dx < p.dstW; ++dx, pd += srcC)
+                            for (size_t dx = 0; dx < p.dstW; ++dx, pd += p.dstC)
                             {
                                 __m512 sum = _bias;
                                 for (size_t ky = 0; ky < p.kernelY; ++ky)
@@ -228,7 +228,6 @@ namespace Simd
                             }
                         }
                     }
-
                     src += srcS;
                     dst += F;
                     weight += weightS;
@@ -449,7 +448,7 @@ namespace Simd
                         if (padX)
                             ConvolutionDepthwise3x3Edge3x2<type>(src0, src1, src2, _weight + 1, _bias, _params, pDst, tail), pDst += p.dstC, dx++, src0 += xStep0, src1 += xStep0, src2 += xStep0;
                         for (; dx < xMainEnd2; dx += 2, pDst += 2 * p.dstC, src0 += 2 * xStep, src1 += 2 * xStep, src2 += 2 * xStep)
-                            ConvolutionDepthwise3x3Main1x2<type>(src0, src1, src2, _weight + 0, _bias, _params, pDst, srcC, tail);
+                            ConvolutionDepthwise3x3Main1x2<type>(src0, src1, src2, _weight + 0, _bias, _params, pDst, p.dstC, tail);
                         for (; dx < xMainEnd; dx++, pDst += p.dstC, src0 += xStep, src1 += xStep, src2 += xStep)
                             ConvolutionDepthwise3x3Main1x1<type>(src0, src1, src2, _weight + 0, _bias, _params, pDst, tail);
                         if (padW)

@@ -29,7 +29,9 @@
 #include "Test/TestString.h"
 
 #if defined(_MSC_VER)
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 
@@ -113,8 +115,11 @@ namespace Test
     TEST_ADD_GROUP_A0(BgraToYuv444p);
     TEST_ADD_GROUP_A0(BgraToYuv444pV2);
     TEST_ADD_GROUP_A0(BgrToYuv420p);
+    TEST_ADD_GROUP_A0(BgrToYuv420pV2);
     TEST_ADD_GROUP_A0(BgrToYuv422p);
+    TEST_ADD_GROUP_A0(BgrToYuv422pV2);
     TEST_ADD_GROUP_A0(BgrToYuv444p);
+    TEST_ADD_GROUP_A0(BgrToYuv444pV2);
     TEST_ADD_GROUP_A0(Uyvy422ToYuv420p);
     TEST_ADD_GROUP_A0(BgraToYuva420p);
     TEST_ADD_GROUP_A0(BgraToYuva420pV2);
@@ -337,6 +342,8 @@ namespace Test
     TEST_ADD_GROUP_AS(ResizeBilinear);
     TEST_ADD_GROUP_A0(Resizer);
     TEST_ADD_GROUP_0S(ResizeYuv420p);
+    TEST_ADD_GROUP_0S(ResizeAreaGray);
+    TEST_ADD_GROUP_0S(ResizeArea);
 
     TEST_ADD_GROUP_A0(SegmentationShrinkRegion);
     TEST_ADD_GROUP_A0(SegmentationFillSingleHoles);
@@ -405,6 +412,8 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetFusedLayerForward8);
     TEST_ADD_GROUP_A0(SynetFusedLayerForward9);
 
+    TEST_ADD_GROUP_A0(SynetGridSample2d);
+
     TEST_ADD_GROUP_A0(SynetInnerProduct32fForward);
     TEST_ADD_GROUP_A0(SynetInnerProductLayerForward);
     TEST_ADD_GROUP_A0(SynetInnerProduct8i);
@@ -415,6 +424,7 @@ namespace Test
 
     TEST_ADD_GROUP_A0(SynetNormalizeLayerForward);
     TEST_ADD_GROUP_A0(SynetNormalizeLayerForwardV2);
+    TEST_ADD_GROUP_A0(SynetNormalizeLayerForwardV3);
 
     TEST_ADD_GROUP_A0(SynetPermute);
 
@@ -477,15 +487,21 @@ namespace Test
 #endif
 
     TEST_ADD_GROUP_A0(Yuv444pToBgr);
+    TEST_ADD_GROUP_A0(Yuv444pToBgrV2);
     TEST_ADD_GROUP_A0(Yuv422pToBgr);
+    TEST_ADD_GROUP_A0(Yuv422pToBgrV2);
     TEST_ADD_GROUP_AS(Yuv420pToBgr);
+    TEST_ADD_GROUP_A0(Yuv420pToBgrV2);
     TEST_ADD_GROUP_A0(Yuv444pToHsl);
     TEST_ADD_GROUP_A0(Yuv444pToHsv);
     TEST_ADD_GROUP_A0(Yuv444pToHue);
     TEST_ADD_GROUP_A0(Yuv420pToHue);
     TEST_ADD_GROUP_A0(Yuv444pToRgb);
+    TEST_ADD_GROUP_A0(Yuv444pToRgbV2);
     TEST_ADD_GROUP_A0(Yuv422pToRgb);
+    TEST_ADD_GROUP_A0(Yuv422pToRgbV2);
     TEST_ADD_GROUP_A0(Yuv420pToRgb);
+    TEST_ADD_GROUP_A0(Yuv420pToRgbV2);
     TEST_ADD_GROUP_A0(Yuv420pToUyvy422);
 
     TEST_ADD_GROUP_A0(Yuva420pToBgra);
@@ -493,6 +509,7 @@ namespace Test
     TEST_ADD_GROUP_A0(Yuv444pToBgra);
     TEST_ADD_GROUP_A0(Yuv444pToBgraV2);
     TEST_ADD_GROUP_A0(Yuv422pToBgra);
+    TEST_ADD_GROUP_A0(Yuv422pToBgraV2);
     TEST_ADD_GROUP_A0(Yuv420pToBgra);
     TEST_ADD_GROUP_A0(Yuv420pToBgraV2);
 
@@ -561,12 +578,31 @@ namespace Test
             }
             __except (EXCEPTION_EXECUTE_HANDLER)
             {
+                PrintErrorMessage(GetExceptionCode());
                 return false;
             }
 #else
             return group.autoTest();
 #endif
         }
+
+#if defined(_MSC_VER)
+        static void PrintErrorMessage(int code)
+        {
+            String desc;
+            switch (code)
+            {
+            case EXCEPTION_ACCESS_VIOLATION: desc = "Access violation"; break;
+            case EXCEPTION_FLT_DIVIDE_BY_ZERO: desc = "Float divide by zero"; break;
+            case EXCEPTION_INT_DIVIDE_BY_ZERO: desc = "Integer divide by zero"; break;
+            case EXCEPTION_ILLEGAL_INSTRUCTION: desc = "Illegal instruction"; break;
+            case EXCEPTION_STACK_OVERFLOW: desc = "Stack overflow"; break;
+            default:
+                desc = "Unknown error(" + std::to_string(code) + ")";
+            }
+            TEST_LOG_SS(Error, "There is unhandled exception: " << desc << " !");
+        }
+#endif
     };
     volatile bool Task::s_stopped = false;
     typedef std::shared_ptr<Task> TaskPtr;

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar,
+* Copyright (c) 2011-2023 Yermalayeu Ihar,
 *               2022-2022 Fabien Spindler.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +26,8 @@
 #define __SimdCpu_h__
 
 #include "Simd/SimdDefs.h"
+
+#include <string>
 
 namespace Simd
 {
@@ -89,12 +91,14 @@ namespace Simd
 
     namespace Cpu
     {
+        extern const std::string CPU_MODEL;
         extern const size_t SOCKET_NUMBER;
         extern const size_t CORE_NUMBER;
         extern const size_t THREAD_NUMBER;
         extern const size_t L1_CACHE_SIZE;
         extern const size_t L2_CACHE_SIZE;
         extern const size_t L3_CACHE_SIZE;
+        extern const uint64_t RAM_SIZE;
     }
 
     namespace Base
@@ -108,6 +112,8 @@ namespace Simd
 #if defined(__GNUC__) && (defined(SIMD_PPC_ENABLE) || defined(SIMD_PPC64_ENABLE) || defined(SIMD_ARM_ENABLE) || defined(SIMD_ARM64_ENABLE))
         bool CheckBit(int at, int bit);
 #endif
+
+        std::string CpuModel();
 
         size_t CpuSocketNumber();
 

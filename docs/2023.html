@@ -33,19 +33,184 @@
 </center>
 
 <hr/>
-<h3 id="R127">July 5, 2023 (version X.X.127)</h3>
+<h3 id="R130">October X, 2023 (version X.X.130)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function BgrToYuv420pV2.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function BgrToYuv422pV2.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function BgrToYuv444pV2.</li>
+ <li>Parameter yuvType in function Simd::BgrToYuv420p.</li>
+ <li>Parameter yuvType in function Simd::BgrToYuv422p.</li>
+ <li>Parameter yuvType in function Simd::BgrToYuv444p.</li>
+ <li>The mark of function SimdBgrToYuv420p as deprecated.</li>
+ <li>The mark of function SimdBgrToYuv422p as deprecated.</li>
+ <li>The mark of function SimdBgrToYuv444p as deprecated.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv420pToRgbV2.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv422pToRgbV2.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv444pToRgbV2.</li>
+ <li>Parameter yuvType in function Simd::Yuv420pToRgb.</li>
+ <li>Parameter yuvType in function Simd::Yuv422pToRgb.</li>
+ <li>Parameter yuvType in function Simd::Yuv444pToRgb</li>
+ <li>The mark of function SimdYuv420pToRgb as deprecated.</li>
+ <li>The mark of function SimdYuv422pToRgb as deprecated.</li>
+ <li>The mark of function SimdYuv444pToRgb as deprecated.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in AVX-512BW optimizations of function SynetSoftmaxLayerForward.</li>
+ <li>Error in AVX2 optimizations of class ResizerByteArea2x2 (internal buffer overflow).</li>
+ <li>Error in function Simd::BgraToYuv420p.</li>
+ <li>Error in function Simd::BgraToYuv422p.</li>
+ <li>Error in function Simd::BgraToYuv444p.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of function BgrToYuv420pV2.</li>
+ <li>Tests for verifying functionality of function BgrToYuv422pV2.</li>
+ <li>Tests for verifying functionality of function BgrToYuv444pV2.</li>
+ <li>Tests for verifying functionality of function Yuv420pToRgbV2.</li>
+ <li>Tests for verifying functionality of function Yuv422pToRgbV2.</li>
+ <li>Tests for verifying functionality of function Yuv444pToRgbV2.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R129">September 4, 2023 (version 5.3.129)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv420pToBgrV2.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv422pToBgrV2.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv444pToBgrV2.</li>
+ <li>Parameter yuvType in function Simd::Yuv420pToBgr.</li>
+ <li>Parameter yuvType in function Simd::Yuv422pToBgr.</li>
+ <li>Parameter yuvType in function Simd::Yuv444pToBgr.</li>
+ <li>The mark of function SimdYuv420pToBgr as deprecated.</li>
+ <li>The mark of function SimdYuv422pToBgr as deprecated.</li>
+ <li>The mark of function SimdYuv444pToBgr as deprecated.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function Yuv422pToBgraV2.</li>
+ <li>Parameter yuvType in function Simd::Yuv420pToBgra.</li>
+ <li>Parameter yuvType in function Simd::Yuv422pToBgra.</li>
+ <li>Parameter yuvType in function Simd::Yuv444pToBgra.</li>
+ <li>The mark of function SimdYuv420pToBgra as deprecated.</li>
+ <li>The mark of function SimdYuv422pToBgra as deprecated.</li>
+ <li>The mark of function SimdYuv444pToBgra as deprecated.</li>
+ <li>Parameter yuvType in function Simd::BgraToYuv420p.</li>
+ <li>Parameter yuvType in function Simd::BgraToYuv422p.</li>
+ <li>Parameter yuvType in function Simd::BgraToYuv444p.</li>
+ <li>Parameter yuvType in function Simd::BgraToYuva420p.</li>
+ <li>The mark of function SimdBgraToYuv420p as deprecated.</li>
+ <li>The mark of function SimdBgraToYuv422p as deprecated.</li>
+ <li>The mark of function SimdBgraToYuv444p as deprecated.</li>
+ <li>The mark of function SimdBgraToYuva420p as deprecated.</li>
+ <li>The mark of function SimdResizeBilinear as deprecated.</li>
+ <li>The mark of function Simd::ResizeBilinear as deprecated.</li>
+ <li>The mark of function Simd::ResizeAreaGray as deprecated.</li>
+ <li>The mark of function Simd::ResizeArea as deprecated.</li>
+ <li>The mark of function Simd::InterferenceIncrement as deprecated.</li>
+ <li>The mark of function Simd::InterferenceIncrementMasked as deprecated.</li>
+ <li>The mark of function Simd::InterferenceDecrement as deprecated.</li>
+ <li>The mark of function Simd::InterferenceDecrementMasked as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward0 as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward1 as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward2 as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward3 as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward4 as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward8 as deprecated.</li>
+ <li>The mark of function SimdSynetFusedLayerForward9 as deprecated.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in NEON optimizations of Resizer engine.</li>
+ <li>The memory reading outside border of input array in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntDecode32f.</li>
+ <li>The memory reading outside border of input array in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntDecode16f.</li>
+ <li>The memory reading outside border of input array in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntCosineDistance.</li>
+ <li>The memory reading outside border of input array in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntCosineDistancesMxNa.</li>
+ <li>The memory reading outside border of input array in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntCosineDistancesMxNp.</li>
+ <li>Error in AVX-512BW optimizations of function DescrIntEncode32f.</li>
+ <li>Error in AVX-512BW optimizations of function DescrIntEncode16f.</li>
+ <li>Compiler error in function Simd::ResizeArea.</li>
+ <li>Error in SSE4.1, AVX, AVX2, AVX-512BW, NEON optimizations of class MergedConvolution32fCd.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of function Yuv420pToBgrV2.</li>
+ <li>Tests for verifying functionality of function Yuv422pToBgrV2.</li>
+ <li>Tests for verifying functionality of function Yuv444pToBgrV2.</li>
+ <li>Tests for verifying functionality of function Yuv422pToBgraV2.</li>
+ <li>Special test for verifying functionality of function Simd::ResizeAreaGray.</li>
+ <li>Special test for verifying functionality of function Simd::ResizeArea.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R128">August 1, 2023 (version 5.3.128)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Support of SimdCpuInfoRam in function SimdCpuInfo.</li>
+ <li>Support of SimdCpuInfoRam in function Simd::PrintInfo.</li>
+ <li>Base implementation of function SimdCpuDesc.</li>
+ <li>Base implementation of SynetGridSample2dRef class.</li>
+ <li>Base implementation, SSE4.1, AVX2 optimizations of SynetGridSample2d32fBlZ class.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in AVX-512VNNI optimizations of class SynetMergedConvolution8iCdc.</li>
+ <li>Error in AVX-512VNNI optimizations of class SynetMergedConvolution8iCd.</li>
+ <li>Error in AVX-512VNNI optimizations of class SynetMergedConvolution8iDc.</li>
+ <li>Error (assert) in Base implementation of class ResizerNearest.</li>
+ <li>Error in SSE4.1, AVX, AVX2, AVX-512BW optimizations of class SynetMergedConvolution32fCd.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of SynetGridSample2d engine.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>WIN32 performance report.</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>New features</h5>
+<ul>
+ <li>Github actions script for CMake (build and test for GCC-13 (instead of GCC-12), Linux).</li>
+</ul>
+
+<h4>Documentation</h4>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Wrong description of function SimdDescrIntInit.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R127">July 4, 2023 (version 5.3.127)</h3>
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntEncode16f.</li>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntDecode16f.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntEncode32f.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntEncode16f.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntDecode32f.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntDecode16f.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntCosineDistance.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntCosineDistancesMxNp.</li>
- <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2 optimizations of function DescrIntCosineDistancesMxNa.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntEncode32f.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntEncode16f.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntDecode32f.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntDecode16f.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntCosineDistance.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI optimizations of function DescrIntCosineDistancesMxNp.</li>
+ <li>Support of 4-bit and 5-bit depth in Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI optimizations of function DescrIntCosineDistancesMxNa.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetNormalizeLayerForwardV3.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntCosineDistancesMxNp for 4, 5, 6, 7-bits depth.</li>
+ <li>SSE4.1, AVX2, AVX-512BW optimizations of function DescrIntCosineDistancesMxNa for 4, 5, 6, 7-bits depth.</li>
 </ul>
 <h5>Bug fixing</h5>
 <ul>
@@ -62,6 +227,17 @@
 <ul>
  <li>Tests for verifying functionality of function DescrIntEncode16f.</li>
  <li>Tests for verifying functionality of function DescrIntDecode16f.</li>
+ <li>Tests for verifying functionality of function SynetNormalizeLayerForwardV3</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>WIN32 exception handling.</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>Improving</h5>
+<ul>
+ <li>Host Properties step in Github actions script for MSBuild.</li>
 </ul>
 
 <a href="#HOME">Home</a>
