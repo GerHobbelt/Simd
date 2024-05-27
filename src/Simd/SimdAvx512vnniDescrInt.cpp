@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,11 @@ namespace Simd
         DescrInt::DescrInt(size_t size, size_t depth)
             : Avx512bw::DescrInt(size, depth)
         {
+            _cosineDistance = GetCosineDistance(_depth);
+            _macroCosineDistancesDirect = GetMacroCosineDistancesDirect(_depth);
+            _microMd = 4;
+            _microNd = 4;
+
             if (_depth != 8)
             {
                 _macroCosineDistancesUnpack = GetMacroCosineDistancesUnpack(_depth);

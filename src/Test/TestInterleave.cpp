@@ -86,25 +86,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && InterleaveUvAutoTest(FUNC2(Simd::Base::InterleaveUv), FUNC2(SimdInterleaveUv));
+        if (TestBase())
+            result = result && InterleaveUvAutoTest(FUNC2(Simd::Base::InterleaveUv), FUNC2(SimdInterleaveUv));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && InterleaveUvAutoTest(FUNC2(Simd::Sse41::InterleaveUv), FUNC2(SimdInterleaveUv));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && InterleaveUvAutoTest(FUNC2(Simd::Avx2::InterleaveUv), FUNC2(SimdInterleaveUv));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && InterleaveUvAutoTest(FUNC2(Simd::Avx512bw::InterleaveUv), FUNC2(SimdInterleaveUv));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && InterleaveUvAutoTest(FUNC2(Simd::Neon::InterleaveUv), FUNC2(SimdInterleaveUv));
 #endif
 
@@ -172,25 +173,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && InterleaveBgrAutoTest(FUNC3(Simd::Base::InterleaveBgr), FUNC3(SimdInterleaveBgr));
+        if (TestBase())
+            result = result && InterleaveBgrAutoTest(FUNC3(Simd::Base::InterleaveBgr), FUNC3(SimdInterleaveBgr));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && InterleaveBgrAutoTest(FUNC3(Simd::Sse41::InterleaveBgr), FUNC3(SimdInterleaveBgr));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && InterleaveBgrAutoTest(FUNC3(Simd::Avx2::InterleaveBgr), FUNC3(SimdInterleaveBgr));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && InterleaveBgrAutoTest(FUNC3(Simd::Avx512bw::InterleaveBgr), FUNC3(SimdInterleaveBgr));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && InterleaveBgrAutoTest(FUNC3(Simd::Neon::InterleaveBgr), FUNC3(SimdInterleaveBgr));
 #endif
 
@@ -260,25 +262,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && InterleaveBgraAutoTest(FUNC4(Simd::Base::InterleaveBgra), FUNC4(SimdInterleaveBgra));
+        if (TestBase())
+            result = result && InterleaveBgraAutoTest(FUNC4(Simd::Base::InterleaveBgra), FUNC4(SimdInterleaveBgra));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && InterleaveBgraAutoTest(FUNC4(Simd::Sse41::InterleaveBgra), FUNC4(SimdInterleaveBgra));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && InterleaveBgraAutoTest(FUNC4(Simd::Avx2::InterleaveBgra), FUNC4(SimdInterleaveBgra));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && InterleaveBgraAutoTest(FUNC4(Simd::Avx512bw::InterleaveBgra), FUNC4(SimdInterleaveBgra));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && InterleaveBgraAutoTest(FUNC4(Simd::Neon::InterleaveBgra), FUNC4(SimdInterleaveBgra));
 #endif 
 

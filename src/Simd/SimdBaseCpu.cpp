@@ -1,10 +1,11 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2022-2022 Souriya Trinh,
-*               2022-2022 Fabien Spindler.
-*
+*               2022-2022 Fabien Spindler,
+*               2024-2024 Jan Rysavy.
+* 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
 * in the Software without restriction, including without limitation the rights
@@ -193,18 +194,61 @@ namespace Simd
 
         static std::string Execute(const char* cmd)
         {
-            std::string result = "";            
-            ::FILE * pipe = _popen(cmd, "r");
-            if (pipe)
+            // NOTE: Don't use _popen, it will display a console window
+            std::string result;
+
+            // Set up security attributes for the pipe
+            SECURITY_ATTRIBUTES saAttr;
+            saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+            saAttr.bInheritHandle = TRUE;
+            saAttr.lpSecurityDescriptor = NULL;
+
+            // Create a pipe for the child process's STDOUT
+            HANDLE hReadPipe = NULL;
+            HANDLE hWritePipe = NULL;
+            if (!CreatePipe(&hReadPipe, &hWritePipe, &saAttr, 0))
+                return "";
+            SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);
+
+            // Set up members of the PROCESS_INFORMATION structure
+            PROCESS_INFORMATION piProcInfo;
+            ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+
+            // Set up the start-up information struct.
+            STARTUPINFOA siStartInfo;
+            ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+            siStartInfo.cb = sizeof(STARTUPINFO);
+            siStartInfo.hStdError = hWritePipe;
+            siStartInfo.hStdOutput = hWritePipe;
+            siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+            // Create the child process
+            BOOL bSuccess = CreateProcessA(NULL,
+                (LPSTR)cmd,          // command line
+                NULL,                // process security attributes
+                NULL,                // primary thread security attributes
+                TRUE,                // handles are inherited
+                CREATE_NO_WINDOW,    // creation flags, hide console window
+                NULL,                // use parent's environment
+                NULL,                // use parent's current directory
+                &siStartInfo,        // STARTUPINFO pointer
+                &piProcInfo);        // receives PROCESS_INFORMATION
+
+            // Close write end of pipe
+            CloseHandle(hWritePipe);
+
+            if (bSuccess)
             {
-                char buffer[260];
-                while (!feof(pipe))
-                {
-                    if (fgets(buffer, sizeof(buffer), pipe) != NULL)
-                        result += buffer;
-                }
-                _pclose(pipe);
+                // Read output from the child process's pipe for STDOUT
+                char buffer[4096];
+                DWORD dwRead = 0;
+                while (ReadFile(hReadPipe, buffer, sizeof(buffer), &dwRead, NULL) && dwRead > 0)
+                    result.append(buffer, dwRead);
+                CloseHandle(piProcInfo.hProcess);
+                CloseHandle(piProcInfo.hThread);
             }
+
+            CloseHandle(hReadPipe);
             return result;
         }
 
@@ -216,6 +260,11 @@ namespace Simd
             while (raw[end - 1] == ' ')
                 end--;
             return raw.substr(beg, end - beg);
+        }
+
+        uint64_t CpuCurrentFrequency()
+        {
+            return 0;
         }
 
 #elif defined(__GNUC__)
@@ -317,6 +366,42 @@ namespace Simd
                 ::pclose(file);
             }
             return model;
+        }
+
+        uint64_t CpuCurrentFrequency()
+        {
+            int core = sched_getcpu();
+            std::string scaling_cur_freq = "/sys/devices/system/cpu/cpu" + std::to_string(core) + "/cpufreq/scaling_cur_freq";
+            if (::access(scaling_cur_freq.c_str(), F_OK) != -1)
+            {
+                std::stringstream args;
+                args << "cat " << scaling_cur_freq;
+                ::FILE* p = ::popen(args.str().c_str(), "r");
+                if (p)
+                {
+                    char buffer[1024];
+                    while (::fgets(buffer, 1024, p));
+                    ::pclose(p);
+                    return ::atoi(buffer) * uint64_t(1000);
+                }
+            }
+            else
+            {
+                std::stringstream args;
+                args << "cat /proc/cpuinfo | grep \"MHz\" | head -n" << core + 1 << " | tail -1";
+                ::FILE* p = ::popen(args.str().c_str(), "r");
+                if (p)
+                {
+                    char buffer[1024];
+                    while (::fgets(buffer, 1024, p));
+                    ::pclose(p);
+                    std::string output = buffer;
+                    std::size_t beg = output.find(":");
+                    if (beg != std::string::npos)
+                        return Round(::atof(output.substr(beg + 1).c_str())) * uint64_t(1000000);
+                }
+            }
+            return 0;
         }
 #else
 #error This platform is unsupported!

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,11 @@ namespace Simd
 #ifdef SIMD_AMXBF16_ENABLE    
     namespace AmxBf16
     {
+        void Float32ToBFloat16(const float* src, size_t size, uint16_t* dst);
+
+        void ChangeColors(const uint8_t* src, size_t srcStride, size_t width, size_t height, const uint8_t* colors, uint8_t* dst, size_t dstStride);
+
+        void NormalizeHistogram(const uint8_t* src, size_t srcStride, size_t width, size_t height, uint8_t* dst, size_t dstStride);
     }
 #endif
 }

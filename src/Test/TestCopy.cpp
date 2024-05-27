@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -95,7 +95,8 @@ namespace Test
     {
         bool result = true;
 
-        result = result && CopyAutoTest(FUNC(Simd::Base::Copy), FUNC(SimdCopy));
+        if (TestBase())
+            result = result && CopyAutoTest(FUNC(Simd::Base::Copy), FUNC(SimdCopy));
 
         return result;
     }
@@ -173,7 +174,8 @@ namespace Test
     {
         bool result = true;
 
-        result = result && CopyFrameAutoTest(FUNC_F(Simd::Base::CopyFrame), FUNC_F(SimdCopyFrame));
+        if (TestBase())
+            result = result && CopyFrameAutoTest(FUNC_F(Simd::Base::CopyFrame), FUNC_F(SimdCopyFrame));
 
         return result;
     }

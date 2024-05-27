@@ -63,7 +63,6 @@
 #include "Simd/SimdAvx2.h"
 #include "Simd/SimdAvx512bw.h"
 #include "Simd/SimdAvx512vnni.h"
-#include "Simd/SimdAvx512bf16.h"
 #include "Simd/SimdAmxBf16.h"
 #include "Simd/SimdNeon.h"
 
@@ -90,11 +89,13 @@ namespace Test
     typedef Tensor<uint8_t> Tensor8u;
     typedef Tensor<int8_t> Tensor8i;
     typedef Tensor<int32_t> Tensor32i;
+    typedef Tensor<uint16_t> Tensor16u;
 
     const int E = 10;
     const int O = 9;
 
     extern double MINIMAL_TEST_EXECUTION_TIME;
+    extern double WARM_UP_TIME;
 
     const int DW = 48;
     const int DH = 64;
@@ -104,6 +105,8 @@ namespace Test
     extern int C;
     extern int H;    
     extern int W;
+
+    extern uint32_t DISABLED_EXTENSIONS;
 
     extern String ROOT_PATH;
     extern String SOURCE;
@@ -120,6 +123,47 @@ namespace Test
         DifferenceAny,
         DifferenceLogical,
     };
+
+    //-------------------------------------------------------------------------------------------------
+
+    SIMD_INLINE bool TestBase()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000001) == 0;
+    }
+
+    SIMD_INLINE bool TestSse41()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000002) == 0;
+    }
+
+    SIMD_INLINE bool TestAvx2()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000004) == 0;
+    }
+
+
+    SIMD_INLINE bool TestAvx512bw()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000008) == 0;
+    }
+
+
+    SIMD_INLINE bool TestAvx512vnni()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000010) == 0;
+    }
+
+
+    SIMD_INLINE bool TestAmxBf16()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000020) == 0;
+    }
+
+
+    SIMD_INLINE bool TestNeon()
+    {
+        return (DISABLED_EXTENSIONS & 0x000000002) == 0;
+    }
 }
 
 #endif//__TestConfig_h__

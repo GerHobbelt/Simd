@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetConvolution32f.h"
+#include "Simd/SimdSynetConvolution32fBf16.h"
 #include "Simd/SimdSynetConvolution32fCommon.h"
 #include "Simd/SimdSynet.h"
 #include "Simd/SimdBFloat16.h"
@@ -33,7 +33,7 @@ namespace Simd
 #if defined(SIMD_SYNET_ENABLE)
     namespace Base
     {
-        SynetConvolution32fBf16Gemm::SynetConvolution32fBf16Gemm(const ConvParam32f & p)
+        SynetConvolution32fBf16Gemm::SynetConvolution32fBf16Gemm(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             if (p.trans)
@@ -83,7 +83,7 @@ namespace Simd
 
         void SynetConvolution32fBf16Gemm::Forward(const float * src, float * buf_, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             uint16_t * buf = (uint16_t*)Buffer(buf_);
             const uint16_t* wgt = _weight.data;
             for (size_t b = 0; b < _batch; ++b)
@@ -108,7 +108,7 @@ namespace Simd
 
         void SynetConvolution32fBf16Gemm::ImgToCol(const float* src, uint16_t* dst)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             assert(!p.trans);
             size_t srcSize = p.srcW * p.srcH;
             for (size_t c = 0; c < p.srcC; ++c)
@@ -147,7 +147,7 @@ namespace Simd
 
         void SynetConvolution32fBf16Gemm::ImgToRow(const float* src, uint16_t* dst)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             assert(p.trans);
             size_t size = p.srcC / p.group;
             for (size_t g = 0; g < p.group; ++g)
@@ -205,97 +205,11 @@ namespace Simd
             }
         }
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fBf16Nhwc::SynetConvolution32fBf16Nhwc(const ConvParam32f& p)
+        SynetConvolution32fBf16Nhwc::SynetConvolution32fBf16Nhwc(const ConvParam& p)
             : SynetConvolution32f(p)
         {
-        }
-
-        String SynetConvolution32fBf16Nhwc::Desc() const 
-        {
-            std::stringstream desc;
-            desc << Ext() << "::Bf16Nhwc-";
-            if (_alg.mode)
-            {
-                desc << "gemm";
-                if (_alg.batch > 1)
-                    desc << "-" << _alg.batch;
-            }
-            else
-                desc << "conv";
-            return desc.str();
-        }
-
-
-        void SynetConvolution32fBf16Nhwc::SetAlgParam(size_t microD, size_t microHW, size_t microC, size_t L1, size_t L2, size_t L3)
-        {
-            const ConvParam32f& p = _param;
-            AlgParam& a = _alg;
-
-            a.mode = PreferableMode(microD, microHW, microC, L1, L2, L3);
-            a.batch = 1;
-            if (a.mode)
-            {
-                a.srcH = p.dstH;
-                a.srcW = p.dstW;
-                a.microD = microD;
-                a.macroC = Simd::RestrictRange(AlignHiAny(L1 / p.kernelY / p.kernelX / microD / 2, 2), size_t(1), p.srcC);
-                size_t matSize = p.srcC * p.dstW * p.dstH * p.kernelY * p.kernelX * 2;
-                if (matSize * 2 <= L2 && p.batch > 1)
-                {
-                    for (size_t batch = 1; batch <= p.batch; ++batch)
-                        if (p.batch % batch == 0 && batch * matSize <= L2)
-                            a.batch = batch;
-                }
-                a.macroH = Simd::RestrictRange(L2 / 2 / a.macroC / p.kernelY / p.kernelX / p.dstW, size_t(1), p.dstH * a.batch);
-                a.macroD = Simd::RestrictRange(AlignLoAny(L3 / a.macroC / 2, a.microD), a.microD, AlignHiAny(p.dstC, a.microD));
-            }
-            else
-            {
-                a.srcH = p.srcH + p.padY + p.padH;
-                a.srcW = p.srcW + p.padX + p.padW;
-                a.microD = microD;
-                a.macroC = Simd::RestrictRange<size_t>(AlignHiAny(L1 / p.kernelY / p.kernelX / microD / 2, 2), size_t(1), p.srcC);
-                for (size_t macroH = p.dstH; macroH >= 1; macroH--)
-                {
-                    a.macroH = macroH;
-                    if (a.macroC * a.srcW * (a.macroH * p.strideY + p.kernelY * p.dilationY - 1) * 2 <= L2)
-                        break;
-                }
-                a.macroD = Simd::RestrictRange(AlignLoAny(L3 / p.kernelY / p.kernelX / a.macroC / 2, a.microD), a.microD, AlignHiAny(p.dstC, a.microD));
-            }
-        }
-
-        int SynetConvolution32fBf16Nhwc::PreferableMode(size_t microD, size_t microHW, size_t microC, size_t L1, size_t L2, size_t L3)
-        {
-            const ConvParam32f& p = _param;
-            if (p.Is1x1())
-                return 1;
-            float kernelArea = float(p.kernelY * p.kernelX);
-            float convArea = kernelArea / float(p.strideY * p.strideX);
-            if (convArea <= 1.5f)
-                return 1;
-            if (p.dstW * p.dstH < 25)
-                return 1;
-            if (L1 / kernelArea / microD / 2 < microC)
-                return 1;
-            return 0;
-        }
-
-        size_t SynetConvolution32fBf16Nhwc::ExternalBufferSize() const
-        {
-            const ConvParam32f& p = _param;
-            const AlgParam& a = _alg;
-            //if (p.dstC <= a.macroD)
-            //    return Base::AlgCacheL2() / 4;
-            //else
-            {
-                if (a.mode)
-                    return a.batch * AlignHi(p.srcC, 2) * p.dstW * p.dstH * p.kernelY * p.kernelX / 2;
-                else
-                    return a.srcH * a.srcW * AlignHi(p.srcC, 2) / 2;
-            }
         }
 
         size_t SynetConvolution32fBf16Nhwc::InternalBufferSize() const
@@ -303,72 +217,19 @@ namespace Simd
             return _buffer.size + _weight.size / 2 + _bias.size + _params.size;
         }
 
-        void SynetConvolution32fBf16Nhwc::SetParams(const float* weight, SimdBool* internal, const float* bias, const float* params)
+        void SynetConvolution32fBf16Nhwc::SetBias(const float* bias, size_t align)
         {
-            SetWeight(weight);
-            if (internal)
-                *internal = SimdTrue;
-            SetBias(bias);
-            SetParams(params);
-        }
-
-        void SynetConvolution32fBf16Nhwc::SetWeight(const float * weight)
-        {
-            const ConvParam32f& p = _param;
-            const AlgParam& a = _alg;
-            _weight.Resize(p.kernelY * p.kernelX * AlignHi(p.srcC, 2) * AlignHiAny(p.dstC, a.microD));
-            uint16_t * dst = _weight.data;
-            for (size_t mad = 0; mad < p.dstC; mad += a.macroD)
-            {
-                size_t macroD = Simd::Min(p.dstC, mad + a.macroD) - mad;
-                for (size_t mac = 0; mac < p.srcC; mac += a.macroC)
-                {
-                    size_t macroC = Simd::Min(p.srcC, mac + a.macroC) - mac;
-                    for (size_t mid = 0; mid < macroD; mid += a.microD)
-                    {
-                        for (size_t ky = 0; ky < p.kernelY; ++ky)
-                        {
-                            for (size_t kx = 0; kx < p.kernelX; ++kx)
-                            {
-                                for (size_t c = 0; c < macroC; c += 2)
-                                {
-                                    const float* src = weight + ((ky * p.kernelX + kx) * p.srcC + mac + c) * p.dstC + mad + mid;
-                                    for (size_t d = 0; d < a.microD; ++d)
-                                    {
-                                        if (mad + mid + d < p.dstC)
-                                        {
-                                            *(dst++) = Float32ToBFloat16(src[d]);
-                                            *(dst++) = mac + c + 1 < p.srcC ? Float32ToBFloat16(src[p.dstC + d]) : 0;
-                                        }
-                                        else
-                                        {
-                                            *(dst++) = 0;
-                                            *(dst++) = 0;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        void SynetConvolution32fBf16Nhwc::SetBias(const float* bias)
-        {
-            const ConvParam32f& p = _param;
-            const AlgParam& a = _alg;
-            _bias.Resize(AlignHiAny(p.dstC, a.microD), true);
+            const ConvParam& p = _param;
+            _bias.Resize(AlignHiAny(p.dstC, align), true);
             if (bias)
                 memcpy(_bias.data, bias, p.dstC * sizeof(float));
         }
 
-        void SynetConvolution32fBf16Nhwc::SetParams(const float* params)
+        void SynetConvolution32fBf16Nhwc::SetParams(const float* params, size_t align)
         {
-            const ConvParam32f& p = _param;
-            const AlgParam& a = _alg;
+            const ConvParam& p = _param;
             if (p.activation == SimdConvolutionActivationLeakyRelu || p.activation == SimdConvolutionActivationPrelu)
-                _params.Resize(AlignHiAny(p.dstC, a.microD), true);
+                _params.Resize(AlignHiAny(p.dstC, align), true);
             else
                 _params.Resize(2, true);
             switch (p.activation)
@@ -417,65 +278,120 @@ namespace Simd
             }
         }
 
-        void SynetConvolution32fBf16Nhwc::Forward(const float* src, float* buf, float* dst)
+        //-------------------------------------------------------------------------------------------------
+
+        SynetConvolution32fBf16NhwcGemm::SynetConvolution32fBf16NhwcGemm(const ConvParam& p)
+            : SynetConvolution32fBf16Nhwc(p)
         {
-            const ConvParam32f& p = _param;
+            _convert = 0;
+            _convolutions[0] = 0;
+            _convolutions[1] = 0;
+        }
+
+        String SynetConvolution32fBf16NhwcGemm::Desc() const
+        {
+            std::stringstream desc;
+            desc << Ext() << "::Bf16NhwcGemm";
+            if (_alg.batch > 1)
+                desc << "-" << _alg.batch;
+            return desc.str();
+        }
+
+        void SynetConvolution32fBf16NhwcGemm::SetAlgParam(size_t microD, size_t microM, size_t microK, size_t L1, size_t L2, size_t L3)
+        {
+            const ConvParam& p = _param;
+            AlgParam& a = _alg;
+
+            a.M = p.dstW * p.dstH;
+            a.K = p.srcC * p.kernelY * p.kernelX;
+            a.microD = microD;
+            a.microM = microM;
+            a.microK = microK;
+            a.bufD = AlignHiAny(p.dstC, a.microD);
+            a.bufK = AlignHi(a.K, a.microK);
+            a.macroK = Simd::RestrictRange(AlignLo(L1 / a.microD / 2, a.microK), a.microK, a.bufK);
+            a.batch = 1;
+            size_t bufSize = a.M * a.bufK * 2;
+            if (bufSize * 2 <= L2 && p.batch > 1)
+            {
+                for (size_t batch = 1; batch <= p.batch; ++batch)
+                    if (p.batch % batch == 0 && batch * bufSize <= L2)
+                        a.batch = batch;
+            }
+            a.bufM = a.batch * a.M;
+            a.macroH = Simd::RestrictRange(L2 / a.macroK / p.dstW / 2, size_t(1), p.dstH * a.batch);
+            a.macroD = Simd::RestrictRange(AlignLoAny(L3 / a.macroK / 2, a.microD), a.microD, a.bufD);
+        }
+
+        size_t SynetConvolution32fBf16NhwcGemm::ExternalBufferSize() const
+        {
+            const AlgParam& a = _alg;
+            return (a.bufM + 1) * a.bufK / 2;
+        }
+
+        void SynetConvolution32fBf16NhwcGemm::SetParams(const float* weight, SimdBool* internal, const float* bias, const float* params)
+        {
+            SetWeight(weight);
+            if (internal)
+                *internal = SimdTrue;
+            SynetConvolution32fBf16Nhwc::SetBias(bias, _alg.microD);
+            SynetConvolution32fBf16Nhwc::SetParams(params, _alg.microD);
+        }
+
+        void SynetConvolution32fBf16NhwcGemm::SetWeight(const float* weight)
+        {
+            const ConvParam& p = _param;
+            const AlgParam& a = _alg;
+            Array16u buffer(a.bufD * a.bufK, true);
+            uint16_t* buf = buffer.data;
+            for (size_t k = 0; k < a.K; k += 2)
+            {
+                for (size_t d = 0; d < p.dstC; ++d)
+                {
+                    *(buf++) = Float32ToBFloat16(weight[d]);
+                    *(buf++) = k + 1 < a.K ? Float32ToBFloat16(weight[d + p.dstC]) : 0;
+                }
+                buf += 2 * (a.bufD - p.dstC);
+                weight += 2 * p.dstC;
+            }
+            _weight.Resize(a.bufK * a.bufD, true);
+            size_t bufK = a.bufK / 2, macK = a.macroK / 2, bufD = a.bufD * 2, macD = a.macroD * 2, micD = a.microD * 2;
+            const uint16_t * src = buffer.data;
+            uint16_t* dst = _weight.data;
+            for (size_t mad = 0; mad < bufD; mad += macD)
+            {
+                size_t macroD = Simd::Min(bufD, mad + macD) - mad;
+                for (size_t mak = 0; mak < bufK; mak += macK)
+                {
+                    size_t macroK = Simd::Min(bufK, mak + macK) - mak;
+                    for (size_t mid = 0; mid < macroD; mid += micD)
+                    {
+                        for (size_t k = 0; k < macroK; ++k)
+                        {
+                            memcpy(dst, src + (mak + k) * bufD + mad + mid, micD * 2);
+                            dst += micD;
+                        }
+                    }
+                }
+            }
+        }
+
+        void SynetConvolution32fBf16NhwcGemm::Forward(const float* src, float* buf, float* dst)
+        {
+            const ConvParam& p = _param;
             const AlgParam& a = _alg;
             buf = Buffer(buf);
             for (size_t b = 0; b < p.batch; b += a.batch)
             {
-                if(a.mode)
-                    ForwardGemm(src, (uint16_t*)buf, dst);
-                else
-                    ForwardConv(src, (uint16_t*)buf, dst);
+                Forward(src, (uint16_t*)buf, dst);
                 src += p.srcH * p.srcW * p.srcC * a.batch;
                 dst += p.dstH * p.dstW * p.dstC * a.batch;
             }
         }
 
-        bool SynetConvolution32fBf16Nhwc::Preferable(const ConvParam32f& p)
+        void SynetConvolution32fBf16NhwcGemm::Forward(const float* src, uint16_t* buf, float* dst)
         {
-            return p.trans != 0 && p.group == 1;
-        }
-
-        void SynetConvolution32fBf16Nhwc::ForwardConv(const float* src, uint16_t* buf, float* dst)
-        {
-            const ConvParam32f& p = _param;
-            const AlgParam& a = _alg;
-            const uint16_t* weight = _weight.data;
-            const float* bias = _bias.data, * params = _params.data;
-            for (size_t dc = 0; dc < p.dstC; dc += a.macroD)
-            {
-                size_t macroD = Simd::Min(p.dstC, dc + a.macroD) - dc;
-                for (size_t sc = 0; sc < p.srcC; sc += a.macroC)
-                {
-                    size_t macroC = Simd::Min(p.srcC, sc + a.macroC) - sc;
-                    for (size_t yBeg = 0; yBeg < p.dstH;)
-                    {
-                        size_t yEnd = Simd::Min(yBeg + a.macroH, p.dstH);
-                        size_t offs = Offset(yBeg, sc, sc + macroC);
-                        if (dc == 0)
-                            _convert(src + sc, p, yBeg, yEnd, macroC, buf + offs);
-                        if (sc + macroC == p.srcC)
-                            _convolutions[TermLast](buf + offs, p, macroD, yEnd - yBeg, macroC, macroC == p.srcC ? 1 : 0, 
-                                weight, bias, params, dst + yBeg * p.dstW * p.dstC);
-                        else
-                            _convolutions[TermInterim](buf + offs, p, macroD, yEnd - yBeg, macroC, sc == 0 ? 1 : 0,
-                                weight, bias, params, dst + yBeg * p.dstW * p.dstC);
-                        yBeg = yEnd;
-                    }
-                    weight += p.kernelY * p.kernelY * AlignHi(macroC, 2) * AlignHiAny(macroD, a.microD);
-                }
-                bias += macroD;
-                if (p.activation == ::SimdConvolutionActivationPrelu)
-                    params += macroD;
-                dst += macroD;
-            }
-        }
-
-        void SynetConvolution32fBf16Nhwc::ForwardGemm(const float* src, uint16_t* buf, float* dst)
-        {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             const AlgParam& a = _alg;
             const uint16_t* weight = _weight.data;
             const float* bias = _bias.data, * params = _params.data;
@@ -483,35 +399,33 @@ namespace Simd
             for (size_t dc = 0; dc < p.dstC; dc += a.macroD)
             {
                 size_t macroD = Simd::Min(p.dstC, dc + a.macroD) - dc;
-                for (size_t sc = 0; sc < p.srcC; sc += a.macroC)
+                for (size_t mak = 0; mak < a.K; mak += a.macroK)
                 {
-                    size_t macroC = Simd::Min(p.srcC, sc + a.macroC) - sc;
-                    size_t macroK = AlignHi(macroC, 2) * p.kernelY * p.kernelX;
+                    size_t macroK = Simd::Min(a.bufK, mak + a.macroK) - mak;
                     for (size_t yBeg = 0; yBeg < dstH;)
                     {
                         size_t yEnd = Simd::Min(yBeg + a.macroH, dstH);
-                        size_t offs = Offset(yBeg, sc, sc + AlignHi(macroC, 2));
-                        if (dc == 0)
+                        size_t offs = a.macroK < a.bufK ? mak * a.bufM + yBeg * p.dstW * macroK : 0;
+                        if (dc == 0 && mak == 0)
                         {
                             if (a.batch > 1)
                             {
                                 size_t dS = p.srcH * p.srcW * p.srcC;
-                                size_t dB = p.dstH * p.dstW * macroK;
                                 for (size_t b = 0; b < a.batch; ++b)
-                                    _convert(src + sc + b * dS, p, 0, p.dstH, macroC, buf + offs + b * dB);
+                                    _convert(src + b * dS, p, a, b, 0, p.dstH, buf);
                             }
                             else
-                                _convert(src + sc, p, yBeg, yEnd, macroC, buf + offs);
+                                _convert(src, p, a, 0, yBeg, yEnd, buf);
                         }
-                        if (sc + macroC == p.srcC)
-                            _convolutions[TermLast](buf + offs, p, macroD, yEnd - yBeg, macroK, macroC == p.srcC ? 1 : 0,
+                        if (mak + macroK == a.bufK)
+                            _convolutions[TermLast](buf + offs, p, macroD, yEnd - yBeg, macroK, macroK == a.bufK ? 1 : 0,
                                 weight, bias, params, dst + yBeg * p.dstW * p.dstC);
                         else
-                            _convolutions[TermInterim](buf + offs, p, macroD, yEnd - yBeg, macroK, sc == 0 ? 1 : 0,
+                            _convolutions[TermInterim](buf + offs, p, macroD, yEnd - yBeg, macroK, mak == 0 ? 1 : 0,
                                 weight, bias, params, dst + yBeg * p.dstW * p.dstC);
                         yBeg = yEnd;
                     }
-                    weight += AlignHi(macroC, 2) * p.kernelY * p.kernelX * AlignHiAny(macroD, a.microD);
+                    weight += AlignHi(macroK, a.microK) * AlignHiAny(macroD, a.microD);
                 }
                 bias += macroD;
                 if (p.activation == ::SimdConvolutionActivationPrelu)
@@ -520,19 +434,9 @@ namespace Simd
             }
         }
 
-        size_t SynetConvolution32fBf16Nhwc::Offset(size_t yBeg, size_t cBeg, size_t cEnd)
+        bool SynetConvolution32fBf16NhwcGemm::Preferable(const ConvParam& p)
         {
-            const ConvParam32f& p = _param;
-            const AlgParam& a = _alg;
-            if (p.dstC <= a.macroD)
-                return 0;
-            else
-            {
-                if (a.mode)
-                    return p.dstW * (p.dstH * a.batch * cBeg + (cEnd - cBeg) * yBeg);
-                else
-                    return a.srcW * (a.srcH * cBeg + (cEnd - cBeg) * p.strideY * yBeg);
-            }
+            return p.trans != 0 && p.group == 1;
         }
     }
 #endif

@@ -246,8 +246,7 @@ namespace Test
         T avx2;
         T avx512bw;
         T avx512vnni;
-        T avx512bf16;
-        T amx;
+        T amxBf16;
         T neon;
 
         size_t Size() const { return sizeof(Statistic) / sizeof(T); };
@@ -265,6 +264,11 @@ namespace Test
     template <class T> const T & Previous(const T & f)
     {
         return (&f)[-1].first.Average() > 0 ? (&f)[-1] : Previous((&f)[-1]);
+    }
+
+    template <class T> const T& Previous(const T* d, size_t i)
+    {
+        return d[i - 1].first.Average() > 0 || i == 2 ? d[i - 1] : Previous(d, i - 1);
     }
 
     static inline void AddToFunction(const PerformanceMeasurer & src, Function & dst, bool & enable)
@@ -290,10 +294,8 @@ namespace Test
             AddToFunction(src, dst.avx512bw, enable.avx512bw);
         if (desc.find("Simd::Avx512vnni::") != std::string::npos)
             AddToFunction(src, dst.avx512vnni, enable.avx512vnni);
-        if (desc.find("Simd::Avx512bf16::") != std::string::npos)
-            AddToFunction(src, dst.avx512bf16, enable.avx512bf16);
         if (desc.find("Simd::AmxBf16::") != std::string::npos)
-            AddToFunction(src, dst.amx, enable.amx);
+            AddToFunction(src, dst.amxBf16, enable.amxBf16);
         if (desc.find("Simd::Neon::") != std::string::npos)
             AddToFunction(src, dst.neon, enable.neon);
     }
@@ -317,8 +319,7 @@ namespace Test
         if (enable.avx2) Add(Cond(s.avx2, Cond(s.sse41, s.base)), d.avx2);
         if (enable.avx512bw) Add(Cond(s.avx512bw, Cond(s.avx2, Cond(s.sse41, s.base))), d.avx512bw);
         if (enable.avx512vnni) Add(Cond(s.avx512vnni, Cond(s.avx512bw, Cond(s.avx2, Cond(s.sse41, s.base)))), d.avx512vnni);
-        if (enable.avx512bf16) Add(Cond(s.avx512bf16, Cond(s.avx512vnni, Cond(s.avx512bw, Cond(s.avx2, Cond(s.sse41, s.base))))), d.avx512bf16);
-        if (enable.amx) Add(Cond(s.amx, Cond(s.avx512bf16, Cond(s.avx512vnni, Cond(s.avx512bw, Cond(s.avx2, Cond(s.sse41, s.base)))))), d.amx);
+        if (enable.amxBf16) Add(Cond(s.amxBf16, Cond(s.avx512vnni, Cond(s.avx512bw, Cond(s.avx2, Cond(s.sse41, s.base))))), d.amxBf16);
         if (enable.neon) Add(Cond(s.neon, s.base), d.neon);
     }
 
@@ -332,14 +333,15 @@ namespace Test
 		for (size_t i = 0; i < enable.Size(); ++i)
 			if (enable[i])
 				table.SetHeader(col++, names[i].full, i == last, Table::Right);
-        if (enable[1])
+        for (size_t i = 2; i < enable.Size(); ++i)
+            if (enable[1] && enable[i])
+                table.SetHeader(col++, String(names[1].brief) + "/" + names[i].brief, i == last, Table::Right);
+        for (size_t i = 2, p = 1; i < enable.Size(); ++i)
         {
-            for (size_t i = 2; i < enable.Size(); ++i)
-                if (enable[i])
-                    table.SetHeader(col++, String(names[1].brief) + "/" + names[i].brief, i == last, Table::Right);
-            for (size_t i = 2, p = 1; i < enable.Size(); ++i)
-                if (enable[i])
-                    table.SetHeader(col++, names[p].brief + String("/") + names[i].brief, i == last, Table::Right), p = i;
+            if (enable[p] && enable[i])
+                table.SetHeader(col++, names[p].brief + String("/") + names[i].brief, i == last, Table::Right);
+            if (enable[i])
+                p = i;
         }
 		if (align)
 		{
@@ -357,14 +359,15 @@ namespace Test
         for (size_t i = 0; i < statistic.Size(); ++i)
             if (enable[i])
                 table.SetCell(col++, row, ToString(statistic[i].first.Average()*(timeMax < 0.001 ? 1000000.0 : 1000.0), V, false));
-        if (enable[1])
+        for (size_t i = 2; i < statistic.Size(); ++i)
+            if (enable[1] && enable[i])
+                table.SetCell(col++, row, ToString(Test::Relation(statistic[1].first, statistic[i].first), R, false));
+        for (size_t i = 2, p = 1; i < statistic.Size(); ++i)
         {
-            for (size_t i = 2; i < statistic.Size(); ++i)
-                if (enable[i])
-                    table.SetCell(col++, row, ToString(Test::Relation(statistic[1].first, statistic[i].first), R, false));
-            for (size_t i = 2; i < statistic.Size(); ++i)
-                if (enable[i])
-                    table.SetCell(col++, row, ToString(Test::Relation(Previous(statistic[i]).first, statistic[i].first), R, false));
+            if (enable[p] && enable[i])
+                table.SetCell(col++, row, ToString(Test::Relation(Previous(&statistic.simd, i).first, statistic[i].first), R, false));
+            if (enable[i])
+                p = i;
         }
         if (align)
         {
@@ -395,8 +398,8 @@ namespace Test
 
         FunctionStatisticMap functions;
         CommonStatistic common;
-        StatisticEnable enable = { false, false, false, false, false, false, false, false, false};
-        StatisticNames names = { { "API", "A" },{ "Base", "Bs" },{ "Sse41", "S4" },{ "Avx2", "A2" },{ "Avx5b", "A5" },{ "Vnni", "Vn" },{ "Bf16", "Bf" },{ "Amx", "Am" },{ "Neon", "Ne" } };
+        StatisticEnable enable = { false, false, false, false, false, false, false, false};
+        StatisticNames names = { { "API", "A" },{ "Base", "Bs" },{ "Sse41", "S4" },{ "Avx2", "A2" },{ "Avx5b", "A5" },{ "Vnni", "Vn" },{ "Amx", "Am" },{ "Neon", "Ne" } };
         double timeMax = 0;
         for (FunctionMap::const_iterator it = map.begin(); it != map.end(); ++it)
         {
@@ -413,7 +416,7 @@ namespace Test
         for (size_t i = 0; i < enable.Size(); ++i)
             if (enable[i])
                 size++;
-        TablePtr table(new Table(size*(align ? 4 : 3) - 3, 1 + functions.size()));
+        TablePtr table(new Table(1 + size + (enable[1] ? size - 2 : 0) + (size > 2 ? size - 2: 0) + (align ? size : 0), 1 + functions.size()));
         AddHeader(*table, names, enable, align);
         size_t row = 0;
         table->SetRowProp(row, true, true);
@@ -461,8 +464,7 @@ namespace Test
         info << ", L3: " << ToString(double(SimdCpuInfo(SimdCpuInfoCacheL3) / 1024) / 1024, 1, false) << " MB";
         info << ", RAM: " << ToString(double(SimdCpuInfo(SimdCpuInfoRam)) / 1024 / 1024 / 1024, 1, false) << " GB";
         info << "; SIMD:";
-        info << (SimdCpuInfo(SimdCpuInfoAmx) ? " AMX" : "");
-        info << (SimdCpuInfo(SimdCpuInfoAvx512bf16) ? " AVX-512BF16" : "");
+        info << (SimdCpuInfo(SimdCpuInfoAmxBf16) ? " AMX-BF16 AMX-INT8 AVX-512BF16" : "");
         info << (SimdCpuInfo(SimdCpuInfoAvx512vnni) ? " AVX-512VNNI" : "");
         info << (SimdCpuInfo(SimdCpuInfoAvx512bw) ? " AVX-512BW AVX-512F" : "");
         info << (SimdCpuInfo(SimdCpuInfoAvx2) ? " AVX2 FMA AVX" : "");

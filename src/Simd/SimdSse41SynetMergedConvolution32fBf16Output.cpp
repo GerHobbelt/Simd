@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,8 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetMergedConvolution32f.h"
-#include "Simd/SimdSynetConvolution32fBf16Common.h"
+#include "Simd/SimdSynetMergedConvolution32fBf16.h"
+#include "Simd/SimdSynetConvolution16bCommon.h"
 #include "Simd/SimdSynet.h"
 #include "Simd/SimdMath.h"
 #include "Simd/SimdBase.h"
@@ -38,8 +38,8 @@ namespace Simd
 
         //---------------------------------------------------------------------
 
-        template<TermBf16Type term, SimdConvolutionActivationType type, int M> void OutputConvolution1x1_2xM(
-            const uint16_t* src0, const ConvParam32f& p, const AlgParam& a, size_t srcC, size_t dstC,
+        template<Term16bType term, SimdConvolutionActivationType type, int M> void OutputConvolution1x1_2xM(
+            const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcC, size_t dstC,
             const uint16_t* weight, const __m128* bias, const __m128* params, float* dst, int zero)
         {
             __m128 d00, d01, d10, d11, d20, d21, d30, d31, d40, d41, s0, w00, w01, w10, w11, m = _mm_castsi128_ps(Bf16::MASK);
@@ -207,10 +207,10 @@ namespace Simd
             }
         }
 
-        typedef void(*OutputConvolution1x1_2xM_Ptr)(const uint16_t* src0, const ConvParam32f& p, const AlgParam& a, size_t srcC, size_t dstC,
+        typedef void(*OutputConvolution1x1_2xM_Ptr)(const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcC, size_t dstC,
             const uint16_t* weight0, const __m128* bias, const __m128* params, float* dst, int zero);
 
-        template<TermBf16Type term, SimdConvolutionActivationType type> OutputConvolution1x1_2xM_Ptr GetOutputConvolution1x1_2xM(size_t M)
+        template<Term16bType term, SimdConvolutionActivationType type> OutputConvolution1x1_2xM_Ptr GetOutputConvolution1x1_2xM(size_t M)
         {
             switch (M)
             {
@@ -225,8 +225,8 @@ namespace Simd
             return NULL;
         }
 
-        template<TermBf16Type term, SimdConvolutionActivationType type> void OutputConvolution1x1_2(const uint16_t* src,
-            const ConvParam32f& p, const AlgParam& a, size_t maC, size_t yBeg, size_t yEnd, const uint16_t* weight,
+        template<Term16bType term, SimdConvolutionActivationType type> void OutputConvolution1x1_2(const uint16_t* src,
+            const ConvParam& p, const AlgParam& a, size_t maC, size_t yBeg, size_t yEnd, const uint16_t* weight,
             const float* bias, const float* params, float* dst, int zero)
         {
             size_t n = 5, n1 = (yEnd - yBeg) * p.dstW, nn = AlignLoAny(n1, n), m = n1 - nn;
@@ -258,13 +258,13 @@ namespace Simd
 
         //---------------------------------------------------------------------
 
-        template<SimdConvolutionActivationType type> static void SetOutput(const ConvParam32f& p, OutputPtr* output)
+        template<SimdConvolutionActivationType type> static void SetOutput(const ConvParam& p, OutputPtr* output)
         {
-            output[0] = OutputConvolution1x1_2<TermBf16Last32f, type>;
-            output[1] = OutputConvolution1x1_2<TermBf16Interim, SimdConvolutionActivationIdentity>;
+            output[0] = OutputConvolution1x1_2<Term16bLast32f, type>;
+            output[1] = OutputConvolution1x1_2<Term16bInterim, SimdConvolutionActivationIdentity>;
         }
 
-        void SetOutput(const ConvParam32f& p, OutputPtr* output)
+        void SetOutput(const ConvParam& p, OutputPtr* output)
         {
             switch (p.activation)
             {

@@ -255,13 +255,13 @@ typedef enum
     SimdCpuInfoCacheL2, /*!< A size of level 2 cache. */
     SimdCpuInfoCacheL3, /*!< A size of level 3 cache. */
     SimdCpuInfoRam, /*!< A size of physical RAM. */
-    SimdCpuInfoSse41, /*!< Availability of SSE4.1 (x86). */
-    SimdCpuInfoAvx2, /*!< Availability of AVX2 (x86). */
-    SimdCpuInfoAvx512bw, /*!< Availability of AVX-512BW (x86). */
+    SimdCpuInfoSse41, /*!< Availability of SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2 (x86). */
+    SimdCpuInfoAvx2, /*!< Availability of AVX, FMA, AVX2 (x86). */
+    SimdCpuInfoAvx512bw, /*!< Availability of AVX-512F, AVX-512BW (x86). */
     SimdCpuInfoAvx512vnni, /*!< Availability of AVX-512VNNI (x86). */
-    SimdCpuInfoAvx512bf16, /*!< Availability of AVX-512BF16 (x86). */
-    SimdCpuInfoAmx, /*!< Availability of AMX (x86). */
+    SimdCpuInfoAmxBf16, /*!< Availability of AMX-BF16, AMX-INT8 (x86). */
     SimdCpuInfoNeon, /*!< Availability of NEON (ARM). */
+    SimdCpuInfoCurrentFrequency, /*!< Gets CPU current frequency (for current CPU core). */
 } SimdCpuInfoType;
 
 /*! @ingroup c_types
@@ -520,6 +520,8 @@ typedef enum
     /*! Gets ceil for every point of input tensor. */
     SimdSynetUnaryOperation32fCeil,
     /*! Gets erf (error function) for every point of input tensor. */
+    SimdSynetUnaryOperation32fCos,
+    /*! Gets cosine function for every point of input tensor. */
     SimdSynetUnaryOperation32fErf,
     /*! Gets exponent for every point of input tensor. */
     SimdSynetUnaryOperation32fExp,
@@ -535,6 +537,8 @@ typedef enum
     SimdSynetUnaryOperation32fRcp,
     /*! Gets reverse square root for every point of input tensor. */
     SimdSynetUnaryOperation32fRsqrt,
+    /*! Gets sine function for every point of input tensor. */
+    SimdSynetUnaryOperation32fSin,
     /*! Gets square root for every point of input tensor. */
     SimdSynetUnaryOperation32fSqrt,
     /*! Gets hyperbolic tangent for every point of input tensor. */
@@ -784,12 +788,10 @@ extern "C"
             std::cout << "L3 Cache: " << SimdCpuInfo(SimdCpuInfoCacheL3) / 1024  << " KB" << std::endl;
             std::cout << "RAM: " << SimdCpuInfo(SimdCpuInfoRam) / 1024 / 1024 << " MB" << std::endl;
             std::cout << "SSE4.1: " << (SimdCpuInfo(SimdCpuInfoSse41) ? "Yes" : "No") << std::endl;
-            std::cout << "AVX: " << (SimdCpuInfo(SimdCpuInfoAvx) ? "Yes" : "No") << std::endl;
             std::cout << "AVX2: " << (SimdCpuInfo(SimdCpuInfoAvx2) ? "Yes" : "No") << std::endl;
             std::cout << "AVX-512BW: " << (SimdCpuInfo(SimdCpuInfoAvx512bw) ? "Yes" : "No") << std::endl;
             std::cout << "AVX-512VNNI: " << (SimdCpuInfo(SimdCpuInfoAvx512vnni) ? "Yes" : "No") << std::endl;
-            std::cout << "AVX-512BF16: " << (SimdCpuInfo(SimdCpuInfoAvx512bf16) ? "Yes" : "No") << std::endl;
-            std::cout << "AMX: " << (SimdCpuInfo(SimdCpuInfoAmx) ? "Yes" : "No") << std::endl;
+            std::cout << "AMX-BF16: " << (SimdCpuInfo(SimdCpuInfoAmxBf16) ? "Yes" : "No") << std::endl;
             std::cout << "ARM-NEON: " << (SimdCpuInfo(SimdCpuInfoNeon) ? "Yes" : "No") << std::endl;
             return 0;
         }
@@ -6115,6 +6117,80 @@ extern "C"
         \param [out] dst - a pointer to output tensor.
     */
     SIMD_API void SimdSynetConvolution32fForward(void * context, const float * src, float * buf, float * dst);
+
+    /*! @ingroup synet_convolution_bf16
+
+        \fn void * SimdSynetConvolution16bInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+
+        \short Initilizes BF16 convolution algorithm.
+
+        \param [in] batch - a batch size.
+        \param [in] conv - a pointer to convolution parameters.
+        \param [in] compatibility - a flags of calculation compatibility.
+        \return a pointer to BF16 convolution context. On error it returns NULL. It must be released with using of function ::SimdRelease.
+            This pointer is used in functions ::SimdSynetConvolution16bExternalBufferSize, ::SimdSynetConvolution16bInternalBufferSize,
+            ::SimdSynetConvolution16bInfo, ::SimdSynetConvolution16bSetParams and ::SimdSynetConvolution16bForward.
+    */
+    SIMD_API void* SimdSynetConvolution16bInit(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility);
+
+    /*! @ingroup synet_convolution_bf16
+
+        \fn size_t SimdSynetConvolution16bExternalBufferSize(const void * context);
+
+        \short Gets size in bytes of external temporary buffer required for BF16 convolution algorithm.
+
+        \param [in] context - a pointer to BF16 convolution context. It must be created by function ::SimdSynetConvolution16bInit and released by function ::SimdRelease.
+        \return size of external temporary buffer required for BF16 convolution algorithm.
+    */
+    SIMD_API size_t SimdSynetConvolution16bExternalBufferSize(const void* context);
+
+    /*! @ingroup synet_convolution_bf16
+
+        \fn size_t SimdSynetConvolution16bInternalBufferSize(const void * context);
+
+        \short Gets size (in bytes) of internal buffer used inside BF16 convolution algorithm.
+
+        \param [in] context - a pointer to BF16 convolution context. It must be created by function ::SimdSynetConvolution16bInit and released by function ::SimdRelease.
+        \return size of internal buffer used inside BF16 convolution algorithm.
+    */
+    SIMD_API size_t SimdSynetConvolution16bInternalBufferSize(const void* context);
+
+    /*! @ingroup synet_convolution_bf16
+
+        \fn const char* SimdSynetConvolution16bInfo(const void* context);
+
+        \short Gets description of internal implementation of BF16 convolution algorithm.
+
+        \param [in] context - a pointer to BF16 convolution context. It must be created by function ::SimdSynetConvolution16bInit and released by function ::SimdRelease.
+        \return string with description of internal implementation of BF16 convolution algorithm.
+    */
+    SIMD_API const char* SimdSynetConvolution16bInfo(const void* context);
+
+    /*! @ingroup synet_convolution_bf16
+
+        \fn void SimdSynetConvolution16bSetParams(void * context, const float * weight, const float * bias, const float * params, const float * const * stats);
+
+        \short Sets weights, biases, parameters of activation function, input/output tensor statistics required for BF16 convolution algorithm.
+
+        \param [in, out] context - a pointer to BF16 convolution context. It must be created by function ::SimdSynetConvolution16bInit and released by function ::SimdRelease.
+        \param [in] weight - a pointer to original (32-bit float point) convolution weights.
+        \param [in] bias - a pointer to original (32-bit float point) bias. Can be NULL.
+        \param [in] params - a pointer to original (32-bit float point) parameters of activation functions (see ::SimdConvolutionActivationType). Can be NULL.
+    */
+    SIMD_API void SimdSynetConvolution16bSetParams(void* context, const float* weight, const float* bias, const float* params);
+
+    /*! @ingroup synet_convolution_bf16
+
+        \fn void SimdSynetConvolution16bForward(void * context, const uint8_t * src, uint8_t * buf, uint8_t * dst);
+
+        \short Performs forward propagation of BF16 convolution algorithm.
+
+        \param [in] context - a pointer to BF16 convolution context. It must be created by function ::SimdSynetConvolution16bInit and released by function ::SimdRelease.
+        \param [in] src - a pointer to input tensor.
+        \param [out] buf - a pointer to external temporary buffer. The size of the external temporary buffer is determined by function ::SimdSynetConvolution16bExternalBufferSize. Can be NULL (it causes usage of internal buffer).
+        \param [out] dst - a pointer to output tensor.
+    */
+    SIMD_API void SimdSynetConvolution16bForward(void* context, const uint8_t* src, uint8_t* buf, uint8_t* dst);
 
     /*! @ingroup synet_convolution_int8
 

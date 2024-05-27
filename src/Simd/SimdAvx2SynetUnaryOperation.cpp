@@ -33,6 +33,7 @@
 #include "Simd/SimdErf.h"
 #include "Simd/SimdPerformance.h"
 #include "Simd/SimdGather.h"
+#include "Simd/SimdTrigonometric.h"
 
 namespace Simd
 {
@@ -49,6 +50,11 @@ namespace Simd
         template<> SIMD_INLINE __m256 SynetUnaryOperation32f<SimdSynetUnaryOperation32fCeil>(__m256 value)
         {
             return _mm256_ceil_ps(value);
+        }
+
+        template<> SIMD_INLINE __m256 SynetUnaryOperation32f<SimdSynetUnaryOperation32fCos>(__m256 value)
+        {
+            return Cos(value);
         }
 
         template<> SIMD_INLINE __m256 SynetUnaryOperation32f<SimdSynetUnaryOperation32fErf>(__m256 value)
@@ -91,6 +97,11 @@ namespace Simd
             return _mm256_rsqrt_ps(value);
         }
 
+        template<> SIMD_INLINE __m256 SynetUnaryOperation32f<SimdSynetUnaryOperation32fSin>(__m256 value)
+        {
+            return Sin(value);
+        }
+
         template<> SIMD_INLINE __m256 SynetUnaryOperation32f<SimdSynetUnaryOperation32fSqrt>(__m256 value)
         {
             return _mm256_sqrt_ps(value);
@@ -130,6 +141,7 @@ namespace Simd
             {
             case SimdSynetUnaryOperation32fAbs: SynetUnaryOperation32f<SimdSynetUnaryOperation32fAbs, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fCeil: SynetUnaryOperation32f<SimdSynetUnaryOperation32fCeil, align>(src, size, dst); break;
+            case SimdSynetUnaryOperation32fCos: SynetUnaryOperation32f<SimdSynetUnaryOperation32fCos, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fExp: SynetUnaryOperation32f<SimdSynetUnaryOperation32fExp, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fErf: SynetUnaryOperation32f<SimdSynetUnaryOperation32fErf, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fFloor: SynetUnaryOperation32f<SimdSynetUnaryOperation32fFloor, align>(src, size, dst); break;
@@ -138,11 +150,12 @@ namespace Simd
             case SimdSynetUnaryOperation32fNot: SynetUnaryOperation32f<SimdSynetUnaryOperation32fNot, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fRcp: SynetUnaryOperation32f<SimdSynetUnaryOperation32fRcp, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fRsqrt: SynetUnaryOperation32f<SimdSynetUnaryOperation32fRsqrt, align>(src, size, dst); break;
+            case SimdSynetUnaryOperation32fSin: SynetUnaryOperation32f<SimdSynetUnaryOperation32fSin, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fSqrt: SynetUnaryOperation32f<SimdSynetUnaryOperation32fSqrt, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fTanh: SynetUnaryOperation32f<SimdSynetUnaryOperation32fTanh, align>(src, size, dst); break;
             case SimdSynetUnaryOperation32fZero: SynetUnaryOperation32f<SimdSynetUnaryOperation32fZero, align>(src, size, dst); break;
             default:
-                assert(0);
+                Sse41::SynetUnaryOperation32f(src, size, type, dst);
             }
         }
 

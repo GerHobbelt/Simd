@@ -88,25 +88,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetElu32fAutoTest(FUNC_ELU32F(Simd::Base::SynetElu32f), FUNC_ELU32F(SimdSynetElu32f));
+        if (TestBase())
+            result = result && SynetElu32fAutoTest(FUNC_ELU32F(Simd::Base::SynetElu32f), FUNC_ELU32F(SimdSynetElu32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetElu32fAutoTest(FUNC_ELU32F(Simd::Sse41::SynetElu32f), FUNC_ELU32F(SimdSynetElu32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetElu32fAutoTest(FUNC_ELU32F(Simd::Avx2::SynetElu32f), FUNC_ELU32F(SimdSynetElu32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetElu32fAutoTest(FUNC_ELU32F(Simd::Avx512bw::SynetElu32f), FUNC_ELU32F(SimdSynetElu32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetElu32fAutoTest(FUNC_ELU32F(Simd::Neon::SynetElu32f), FUNC_ELU32F(SimdSynetElu32f));
 #endif 
 
@@ -173,25 +174,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetGelu32fAutoTest(FUNC_GELU32F(Simd::Base::SynetGelu32f), FUNC_GELU32F(SimdSynetGelu32f));
+        if (TestBase())
+            result = result && SynetGelu32fAutoTest(FUNC_GELU32F(Simd::Base::SynetGelu32f), FUNC_GELU32F(SimdSynetGelu32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetGelu32fAutoTest(FUNC_GELU32F(Simd::Sse41::SynetGelu32f), FUNC_GELU32F(SimdSynetGelu32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetGelu32fAutoTest(FUNC_GELU32F(Simd::Avx2::SynetGelu32f), FUNC_GELU32F(SimdSynetGelu32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetGelu32fAutoTest(FUNC_GELU32F(Simd::Avx512bw::SynetGelu32f), FUNC_GELU32F(SimdSynetGelu32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetGelu32fAutoTest(FUNC_GELU32F(Simd::Neon::SynetGelu32f), FUNC_GELU32F(SimdSynetGelu32f));
 #endif 
 
@@ -260,25 +262,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Base::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
+        if (TestBase())
+            result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Base::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Sse41::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Avx2::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Avx512bw::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetHardSigmoid32fAutoTest(FUNC_HARDSIGMOID32F(Simd::Neon::SynetHardSigmoid32f), FUNC_HARDSIGMOID32F(SimdSynetHardSigmoid32f));
 #endif 
 
@@ -347,25 +350,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Base::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
+        if (TestBase())
+            result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Base::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Sse41::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Avx2::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Avx512bw::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetHswish32fAutoTest(FUNC_HSWISH32F(Simd::Neon::SynetHswish32f), FUNC_HSWISH32F(SimdSynetHswish32f));
 #endif 
 
@@ -433,25 +437,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetMish32fAutoTest(FUNC_MISH32F(Simd::Base::SynetMish32f), FUNC_MISH32F(SimdSynetMish32f));
+        if (TestBase())
+            result = result && SynetMish32fAutoTest(FUNC_MISH32F(Simd::Base::SynetMish32f), FUNC_MISH32F(SimdSynetMish32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetMish32fAutoTest(FUNC_MISH32F(Simd::Sse41::SynetMish32f), FUNC_MISH32F(SimdSynetMish32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetMish32fAutoTest(FUNC_MISH32F(Simd::Avx2::SynetMish32f), FUNC_MISH32F(SimdSynetMish32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetMish32fAutoTest(FUNC_MISH32F(Simd::Avx512bw::SynetMish32f), FUNC_MISH32F(SimdSynetMish32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetMish32fAutoTest(FUNC_MISH32F(Simd::Neon::SynetMish32f), FUNC_MISH32F(SimdSynetMish32f));
 #endif 
 
@@ -530,25 +535,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Base::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
+        if (TestBase())
+            result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Base::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Sse41::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Avx2::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Avx512bw::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetPreluLayerForwardAutoTest(FUNC_PLF(Simd::Neon::SynetPreluLayerForward), FUNC_PLF(SimdSynetPreluLayerForward));
 #endif
 
@@ -613,25 +619,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Base::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
+        if (TestBase())
+            result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Base::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Sse41::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Avx2::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Avx512bw::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetRelu32fAutoTest(FUNC_RE(Simd::Neon::SynetRelu32f), FUNC_RE(SimdSynetRelu32f));
 #endif
 
@@ -697,25 +704,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Base::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
+        if (TestBase())
+            result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Base::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Sse41::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Avx2::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Avx512bw::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetRestrictRange32fAutoTest(FUNC_RR(Simd::Neon::SynetRestrictRange32f), FUNC_RR(SimdSynetRestrictRange32f));
 #endif 
 
@@ -780,25 +788,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetSigmoid32fAutoTest(FUNC_SG(Simd::Base::SynetSigmoid32f), FUNC_SG(SimdSynetSigmoid32f));
+        if (TestBase())
+            result = result && SynetSigmoid32fAutoTest(FUNC_SG(Simd::Base::SynetSigmoid32f), FUNC_SG(SimdSynetSigmoid32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetSigmoid32fAutoTest(FUNC_SG(Simd::Sse41::SynetSigmoid32f), FUNC_SG(SimdSynetSigmoid32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetSigmoid32fAutoTest(FUNC_SG(Simd::Avx2::SynetSigmoid32f), FUNC_SG(SimdSynetSigmoid32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetSigmoid32fAutoTest(FUNC_SG(Simd::Avx512bw::SynetSigmoid32f), FUNC_SG(SimdSynetSigmoid32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetSigmoid32fAutoTest(FUNC_SG(Simd::Neon::SynetSigmoid32f), FUNC_SG(SimdSynetSigmoid32f));
 #endif
 
@@ -863,25 +872,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetSwish32fAutoTest(FUNC_SW(Simd::Base::SynetSwish32f), FUNC_SW(SimdSynetSwish32f));
+        if (TestBase())
+            result = result && SynetSwish32fAutoTest(FUNC_SW(Simd::Base::SynetSwish32f), FUNC_SW(SimdSynetSwish32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetSwish32fAutoTest(FUNC_SW(Simd::Sse41::SynetSwish32f), FUNC_SW(SimdSynetSwish32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetSwish32fAutoTest(FUNC_SW(Simd::Avx2::SynetSwish32f), FUNC_SW(SimdSynetSwish32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetSwish32fAutoTest(FUNC_SW(Simd::Avx512bw::SynetSwish32f), FUNC_SW(SimdSynetSwish32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetSwish32fAutoTest(FUNC_SW(Simd::Neon::SynetSwish32f), FUNC_SW(SimdSynetSwish32f));
 #endif 
 
@@ -947,25 +957,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetSoftplus32fAutoTest(FUNC_SP(Simd::Base::SynetSoftplus32f), FUNC_SP(SimdSynetSoftplus32f));
+        if (TestBase())
+            result = result && SynetSoftplus32fAutoTest(FUNC_SP(Simd::Base::SynetSoftplus32f), FUNC_SP(SimdSynetSoftplus32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetSoftplus32fAutoTest(FUNC_SP(Simd::Sse41::SynetSoftplus32f), FUNC_SP(SimdSynetSoftplus32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetSoftplus32fAutoTest(FUNC_SP(Simd::Avx2::SynetSoftplus32f), FUNC_SP(SimdSynetSoftplus32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetSoftplus32fAutoTest(FUNC_SP(Simd::Avx512bw::SynetSoftplus32f), FUNC_SP(SimdSynetSoftplus32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetSoftplus32fAutoTest(FUNC_SP(Simd::Neon::SynetSoftplus32f), FUNC_SP(SimdSynetSoftplus32f));
 #endif 
 
@@ -1030,25 +1041,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && SynetTanh32fAutoTest(FUNC_TH(Simd::Base::SynetTanh32f), FUNC_TH(SimdSynetTanh32f));
+        if (TestBase())
+            result = result && SynetTanh32fAutoTest(FUNC_TH(Simd::Base::SynetTanh32f), FUNC_TH(SimdSynetTanh32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && SynetTanh32fAutoTest(FUNC_TH(Simd::Sse41::SynetTanh32f), FUNC_TH(SimdSynetTanh32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && SynetTanh32fAutoTest(FUNC_TH(Simd::Avx2::SynetTanh32f), FUNC_TH(SimdSynetTanh32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && SynetTanh32fAutoTest(FUNC_TH(Simd::Avx512bw::SynetTanh32f), FUNC_TH(SimdSynetTanh32f));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && SynetTanh32fAutoTest(FUNC_TH(Simd::Neon::SynetTanh32f), FUNC_TH(SimdSynetTanh32f));
 #endif
 

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar,
+* Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2022-2022 Fabien Spindler.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -124,6 +124,8 @@ namespace Simd
 #endif
 
         size_t CpuCacheSize(size_t level);
+
+        uint64_t CpuCurrentFrequency();
 
         SIMD_INLINE size_t AlgCacheL1()
         {

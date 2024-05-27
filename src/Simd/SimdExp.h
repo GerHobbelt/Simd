@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 
 #include "Simd/SimdMath.h"
 #include "Simd/SimdFmadd.h"
+#include "Simd/SimdPoly.h"
 
 namespace Simd
 {
@@ -123,17 +124,6 @@ namespace Simd
 
         namespace Detail
         {
-            SIMD_INLINE __m128 Poly5(__m128 x, float a, float b, float c, float d, float e, float f)
-            {
-                __m128 p = _mm_set1_ps(f);
-                p = _mm_add_ps(_mm_mul_ps(x, p), _mm_set1_ps(e));
-                p = _mm_add_ps(_mm_mul_ps(x, p), _mm_set1_ps(d));
-                p = _mm_add_ps(_mm_mul_ps(x, p), _mm_set1_ps(c));
-                p = _mm_add_ps(_mm_mul_ps(x, p), _mm_set1_ps(b));
-                p = _mm_add_ps(_mm_mul_ps(x, p), _mm_set1_ps(a));
-                return p;
-            }
-
             SIMD_INLINE __m128 Exp2(__m128 x)
             {
                 x = _mm_max_ps(_mm_min_ps(x, _mm_set1_ps(126.99999f)), _mm_set1_ps(-126.99999f));
@@ -286,17 +276,6 @@ namespace Simd
 
         namespace Detail
         {
-            SIMD_INLINE __m256 Poly5(__m256 x, float a, float b, float c, float d, float e, float f)
-            {
-                __m256 p = _mm256_set1_ps(f);
-                p = _mm256_add_ps(_mm256_mul_ps(x, p), _mm256_set1_ps(e));
-                p = _mm256_add_ps(_mm256_mul_ps(x, p), _mm256_set1_ps(d));
-                p = _mm256_add_ps(_mm256_mul_ps(x, p), _mm256_set1_ps(c));
-                p = _mm256_add_ps(_mm256_mul_ps(x, p), _mm256_set1_ps(b));
-                p = _mm256_add_ps(_mm256_mul_ps(x, p), _mm256_set1_ps(a));
-                return p;
-            }
-
             SIMD_INLINE __m256 Exp2(__m256 x)
             {
                 x = _mm256_max_ps(_mm256_min_ps(x, _mm256_set1_ps(126.99999f)), _mm256_set1_ps(-126.99999f));
@@ -448,17 +427,6 @@ namespace Simd
 
         namespace Detail
         {
-            SIMD_INLINE __m512 Poly5(__m512 x, float a, float b, float c, float d, float e, float f)
-            {
-                __m512 p = _mm512_set1_ps(f);
-                p = _mm512_add_ps(_mm512_mul_ps(x, p), _mm512_set1_ps(e));
-                p = _mm512_add_ps(_mm512_mul_ps(x, p), _mm512_set1_ps(d));
-                p = _mm512_add_ps(_mm512_mul_ps(x, p), _mm512_set1_ps(c));
-                p = _mm512_add_ps(_mm512_mul_ps(x, p), _mm512_set1_ps(b));
-                p = _mm512_add_ps(_mm512_mul_ps(x, p), _mm512_set1_ps(a));
-                return p;
-            }
-
             SIMD_INLINE __m512 Exp2(__m512 x)
             {
                 x = _mm512_max_ps(_mm512_min_ps(x, _mm512_set1_ps(126.99999f)), _mm512_set1_ps(-126.99999f));

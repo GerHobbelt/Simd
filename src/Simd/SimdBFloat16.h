@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +76,13 @@ namespace Simd
             return _mm_srli_epi32(_mm_add_epi32(_mm_castps_si128(value), Bf16::ROUND), Base::Bf16::SHIFT);
         }
 
+        SIMD_INLINE void Float32ToBFloat16(const float * src, uint16_t * dst)
+        {
+            __m128i d0 = Float32ToBFloat16(_mm_loadu_ps(src + 0));
+            __m128i d1 = Float32ToBFloat16(_mm_loadu_ps(src + F));
+            _mm_storeu_si128((__m128i*)dst, _mm_packus_epi32(d0, d1));
+        }
+
         SIMD_INLINE __m128 BFloat16ToFloat32(__m128i value)
         {
             return _mm_castsi128_ps(_mm_slli_epi32(value, Base::Bf16::SHIFT));
@@ -95,6 +102,13 @@ namespace Simd
         SIMD_INLINE __m256i Float32ToBFloat16(__m256 value)
         {
             return _mm256_srli_epi32(_mm256_add_epi32(_mm256_castps_si256(value), Bf16::ROUND), Base::Bf16::SHIFT);
+        }
+
+        SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t* dst)
+        {
+            __m256i d0 = Float32ToBFloat16(_mm256_loadu_ps(src + 0));
+            __m256i d1 = Float32ToBFloat16(_mm256_loadu_ps(src + F));
+            _mm256_storeu_si256((__m256i*)dst, _mm256_permute4x64_epi64(_mm256_packus_epi32(d0, d1), 0xD8));
         }
 
         SIMD_INLINE __m256 BFloat16ToFloat32(__m256i value)
@@ -131,20 +145,52 @@ namespace Simd
             __m512i d1 = Float32ToBFloat16(s1);
             Store<align, mask>(dst, _mm512_permutexvar_epi64(K64_PERMUTE_FOR_PACK, _mm512_packus_epi32(d0, d1)), dstMask[0]);
         }
-    }
-#endif 
 
-#ifdef SIMD_AVX512BF16_ENABLE    
-    namespace Avx512bf16
-    {
-        template <bool align, bool mask> SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t * dst, __mmask16 srcMask[2], __mmask32 dstMask[1])
+        SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t* dst)
         {
-            __m512 s0 = Avx512bw::Load<align, mask>(src + 0 * F, srcMask[0]);
-            __m512 s1 = Avx512bw::Load<align, mask>(src + 1 * F, srcMask[1]);
-            Avx512bw::Store<align, mask>(dst, (__m512i)_mm512_cvtne2ps_pbh(s0, s1), dstMask[0]);
+            __m512 s0 = _mm512_loadu_ps(src + 0 * F);
+            __m512 s1 = _mm512_loadu_ps(src + 1 * F);
+            __m512i d0 = Float32ToBFloat16(s0);
+            __m512i d1 = Float32ToBFloat16(s1);
+            _mm512_storeu_si512(dst, _mm512_permutexvar_epi64(K64_PERMUTE_FOR_PACK, _mm512_packus_epi32(d0, d1)));
+        }        
+        
+        SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t* dst, __mmask32 loadMask, __mmask32 saveMask = __mmask32(-1))
+        {
+            __m512 s0 = _mm512_maskz_loadu_ps(__mmask16(loadMask >> 0 * 16), src + 0 * F);
+            __m512 s1 = _mm512_maskz_loadu_ps(__mmask16(loadMask >> 1 * 16), src + 1 * F);
+            __m512i d0 = Float32ToBFloat16(s0);
+            __m512i d1 = Float32ToBFloat16(s1);
+            _mm512_mask_storeu_epi16(dst, saveMask, _mm512_permutexvar_epi64(K64_PERMUTE_FOR_PACK, _mm512_packus_epi32(d0, d1)));
         }
     }
 #endif 
+
+#ifdef SIMD_AMXBF16_ENABLE    
+    namespace AmxBf16
+    {
+        template <bool align, bool mask> SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t* dst, __mmask16 srcMask[2], __mmask32 dstMask[1])
+        {
+            __m512 s0 = Avx512bw::Load<align, mask>(src + 0 * F, srcMask[0]);
+            __m512 s1 = Avx512bw::Load<align, mask>(src + 1 * F, srcMask[1]);
+            Avx512bw::Store<align, mask>(dst, (__m512i)_mm512_cvtne2ps_pbh(s1, s0), dstMask[0]);
+        }
+
+        SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t* dst)
+        {
+            __m512 s0 = _mm512_loadu_ps(src + 0 * F);
+            __m512 s1 = _mm512_loadu_ps(src + 1 * F);
+            _mm512_storeu_si512(dst, (__m512i)_mm512_cvtne2ps_pbh(s1, s0));
+        }
+
+        SIMD_INLINE void Float32ToBFloat16(const float* src, uint16_t* dst, __mmask32 loadMask, __mmask32 saveMask = __mmask32(-1))
+        {
+            __m512 s0 = _mm512_maskz_loadu_ps(__mmask16(loadMask >> 0 * 16), src + 0 * F);
+            __m512 s1 = _mm512_maskz_loadu_ps(__mmask16(loadMask >> 1 * 16), src + 1 * F);
+            _mm512_mask_storeu_epi16(dst, saveMask, (__m512i)_mm512_cvtne2ps_pbh(s1, s0));
+        }
+    }
+#endif
 
 #ifdef SIMD_NEON_ENABLE    
     namespace Neon
@@ -168,4 +214,4 @@ namespace Simd
 #endif 
 }
 
-#endif//__SimdBFloat16_h__
+#endif

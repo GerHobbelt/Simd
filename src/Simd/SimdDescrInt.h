@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -204,6 +204,32 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
+        Base::DescrInt::CosineDistancePtr GetCosineDistance(size_t depth);
+        Base::DescrInt::MacroCosineDistancesDirectPtr GetMacroCosineDistancesDirect(size_t depth);
+
+        Base::DescrInt::MacroCosineDistancesUnpackPtr GetMacroCosineDistancesUnpack(size_t depth);
+
+        //-------------------------------------------------------------------------------------------------
+
+        void* DescrIntInit(size_t size, size_t depth);
+    }
+#endif
+
+#if defined(SIMD_AMXBF16_ENABLE)
+    namespace AmxBf16
+    {
+        class DescrInt : public Avx512vnni::DescrInt
+        {
+        public:
+            DescrInt(size_t size, size_t depth);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        Base::DescrInt::CosineDistancePtr GetCosineDistance(size_t depth);
+        Base::DescrInt::MacroCosineDistancesDirectPtr GetMacroCosineDistancesDirect(size_t depth);
+
+        Base::DescrInt::UnpackDataPtr GetUnpackData(size_t depth, bool transpose);
         Base::DescrInt::MacroCosineDistancesUnpackPtr GetMacroCosineDistancesUnpack(size_t depth);
 
         //-------------------------------------------------------------------------------------------------

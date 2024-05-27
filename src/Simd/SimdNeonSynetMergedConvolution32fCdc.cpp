@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetMergedConvolution32f.h"
+#include "Simd/SimdSynetMergedConvolution32fBf16.h"
 #include "Simd/SimdSynetConvolution32fCommon.h"
 #include "Simd/SimdUpdate.h"
 #include "Simd/SimdCpu.h"
@@ -1417,7 +1417,7 @@ namespace Simd
 
 			//---------------------------------------------------------------------
 
-			template <SimdConvolutionActivationType type> void Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32fCdc::ConvolutionPtr* c)
+			template <SimdConvolutionActivationType type> void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32fCdc::ConvolutionPtr* c)
 			{
 				switch (t)
 				{
@@ -1445,7 +1445,7 @@ namespace Simd
 
 		//---------------------------------------------------------------------
 
-		SynetMergedConvolution32fCdc::SynetMergedConvolution32fCdc(const MergConvParam32f& p)
+		SynetMergedConvolution32fCdc::SynetMergedConvolution32fCdc(const MergConvParam& p)
 			: Base::SynetMergedConvolution32fCdc(p)
 		{
 			for (size_t i = 0; i < _param.count; ++i)
@@ -1453,7 +1453,7 @@ namespace Simd
 			SetSize(Base::AlgCacheL1(), Base::AlgCacheL2(), Base::AlgCacheL3(), Neon::F);
 		}
 
-		void SynetMergedConvolution32fCdc::Set(const MergConvParam32f& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c)
+		void SynetMergedConvolution32fCdc::Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c)
 		{
 			switch (p.conv[i].activation)
 			{
@@ -1476,8 +1476,8 @@ namespace Simd
 
 		void* SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility)
 		{
-			MergConvParam32f param(batch, convs, count, add, compatibility);
-			if (!param.Valid())
+			MergConvParam param(batch, convs, count, add, compatibility);
+			if (!param.Valid(SimdTensorData32f))
 				return NULL;
 			if (Base::Bf16Soft(compatibility))
 			{

@@ -33,11 +33,140 @@
  <a href="2013.html">2013</a>
 </center>
 
+<a href="#HOME">Home</a>
 <hr/>
+<h3 id="R138">June X, 2024 (version X.X.138)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512BF16 optimizations of class SynetConvolution16bNhwcDirect.</li>
+ <li>SimdCpuInfoCurrentFrequency in SimdCpuInfoType enumeration.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>AVX-512BF16 optimizations of class SynetConvolution16bNhwcGemm.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Errors in Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512BF16 optimizations of class SynetConvolution16bNhwcGemm.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>-wu command line option to set CPU warm up time in milliseconds.</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Errors in build_and_test_gcc section in Github actions script for CMake.</li>
+</ul>
 
 <a href="#HOME">Home</a>
 <hr/>
-<h3 id="R134">February X, 2023 (version X.X.134)</h3> 
+<h3 id="R137">May 2, 2024 (version 6.1.137)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>AMX-BF16 (AVX-512VBMI) optimizations of function DescrIntCosineDistance.</li>
+ <li>AMX-BF16 (AVX-512VBMI, AMX-INT8) optimizations of function DescrIntCosineDistancesMxNa.</li>
+ <li>AMX-BF16 (AVX-512VBMI, AMX-INT8) optimizations of function DescrIntCosineDistancesMxNp.</li>
+ <li>API of SynetConvolution16b framework.</li>
+ <li>Base implementation of class SynetConvolution16bGemm.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512BF16 optimizations of class SynetConvolution16bNhwcGemm.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>AVX-512VNNI optimizations of function DescrIntCosineDistance.</li>
+ <li>AVX-512VNNI optimizations of function DescrIntCosineDistancesMxNa.</li>
+ <li>AVX-512VNNI optimizations of function DescrIntCosineDistancesMxNp.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of SynetConvolution16b framework.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R136">April 2, 2024 (version 6.1.136)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>AMX-BF16 (AVX-512VBMI) optimizations of function ChangeColors.</li>
+ <li>AMX-BF16 (AVX-512VBMI) optimizations of function NormalizeHistogram.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>AMX-BF16 optimizations of class SynetConvolution32fBf16NhwcGemm.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetConvolution32fBf16NhwcGemm.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Command line parameter to disable testing of some SIMD extensions.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in test of function Nv12SaveAsJpegToMemory.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R135">March 1, 2024 (version 6.1.135)</h3> 
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetConvolution32fBf16NhwcGemm.</li>
+ <li>AMX-BF16 optimizations of function Float32ToBFloat16.</li>
+ <li>Support of SimdSynetUnaryOperation32fCos in function SynetUnaryOperation32f.</li>
+ <li>Support of SimdSynetUnaryOperation32fSin in function SynetUnaryOperation32f.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in function SimdCpuInfo (wrong AMX-BF16 detection).</li>
+ <li>Error in AVX-512BF16 optimization of function Float32ToBFloat16.</li>
+ <li>Error in AMX initialization in function AmxBf16::SupportedByOS.</li>
+ <li>Crash in function AmxBf16::ConvolutionBf16NhwcConv_2.</li>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetMergedConvolution32fBf16Cdc.</li>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetMergedConvolution32fBf16Cd.</li>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetMergedConvolution32fBf16Dc.</li>
+</ul>
+<h5>Removing</h5>
+<ul>
+ <li>AVX-512BF16 optimizations of function Float32ToBFloat16.</li>
+ <li>AVX-512BF16 optimizations of SynetConvolution32fBf16Nhwc.</li>
+ <li>AVX-512BF16 optimizations of class SynetMergedConvolution32fBf16Cdc.</li>
+ <li>AVX-512BF16 optimizations of class SynetMergedConvolution32fBf16Cd.</li>
+ <li>AVX-512BF16 optimizations of class SynetMergedConvolution32fBf16Dc.</li>
+ <li>Stopping of separate support of AVX-512BF16 extension (only together with AMX-BF16).</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in test of SynetMergedConvolution32f framework.</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>Removing</h5>
+<ul>
+ <li>Avx512Bf16 project for MSVS-2022.</li>
+ <li>Avx512Bf16 project for MSVS-2019.</li>
+ <li>Avx512Bf16 project for MSVS-2015.</li>
+ <li>Avx512Bf16 project for MSVS-2017.</li>
+ <li>Avx512Bf16 project for CMake.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R134">February 1, 2024 (version 6.0.134)</h3> 
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>

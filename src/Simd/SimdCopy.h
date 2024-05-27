@@ -21,8 +21,8 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#ifndef __SimdCopyPixel_h__
-#define __SimdCopyPixel_h__
+#ifndef __SimdCopy_h__
+#define __SimdCopy_h__
 
 #include "Simd/SimdDefs.h"
 
@@ -74,6 +74,51 @@ namespace Simd
             ((uint32_t*)dst)[2] = ((uint32_t*)src)[2];
         }
     }
+
+#ifdef SIMD_SSE41_ENABLE
+    namespace Sse41
+    {
+        SIMD_INLINE void Copy(const uint16_t* src, uint16_t* dst)
+        {
+            _mm_storeu_si128((__m128i*)dst, _mm_loadu_si128((__m128i*)src));
+        }
+    }
+#endif
+
+#ifdef SIMD_AVX2_ENABLE
+    namespace Avx2
+    {
+        SIMD_INLINE void Copy(const uint16_t* src, uint16_t* dst)
+        {
+            _mm256_storeu_si256((__m256i*)dst, _mm256_loadu_si256((__m256i*)src));
+        }
+    }
+#endif
+
+#ifdef SIMD_AVX512BW_ENABLE    
+    namespace Avx512bw
+    {
+        SIMD_INLINE void Copy(const uint16_t* src, uint16_t* dst, __mmask32 srcMask = __mmask32(-1), __mmask32 dstMask = __mmask32(-1))
+        {
+            _mm512_mask_storeu_epi16(dst, dstMask, _mm512_maskz_loadu_epi16(srcMask, src));
+        }
+
+        SIMD_INLINE void Copy(const uint16_t* src, size_t size32, __mmask32 tail, uint16_t* dst)
+        {
+            size_t i = 0;
+            for (; i < size32; i += 32)
+                _mm512_storeu_si512(dst + i, _mm512_loadu_si512(src + i));
+            if (tail)
+                _mm512_mask_storeu_epi16(dst + i, tail, _mm512_maskz_loadu_epi16(tail, src + i));
+        }
+
+        SIMD_INLINE void Copy(const uint16_t* src, size_t size, uint16_t* dst)
+        {
+            size_t tail = size & 31;
+            Copy(src, size & (~31), tail ? __mmask32(-1) >> (32 - tail) : 0, dst);
+        }   
+    }
+#endif
 }
 
-#endif//__SimdCopyPixel_h__
+#endif

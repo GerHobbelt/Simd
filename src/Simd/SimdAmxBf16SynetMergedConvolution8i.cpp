@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -128,11 +128,11 @@ namespace Simd
             if (!param.Valid())
                 return NULL;
             if (SynetMergedConvolution8iCdc::Preferable(param))
-                return new SynetMergedConvolution8iCdc(param);
+                return new Avx512vnni::SynetMergedConvolution8iCdc(param);
             else if (SynetMergedConvolution8iCd::Preferable(param))
-                return new SynetMergedConvolution8iCd(param);
+                return new Avx512vnni::SynetMergedConvolution8iCd(param);
             else if (SynetMergedConvolution8iDc::Preferable(param))
-                return new SynetMergedConvolution8iDc(param);
+                return new Avx512vnni::SynetMergedConvolution8iDc(param);
             else
                 return new Base::SynetMergedConvolution8i(param);
         }

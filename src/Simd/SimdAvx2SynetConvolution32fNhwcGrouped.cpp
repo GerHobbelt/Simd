@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace Simd
             _mm256_storeu_ps(dst + offset + F, Activate<type>(_mm256_add_ps(_mm256_unpackhi_ps(sum0, sum1), _mm256_loadu_ps(bias + offset + F)), params, offset + F));
         }
 
-        template<SimdConvolutionActivationType type> void ConvolutionNhwcGroupedBlock1x2Default(const float* src, const ConvParam32f& p, const float* weight, const float* bias, const float* params, float* dst)
+        template<SimdConvolutionActivationType type> void ConvolutionNhwcGroupedBlock1x2Default(const float* src, const ConvParam& p, const float* weight, const float* bias, const float* params, float* dst)
         {
             size_t srcC = p.srcC;
             size_t srcCF = AlignLo(srcC, F);
@@ -177,14 +177,14 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        template <SimdConvolutionActivationType type> SynetConvolution32fNhwcGroupedBlock1x2::ConvolutionPtr GetConvolution(const ConvParam32f& p)
+        template <SimdConvolutionActivationType type> SynetConvolution32fNhwcGroupedBlock1x2::ConvolutionPtr GetConvolution(const ConvParam& p)
         {
             return ConvolutionNhwcGroupedBlock1x2Default<type>;
         }
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fNhwcGroupedBlock1x2::SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam32f& p)
+        SynetConvolution32fNhwcGroupedBlock1x2::SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam& p)
             : Sse41::SynetConvolution32fNhwcGroupedBlock1x2(p)
         {
             if (p.srcC >= F)

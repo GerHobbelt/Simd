@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ namespace Simd
 
         //---------------------------------------------------------------------
 
-        template<Term8iType term, SimdConvolutionActivationType type, bool nofma> void DepthwiseConvolution(const float* src, const ConvParam8i& p, const AlgParam& a, size_t dstC,
+        template<Term8iType term, SimdConvolutionActivationType type, bool nofma> void DepthwiseConvolution(const float* src, const ConvParam& p, const AlgParam& a, size_t dstC,
             size_t yBeg, size_t yEnd, const float* weight, const float* bias, const float* params, const float* scale, const float* shift, uint8_t* dst)
         {
             size_t strideY = p.strideY, strideX = p.strideX, padY = p.padY, padX = p.padX, padH = p.padH, padW = p.padW;
@@ -463,7 +463,7 @@ namespace Simd
             Save1<term, type, nofma>(dst + 3 * dX, sum3, params, scale, shift, upper, tail);
         }
 
-        template<Term8iType term, SimdConvolutionActivationType type, bool nofma> void DepthwiseConvolution3x3(const float* src, const ConvParam8i& p, const AlgParam& a,
+        template<Term8iType term, SimdConvolutionActivationType type, bool nofma> void DepthwiseConvolution3x3(const float* src, const ConvParam& p, const AlgParam& a,
             size_t dstC, size_t yBeg, size_t yEnd, const float* weight, const float* bias, const float* params, const float* scale, const float* shift, uint8_t* dst)
         {
             size_t strideY = p.strideY, padY = p.padY, padX = p.padX, padH = p.padH, padW = p.padW;
@@ -549,7 +549,7 @@ namespace Simd
 
         //---------------------------------------------------------------------
 
-        template<Term8iType term, SimdConvolutionActivationType type> static void SetDepthwise(const ConvParam8i& p, DepthwiseConvolutionPtr& depthwise)
+        template<Term8iType term, SimdConvolutionActivationType type> static void SetDepthwise(const ConvParam& p, DepthwiseConvolutionPtr& depthwise)
         {
             if (p.IsKernel(3) && p.IsDilation(1))
             {
@@ -567,7 +567,7 @@ namespace Simd
             }
         }
 
-        template<SimdConvolutionActivationType type> static void SetDepthwise(const ConvParam8i& p, DepthwiseConvolutionPtr& depthwise)
+        template<SimdConvolutionActivationType type> static void SetDepthwise(const ConvParam& p, DepthwiseConvolutionPtr& depthwise)
         {
             if (p.dstT == SimdTensorData32f)
                 SetDepthwise<Term8iLast32f, type>(p, depthwise);
@@ -575,7 +575,7 @@ namespace Simd
                 SetDepthwise<Term8iLast8u, type>(p, depthwise);
         }
 
-        void SetDepthwise(const ConvParam8i& p, DepthwiseConvolutionPtr& depthwise)
+        void SetDepthwise(const ConvParam& p, DepthwiseConvolutionPtr& depthwise)
         {
             switch (p.activation)
             {

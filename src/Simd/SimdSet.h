@@ -29,6 +29,15 @@
 
 namespace Simd
 {
+    namespace Base
+    {
+        SIMD_INLINE void SetZero(uint16_t* dst, size_t size)
+        {
+            for (size_t i = 0; i < size; ++i)
+                dst[i] = 0;
+        }
+    }
+
 #ifdef SIMD_SSE41_ENABLE
     namespace Sse41
     {
@@ -51,8 +60,15 @@ namespace Simd
         {
             return _mm_unpacklo_ps(_mm_set_ps1(a0), _mm_set_ps1(a1));
         }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SIMD_INLINE void SetZero(uint16_t* dst)
+        {
+            _mm_storeu_si128((__m128i*)dst, _mm_setzero_si128());
+        }
     }
-#endif// SIMD_SSE41_ENABLE
+#endif
 
 #ifdef SIMD_AVX2_ENABLE
     namespace Avx2
@@ -108,8 +124,15 @@ namespace Simd
                 mask[i] = second;
             return _mm256_loadu_si256((__m256i*)mask);
         }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SIMD_INLINE void SetZero(uint16_t* dst)
+        {
+            _mm256_storeu_si256((__m256i*)dst, _mm256_setzero_si256());
+        }
     }
-#endif// SIMD_AVX2_ENABLE
+#endif
 
 #ifdef SIMD_AVX512BW_ENABLE
     namespace Avx512bw
@@ -138,8 +161,31 @@ namespace Simd
         {
             return _mm512_inserti32x4(_mm512_inserti32x4(_mm512_inserti32x4(_mm512_castsi128_si512(a0), a1, 1), a2, 2), a3, 3);
         }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SIMD_INLINE void SetZero(uint16_t* dst, __mmask32 mask = __mmask32(-1))
+        {
+            _mm512_mask_storeu_epi16(dst, mask, _mm512_setzero_si512());
+        }
+
+        SIMD_INLINE void SetZeros(uint16_t* dst, size_t size32, __mmask32 tail)
+        {
+            size_t i = 0;
+            __m512i zero = _mm512_setzero_si512();
+            for (; i < size32; i += 32)
+                _mm512_storeu_si512(dst + i, zero);
+            if (tail)
+                _mm512_mask_storeu_epi16(dst + i, tail, zero);
+        }
+
+        SIMD_INLINE void SetZeros(uint16_t* dst, size_t size)
+        {
+            size_t tail = size & 31;
+            SetZeros(dst, size & (~31), tail ? __mmask32(-1) >> (32 - tail) : 0);
+        }
     }
-#endif// SIMD_AVX512BW_ENABLE
+#endif
 
 #ifdef SIMD_NEON_ENABLE
     namespace Neon
@@ -156,7 +202,7 @@ namespace Simd
             return vld1q_s32(a);
         }
     }
-#endif// SIMD_NEON_ENABLE
+#endif
 }
 
-#endif//__SimdSet_h__
+#endif

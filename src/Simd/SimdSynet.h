@@ -237,6 +237,11 @@ namespace Simd
             return fiv + (fiv < value ? 1.0f : 0.0f);
         }
 
+        template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fCos>(float value)
+        {
+            return ::cosf(value);
+        }
+
         template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fErf>(float value)
         {
             return ::erf(value);
@@ -276,6 +281,11 @@ namespace Simd
         template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fRsqrt>(float value)
         {
             return 1.0f / ::sqrt(value);
+        }
+
+        template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fSin>(float value)
+        {
+            return ::sinf(value);
         }
 
         template<> SIMD_INLINE float SynetUnaryOperation32f<SimdSynetUnaryOperation32fSqrt>(float value)
@@ -441,8 +451,8 @@ namespace Simd
     }
 #endif
 
-#ifdef SIMD_AVX512BF16_ENABLE
-    namespace Avx512bf16
+#ifdef SIMD_AMXBF16_ENABLE
+    namespace AmxBf16
     {
         SIMD_INLINE __m512bh Set2(const uint16_t* src)
         {
@@ -471,7 +481,7 @@ namespace Simd
             return vmlaq_f32(positive, slope, negative);
         }
     }
-#endif//SIMD_NEON_ENABLE
+#endif
 }
 
-#endif//__SimdSynet_h__
+#endif

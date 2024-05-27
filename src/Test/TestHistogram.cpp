@@ -125,7 +125,8 @@ namespace Test
     {
         bool result = true;
 
-        result = result && HistogramAutoTest(FUNC_H(Simd::Base::Histogram), FUNC_H(SimdHistogram));
+        if (TestBase())
+            result = result && HistogramAutoTest(FUNC_H(Simd::Base::Histogram), FUNC_H(SimdHistogram));
 
         return result;
     }
@@ -168,25 +169,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && HistogramMaskedAutoTest(FUNC_HM(Simd::Base::HistogramMasked), FUNC_HM(SimdHistogramMasked));
+        if (TestBase())
+            result = result && HistogramMaskedAutoTest(FUNC_HM(Simd::Base::HistogramMasked), FUNC_HM(SimdHistogramMasked));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
             result = result && HistogramMaskedAutoTest(FUNC_HM(Simd::Sse41::HistogramMasked), FUNC_HM(SimdHistogramMasked));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
             result = result && HistogramMaskedAutoTest(FUNC_HM(Simd::Avx2::HistogramMasked), FUNC_HM(SimdHistogramMasked));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && HistogramMaskedAutoTest(FUNC_HM(Simd::Avx512bw::HistogramMasked), FUNC_HM(SimdHistogramMasked));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
             result = result && HistogramMaskedAutoTest(FUNC_HM(Simd::Neon::HistogramMasked), FUNC_HM(SimdHistogramMasked));
 #endif 
 
@@ -231,25 +233,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && AbsSecondDerivativeHistogramAutoTest(1, FUNC_ASDH(Simd::Base::AbsSecondDerivativeHistogram), FUNC_ASDH(SimdAbsSecondDerivativeHistogram));
+        if (TestBase())
+            result = result && AbsSecondDerivativeHistogramAutoTest(1, FUNC_ASDH(Simd::Base::AbsSecondDerivativeHistogram), FUNC_ASDH(SimdAbsSecondDerivativeHistogram));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable)
+        if (Simd::Sse41::Enable && TestSse41())
             result = result && AbsSecondDerivativeHistogramAutoTest(Simd::Sse41::A, FUNC_ASDH(Simd::Sse41::AbsSecondDerivativeHistogram), FUNC_ASDH(SimdAbsSecondDerivativeHistogram));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable)
+        if (Simd::Avx2::Enable && TestAvx2())
             result = result && AbsSecondDerivativeHistogramAutoTest(Simd::Avx2::A, FUNC_ASDH(Simd::Avx2::AbsSecondDerivativeHistogram), FUNC_ASDH(SimdAbsSecondDerivativeHistogram));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && AbsSecondDerivativeHistogramAutoTest(Simd::Avx512bw::A, FUNC_ASDH(Simd::Avx512bw::AbsSecondDerivativeHistogram), FUNC_ASDH(SimdAbsSecondDerivativeHistogram));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable)
+        if (Simd::Neon::Enable && TestNeon())
             result = result && AbsSecondDerivativeHistogramAutoTest(Simd::Neon::A, FUNC_ASDH(Simd::Neon::AbsSecondDerivativeHistogram), FUNC_ASDH(SimdAbsSecondDerivativeHistogram));
 #endif 
 
@@ -298,7 +301,7 @@ namespace Test
 
         TEST_EXECUTE_AT_LEAST_MIN_TIME(f2.Call(s, c, d2));
 
-        result = result && Compare(d1, d2, 0, true, 32);
+        result = result && Compare(d1, d2, 0, true, 64);
 
         return result;
     }
@@ -317,12 +320,18 @@ namespace Test
     {
         bool result = true;
 
-        result = result && ChangeColorsAutoTest(FUNC_CC(Simd::Base::ChangeColors), FUNC_CC(SimdChangeColors));
+        if (TestBase())
+            result = result && ChangeColorsAutoTest(FUNC_CC(Simd::Base::ChangeColors), FUNC_CC(SimdChangeColors));
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && W >= Simd::Avx512bw::HA)
+        if (Simd::Avx512bw::Enable && TestAvx512bw() && W >= Simd::Avx512bw::HA)
             result = result && ChangeColorsAutoTest(FUNC_CC(Simd::Avx512bw::ChangeColors), FUNC_CC(SimdChangeColors));
 #endif 
+
+#ifdef SIMD_AMXBF16_ENABLE
+        if (Simd::AmxBf16::Enable && TestAmxBf16())
+            result = result && ChangeColorsAutoTest(FUNC_CC(Simd::AmxBf16::ChangeColors), FUNC_CC(SimdChangeColors));
+#endif
 
         return result;
     }
@@ -396,25 +405,26 @@ namespace Test
     {
         bool result = true;
 
-        result = result && HistogramConditionalAutoTest(FUNC_HC(Simd::Base::HistogramConditional), FUNC_HC(SimdHistogramConditional));
+        if (TestBase())
+            result = result && HistogramConditionalAutoTest(FUNC_HC(Simd::Base::HistogramConditional), FUNC_HC(SimdHistogramConditional));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
             result = result && HistogramConditionalAutoTest(FUNC_HC(Simd::Sse41::HistogramConditional), FUNC_HC(SimdHistogramConditional));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
             result = result && HistogramConditionalAutoTest(FUNC_HC(Simd::Avx2::HistogramConditional), FUNC_HC(SimdHistogramConditional));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable)
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
             result = result && HistogramConditionalAutoTest(FUNC_HC(Simd::Avx512bw::HistogramConditional), FUNC_HC(SimdHistogramConditional));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
             result = result && HistogramConditionalAutoTest(FUNC_HC(Simd::Neon::HistogramConditional), FUNC_HC(SimdHistogramConditional));
 #endif 
 

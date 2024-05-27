@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 */
 #include "Simd/SimdSynetConvolution32f.h"
 #include "Simd/SimdSynetConvolution32fCommon.h"
+#include "Simd/SimdSynetConvolution32fBf16.h"
 #include "Simd/SimdSynet.h"
 #include "Simd/SimdBase.h"
 #include "Simd/SimdCpu.h"
@@ -330,7 +331,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fGemmNN::SynetConvolution32fGemmNN(const ConvParam32f & p)
+        SynetConvolution32fGemmNN::SynetConvolution32fGemmNN(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             if (p.IsDilation(1) && p.IsStride(1) && p.IsPad(0))
@@ -402,7 +403,7 @@ namespace Simd
 
         void SynetConvolution32fGemmNN::Forward(const float * src, float * buf, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             if (!_skipConv)
                 buf = Buffer(buf);
             if (_merge > 1)
@@ -470,7 +471,7 @@ namespace Simd
 
         void SynetConvolution32fGemmNN::ImgToCol(const float * src, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             assert(!p.trans);
             size_t srcSize = p.srcW * p.srcH;
             if (p.IsDilation(1) && p.IsStride(2) && p.IsPad(0) && p.IsKernel(1))
@@ -558,7 +559,7 @@ namespace Simd
 
         void SynetConvolution32fGemmNN::ImgToRow(const float * src, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             assert(p.trans);
             size_t size = p.srcC / p.group;
             for (size_t g = 0; g < p.group; ++g)
@@ -606,7 +607,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fGemmNT::SynetConvolution32fGemmNT(const ConvParam32f & p)
+        SynetConvolution32fGemmNT::SynetConvolution32fGemmNT(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             assert(p.group == 1);
@@ -630,7 +631,7 @@ namespace Simd
 
         void SynetConvolution32fGemmNT::Forward(const float * src, float * buf, float * dst)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             if (p.trans == 0)
                 buf = Buffer(buf);
             for (size_t b = 0; b < _batch; ++b)
@@ -651,7 +652,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fGemmNT::Preferable(const ConvParam32f & p)
+        bool SynetConvolution32fGemmNT::Preferable(const ConvParam & p)
         {
             if (p.group != 1)
                 return false;
@@ -661,7 +662,7 @@ namespace Simd
                 return p.srcH < 6 && p.srcW < 6;
         }
 
-        void SynetConvolution32fGemmNT::ImgToRow(const float * src, const ConvParam32f & p, float * dst)
+        void SynetConvolution32fGemmNT::ImgToRow(const float * src, const ConvParam & p, float * dst)
         {
             const size_t K = p.kernelX * p.kernelY*p.srcC, N = p.dstH * p.dstW;
             if (p.IsDilation(1) && p.IsStride(1))
@@ -749,7 +750,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fWinograd::SynetConvolution32fWinograd(const ConvParam32f& p)
+        SynetConvolution32fWinograd::SynetConvolution32fWinograd(const ConvParam& p)
             : SynetConvolution32f(p)
         {
             if (p.kernelY == 1 && p.kernelX == 3)
@@ -819,7 +820,7 @@ namespace Simd
 
         String SynetConvolution32fWinograd::Desc() const 
         { 
-            const ConvParam32f& p = this->Param();
+            const ConvParam& p = this->Param();
             return Ext() + "::Winograd F(" + ToStr(_blockY) + "x" + ToStr(_blockX) + "," + ToStr(p.kernelY) + "x" + ToStr(p.kernelX) + ")" 
                 + (_merge > 1 ? "*" + ToStr(_merge) : "") + (_split > 1 ? "/" + ToStr(_split) : "");
         }
@@ -856,7 +857,7 @@ namespace Simd
         
         void SynetConvolution32fWinograd::Forward(const float * src, float * buf, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             float * bufS = Buffer(buf);
             float * bufD = bufS + _strideS * _count * _merge;
             if (p.trans)
@@ -881,7 +882,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fWinograd::Preferable(const ConvParam32f & p)
+        bool SynetConvolution32fWinograd::Preferable(const ConvParam & p)
         {
             if (!p.IsDilation(1) || !p.IsStride(1) || p.group != 1 || p.srcC <= 16)
                 return false;
@@ -920,7 +921,7 @@ namespace Simd
 
         void SynetConvolution32fWinograd::SetBlock(size_t blockY, size_t blockX)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             _blockY = blockY;
             _blockX = blockX;
             _count = (_blockY + p.kernelY - 1) * (_blockX + p.kernelX - 1);
@@ -972,7 +973,7 @@ namespace Simd
 
         void SynetConvolution32fWinograd::ForwardMerged(const float * src, float * bufS, float * bufD, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             for (size_t b = 0; b < _batch; b += _merge)
             {
                 for (size_t m = 0; m < _merge; ++m)
@@ -1001,7 +1002,7 @@ namespace Simd
 
         void SynetConvolution32fWinograd::ForwardSplitted(const float* src, float* bufS, float* bufD, float* dst)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             for (size_t b = 0; b < _batch; ++b)
             {
                 for (size_t s = 0; s < _split; ++s)
@@ -1036,7 +1037,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fDirectNchw::SynetConvolution32fDirectNchw(const ConvParam32f & p)
+        SynetConvolution32fDirectNchw::SynetConvolution32fDirectNchw(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             _srcC = p.srcC / p.group;
@@ -1060,7 +1061,7 @@ namespace Simd
 
         void SynetConvolution32fDirectNchw::Forward(const float * src, float * buf, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             if(_pad)
                 buf = Buffer(buf);
             for (size_t b = 0; b < p.batch; ++b)
@@ -1088,7 +1089,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fDirectNchw::Preferable(const ConvParam32f & p)
+        bool SynetConvolution32fDirectNchw::Preferable(const ConvParam & p)
         {
             if (!p.IsDilation(1))
                 return false;
@@ -1100,7 +1101,7 @@ namespace Simd
 
         void SynetConvolution32fDirectNchw::Pad(const float * src, float * dst) const
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             for (size_t c = 0; c < _srcC; ++c)
             {
                 if (p.padY)
@@ -1253,7 +1254,7 @@ namespace Simd
 
         SynetConvolution32fDirectNchw::ConvolutionBiasActivationPtr SynetConvolution32fDirectNchw::SetConvolutionBiasActivation()
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             switch (p.strideX)
             {
             case 1:
@@ -1280,7 +1281,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fDirectNhwc::SynetConvolution32fDirectNhwc(const ConvParam32f & p)
+        SynetConvolution32fDirectNhwc::SynetConvolution32fDirectNhwc(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             _batch = p.batch;
@@ -1299,7 +1300,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fDirectNhwc::Preferable(const ConvParam32f & p)
+        bool SynetConvolution32fDirectNhwc::Preferable(const ConvParam & p)
         {
             if (p.trans == 0)
                 return false;
@@ -1311,7 +1312,7 @@ namespace Simd
             return p.IsDepthwise();
         }
 
-        static void ConvolutionDirectNhwcConvolutionBiasActivationDefault(const float * src, const ConvParam32f & p, const float * weight, const float * bias, const float * params, float * dst)
+        static void ConvolutionDirectNhwcConvolutionBiasActivationDefault(const float * src, const ConvParam & p, const float * weight, const float * bias, const float * params, float * dst)
         {
             size_t group = p.group;
             size_t srcC = p.srcC / group;
@@ -1366,7 +1367,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fDepthwiseDotProduct::SynetConvolution32fDepthwiseDotProduct(const ConvParam32f & p)
+        SynetConvolution32fDepthwiseDotProduct::SynetConvolution32fDepthwiseDotProduct(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             _count = p.srcC;
@@ -1413,7 +1414,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fDepthwiseDotProduct::Preferable(const ConvParam32f & p)
+        bool SynetConvolution32fDepthwiseDotProduct::Preferable(const ConvParam & p)
         {
             if (!(p.IsPad(0) && p.IsDilation(1) && p.IsStride(1)))
                 return false;
@@ -1424,7 +1425,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        static void ConvolutionNhwcGroupedBlock1x2(const float* src, const ConvParam32f& p, const float* weight, const float* bias, const float* params, float* dst)
+        static void ConvolutionNhwcGroupedBlock1x2(const float* src, const ConvParam& p, const float* weight, const float* bias, const float* params, float* dst)
         {
             size_t dW = p.kernelY * p.kernelX * p.srcC, srcC = p.srcC;
             for (size_t dy = 0; dy < p.dstH; ++dy)
@@ -1460,7 +1461,7 @@ namespace Simd
             }
         }
 
-        SynetConvolution32fNhwcGroupedBlock1x2::SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam32f& p)
+        SynetConvolution32fNhwcGroupedBlock1x2::SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam& p)
             : SynetConvolution32f(p)
         {
             _batch = p.batch;
@@ -1472,7 +1473,7 @@ namespace Simd
         void SynetConvolution32fNhwcGroupedBlock1x2::SetParams(const float* weight, SimdBool* internal, const float* bias, const float* params)
         {
             SynetConvolution32f::SetParams(weight, internal, bias, params);
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             size_t size = p.kernelY * p.kernelX * p.srcC;
             _rWeight.Resize(size * 2);
             const float* src = _weight;
@@ -1501,7 +1502,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fNhwcGroupedBlock1x2::Preferable(const ConvParam32f& p)
+        bool SynetConvolution32fNhwcGroupedBlock1x2::Preferable(const ConvParam& p)
         {
             if (p.trans == 0 || p.group == 1 || p.IsDepthwise())
                 return false;
@@ -1510,7 +1511,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        SynetConvolution32fNhwcDirect::SynetConvolution32fNhwcDirect(const ConvParam32f & p)
+        SynetConvolution32fNhwcDirect::SynetConvolution32fNhwcDirect(const ConvParam & p)
             : SynetConvolution32f(p)
         {
             _sizeS = p.srcC*p.srcH*p.srcW;
@@ -1563,7 +1564,7 @@ namespace Simd
             }
             if (_rParams.data)
             {
-                const ConvParam32f& p = _param;
+                const ConvParam& p = _param;
                 switch (p.activation)
                 {
                 case SimdConvolutionActivationIdentity:
@@ -1614,7 +1615,7 @@ namespace Simd
 
         void SynetConvolution32fNhwcDirect::Forward(const float * src, float * buf, float * dst)
         {
-            const ConvParam32f & p = _param;
+            const ConvParam & p = _param;
             for (size_t b = 0; b < p.batch; ++b)
             {
                 if(_old.enable)
@@ -1626,7 +1627,7 @@ namespace Simd
             }
         }
 
-        void SynetConvolution32fNhwcDirect::Forward(const float* src, const ConvParam32f& p, const AlgParam& a, const float* weight, const float* bias, const float* params, float* dst)
+        void SynetConvolution32fNhwcDirect::Forward(const float* src, const ConvParam& p, const AlgParam& a, const float* weight, const float* bias, const float* params, float* dst)
         {
             for (size_t dc = 0; dc < p.dstC; dc += a.macroD)
             {
@@ -1653,7 +1654,7 @@ namespace Simd
 
         void SynetConvolution32fNhwcDirect::SetAlgParam(size_t F, size_t N, AlgParam & alg)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             alg.F = F;
             alg.microD = F*N;
             alg.macroC = Simd::Min(Base::AlgCacheL1() / sizeof(float) / p.kernelY / p.kernelX / alg.microD, p.srcC);
@@ -1676,7 +1677,7 @@ namespace Simd
 
         void SynetConvolution32fNhwcDirect::ReorderWeight(const float* src, float* dst)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             const AlgParam & a = _run.At(0).alg;
             for (size_t dc = 0; dc < p.dstC; dc += a.F)
             {
@@ -1703,7 +1704,7 @@ namespace Simd
 
         void SynetConvolution32fNhwcDirect::OldSetAlgParam(size_t F)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             AlgParam & a = _old.alg;
             a.F = F;
             a.microD = a.F*2;
@@ -1726,7 +1727,7 @@ namespace Simd
 
         void SynetConvolution32fNhwcDirect::OldReorderWeight(const float* src, float* dst)
         {
-            const ConvParam32f& p = _param;
+            const ConvParam& p = _param;
             const AlgParam& a = _old.alg;
             for (size_t da = 0; da < p.dstC; da += a.macroD)
             {
@@ -1758,7 +1759,7 @@ namespace Simd
             }
         }
 
-        bool SynetConvolution32fNhwcDirect::Preferable(const ConvParam32f & p)
+        bool SynetConvolution32fNhwcDirect::Preferable(const ConvParam & p)
         {
             return false;
         }
@@ -1769,8 +1770,8 @@ namespace Simd
 
         void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility)
         {
-            ConvParam32f param(batch, conv, compatibility);
-            if (!param.Valid())
+            ConvParam param(batch, conv, compatibility);
+            if (!param.Valid(SimdTensorData32f))
                 return NULL;
             else if (Bf16Soft(compatibility))
             {

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -49,12 +49,12 @@ namespace Simd
 
 //-------------------------------------------------------------------------------------------------
 
-#if defined(SIMD_AMX_EMULATE)  
 namespace Simd
 {
 #ifdef SIMD_AVX512BW_ENABLE  
     namespace Avx512bw
     {
+#if defined (SIMD_AMX_EMULATE)
         union SIMD_ALIGNED(64) TileReg
         {
             int8_t i8[16][64];
@@ -106,9 +106,18 @@ namespace Simd
         void TileMatMulFp16(int dst, int a, int b);
 
         void TileMatMulFp16(Tile1024* dst, const Tile1024& a, const Tile1024& b);
+#endif
+    }
+#endif
+
+#ifdef SIMD_AMXBF16_ENABLE
+    namespace AmxBf16
+    {
     }
 #endif
 }
+
+#if defined(SIMD_AMX_EMULATE)  
 
 #ifdef _tile_loadconfig
 #undef _tile_loadconfig

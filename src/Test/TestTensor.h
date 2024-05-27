@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2023 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -84,16 +84,16 @@ namespace Test
             Resize(value);
         }
 
-        SIMD_INLINE void Extend(const Test::Shape & shape)
+        SIMD_INLINE void Extend(const Test::Shape & shape, const Type& value = Type())
         {
             _shape = shape;
-            Extend();
+            Extend(value);
         }
 
-        SIMD_INLINE void Extend(std::initializer_list<size_t> shape)
+        SIMD_INLINE void Extend(std::initializer_list<size_t> shape, const Type& value = Type())
         {
             _shape.assign(shape.begin(), shape.end());
-            Extend();
+            Extend(value);
         }
 
         SIMD_INLINE void Clone(const Tensor& tensor)
@@ -318,11 +318,11 @@ namespace Test
             SetDebugPtr();
         }
 
-        SIMD_INLINE void Extend()
+        SIMD_INLINE void Extend(const Type& value)
         {
             _size = Size(0, _shape.size());
             if (_size > _data.size())
-                _data.resize(_size);
+                _data.resize(_size, value);
             SetDebugPtr();
         }
 

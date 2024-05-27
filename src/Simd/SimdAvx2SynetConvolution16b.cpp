@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2024 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,24 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#ifndef __SimdAvx512bf16_h__
-#define __SimdAvx512bf16_h__
-
-#include "Simd/SimdDefs.h"
+#include "Simd/SimdSynetConvolution16b.h"
 
 namespace Simd
 {
-#ifdef SIMD_AVX512BF16_ENABLE    
-    namespace Avx512bf16
+#if defined(SIMD_AVX2_ENABLE) && defined(SIMD_SYNET_ENABLE) 
+    namespace Avx2
     {
-        void Float32ToBFloat16(const float* src, size_t size, uint16_t* dst);
+        void* SynetConvolution16bInit(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility)
+        {
+            ConvParam param(batch, conv, compatibility);
+            if (!param.Valid(SimdTensorData32f, SimdTensorData16b))
+                return NULL;
+            if (SynetConvolution16bNhwcDirect::Preferable(param))
+                return new Avx2::SynetConvolution16bNhwcDirect(param);
+            if (SynetConvolution16bNhwcGemm::Preferable(param))
+                return new Avx2::SynetConvolution16bNhwcGemm(param);
+            return new Base::SynetConvolution16bGemm(param);
+        }
     }
-#endif// SIMD_AVX512VNNI_ENABLE
-}
 #endif
+}

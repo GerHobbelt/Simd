@@ -374,6 +374,7 @@ namespace Simd
         const __m512i K8_03 = SIMD_MM512_SET1_EPI8(0x03);
         const __m512i K8_07 = SIMD_MM512_SET1_EPI8(0x07);
         const __m512i K8_0F = SIMD_MM512_SET1_EPI8(0x0F);
+        const __m512i K8_80 = SIMD_MM512_SET1_EPI8(0x80);
 
         const __m512i K8_01_FF = SIMD_MM512_SET2_EPI8(0x01, 0xFF);
 
@@ -568,22 +569,10 @@ namespace Simd
     }
 #endif
 
-#ifdef SIMD_AVX512BF16_ENABLE    
-    namespace Avx512bf16
-    {
-        using namespace Avx512bw;
-    }
-#endif
-
 #if defined(SIMD_AMXBF16_ENABLE) || (defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_AMX_EMULATE))  
     namespace AmxBf16
     {
-#if defined(SIMD_AMX_EMULATE)
         using namespace Avx512bw;
-#else
-        using namespace Avx512vnni;
-        using namespace Avx512bf16;
-#endif
     }
 #endif
 
