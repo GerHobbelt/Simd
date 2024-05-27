@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -120,6 +120,85 @@ namespace Simd
                             dst += channels;
                             src += channels;
                         }
+                    }
+                }
+            }
+            else
+                assert(0);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        void SynetNormalizeLayerForwardV2(const float* src, size_t batch, size_t channels, size_t spatial,
+            const float* scale, const float* shift, const float* eps, SimdTensorFormatType format, float* buf, float* dst)
+        {
+            float k = 1.0f / float(channels), e = *eps;
+            if (format == SimdTensorFormatNchw)
+            {
+                Array32f _buf;
+                if (buf == NULL)
+                {
+                    _buf.Resize(spatial);
+                    buf = _buf.data;
+                }
+                for (size_t b = 0; b < batch; ++b)
+                {
+                    for (size_t s = 0; s < spatial; ++s)
+                        buf[s] = 0;
+                    for (size_t c = 0, o = 0; c < channels; ++c)
+                    {
+                        for (size_t s = 0; s < spatial; ++s, ++o)
+                            buf[s] += src[o];
+                    }
+                    for (size_t s = 0; s < spatial; ++s)
+                        buf[s] = buf[s] * k;
+                    for (size_t c = 0, o = 0; c < channels; ++c)
+                    {
+                        for (size_t s = 0; s < spatial; ++s, ++o)
+                            dst[o] = src[o] - buf[s];
+                    }
+
+                    for (size_t s = 0; s < spatial; ++s)
+                        buf[s] = 0;
+                    for (size_t c = 0, o = 0; c < channels; ++c)
+                    {
+                        for (size_t s = 0; s < spatial; ++s, ++o)
+                            buf[s] += Simd::Square(dst[o]);
+                    }
+                    for (size_t s = 0; s < spatial; ++s)
+                        buf[s] = 1.0f / ::sqrt(buf[s] * k + e);
+                    for (size_t c = 0, o = 0; c < channels; ++c)
+                    {
+                        for (size_t s = 0; s < spatial; ++s, ++o)
+                            dst[o] = dst[o] * buf[s] * scale[c] + shift[c];
+                    }
+
+                    src += channels * spatial;
+                    dst += channels * spatial;
+                }
+            }
+            else if (format == SimdTensorFormatNhwc)
+            {
+                for (size_t b = 0; b < batch; ++b)
+                {
+                    for (size_t s = 0; s < spatial; ++s)
+                    {
+                        float sum = 0;
+                        for (size_t c = 0; c < channels; ++c)
+                            sum += src[c];
+                        float mean = sum * k;
+                        for (size_t c = 0; c < channels; ++c)
+                            dst[c] = src[c] - mean;
+
+                        float sqsum = 0;
+                        for (size_t c = 0; c < channels; ++c)
+                            sqsum += Simd::Square(dst[c]);
+                        float norm = 1.0f / ::sqrt(sqsum * k + e);
+                        for (size_t c = 0; c < channels; ++c)
+                            dst[c] = dst[c] * norm * scale[c] + shift[c];
+
+                        dst += channels;
+                        src += channels;
                     }
                 }
             }

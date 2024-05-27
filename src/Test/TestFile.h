@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ namespace Test
 
     SIMD_INLINE String FolderSeparator()
     {
-#ifdef WIN32
+#if defined(_WIN32)
         return String("\\");
 #elif defined(__unix__) || defined(__APPLE__)
         return String("/");
