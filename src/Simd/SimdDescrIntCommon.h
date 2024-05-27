@@ -29,6 +29,7 @@
 #include "Simd/SimdLoad.h"
 #include "Simd/SimdSet.h"
 #include "Simd/SimdStore.h"
+#include "Simd/SimdShuffle.h"
 
 namespace Simd
 {
@@ -406,6 +407,231 @@ namespace Simd
             ab = _mm512_add_ps(_mm512_mul_ps(aMean, bShift), ab);
             ab = _mm512_add_ps(_mm512_mul_ps(bMean, aShift), ab);
             _mm512_mask_storeu_ps(distances, mask, _mm512_min_ps(_mm512_max_ps(_mm512_sub_ps(_mm512_set1_ps(1.0f), _mm512_div_ps(ab, _mm512_mul_ps(aNorm, bNorm))), _mm512_setzero_ps()), _mm512_set1_ps(2.0f)));
+        }
+    }
+#endif
+
+#ifdef SIMD_NEON_ENABLE
+    namespace Neon
+    {
+        const uint16x8_t E4_MULLO = SIMD_VEC_SETR_EPI16(4096, 1, 4096, 1, 4096, 1, 4096, 1);
+
+        const uint16x8_t E5_MULLO = SIMD_VEC_SETR_EPI16(256, 32, 4, 128, 16, 2, 64, 8);
+        const uint8x8_t E5_SHFL0 = SIMD_VEC_SETR_PI8(0x1, 0x3, 0x7, 0x9, 0xD, 0, 0, 0);
+        const uint8x8_t E5_SHFL1 = SIMD_VEC_SETR_PI8(0x2, 0x4, 0x8, 0xA, 0xE, 0, 0, 0);
+        const uint8x8_t E5_SHFL2 = SIMD_VEC_SETR_PI8(0, 0x6, 0, 0xC, 0, 0, 0, 0);
+
+        const uint16x8_t E6_MULLO = SIMD_VEC_SETR_EPI16(256, 64, 16, 4, 256, 64, 16, 4);
+        const uint8x8_t E6_SHFL0 = SIMD_VEC_SETR_PI8(0x1, 0x3, 0x5, 0x9, 0xB, 0xD, 0, 0);
+        const uint8x8_t E6_SHFL1 = SIMD_VEC_SETR_PI8(0x2, 0x4, 0x6, 0xA, 0xC, 0xE, 0, 0);
+
+        const uint16x8_t E7_MULLO = SIMD_VEC_SETR_EPI16(256, 128, 64, 32, 16, 8, 4, 2);
+        const uint8x8_t E7_SHFL0 = SIMD_VEC_SETR_PI8(0x1, 0x3, 0x5, 0x7, 0x9, 0xB, 0xD, 0);
+        const uint8x8_t E7_SHFL1 = SIMD_VEC_SETR_PI8(0x2, 0x4, 0x6, 0x8, 0xA, 0xC, 0xE, 0);
+
+        const int32x4_t C4_SHL0 = SIMD_VEC_SETR_EPI32(0, -4, -8, -12);
+        const int32x4_t C4_SHL1 = SIMD_VEC_SETR_EPI32(-16, -20, -24, -28);
+        const uint32x4_t C4_AND = SIMD_VEC_SET1_EPI32(0x0F);
+        const int8x16_t C4_8SHL = SIMD_VEC_SETR_EPI8(0, -4, 0, -4, 0, -4, 0, -4, 0, -4, 0, -4, 0, -4, 0, -4);
+        const uint8x16_t C4_8AND = SIMD_VEC_SET1_EPI8(0x0F);
+
+        const int32x4_t C5_SHL0 = SIMD_VEC_SETR_EPI32(0, -5, -10, -15);
+        const int32x4_t C5_SHL1 = SIMD_VEC_SETR_EPI32(-12, -17, -22, -27);
+        const uint32x4_t C5_AND = SIMD_VEC_SET1_EPI32(0x1F);
+        const uint8x8_t C5_TBL0 = SIMD_VEC_SETR_PI8(0x0, 0x0, 0x0, 0x1, 0x1, 0x1, 0x1, 0x2);
+        const uint8x8_t C5_TBL1 = SIMD_VEC_SETR_PI8(0x2, 0x3, 0x3, 0x3, 0x3, 0x4, 0x4, 0x4);
+        const int16x8_t C5_16SHL = SIMD_VEC_SETR_EPI16(-8, -5, -10, -7, -4, -9, -6, -11);
+        const uint16x8_t C5_16AND = SIMD_VEC_SET1_EPI16(0x1F);
+
+        const int32x4_t C6_SHL0 = SIMD_VEC_SETR_EPI32(0, -6, -12, -18);
+        const int32x4_t C6_SHL1 = SIMD_VEC_SETR_EPI32(-8, -14, -20, -26);
+        const uint32x4_t C6_AND = SIMD_VEC_SET1_EPI32(0x3F);
+        const uint8x8_t C6_TBL0 = SIMD_VEC_SETR_PI8(0x0, 0x0, 0x0, 0x1, 0x1, 0x2, 0x2, 0x2);
+        const uint8x8_t C6_TBL1 = SIMD_VEC_SETR_PI8(0x3, 0x3, 0x3, 0x4, 0x4, 0x5, 0x5, 0x5);
+        const int16x8_t C6_16SHL = SIMD_VEC_SETR_EPI16(-8, -6, -4, -2, -8, -6, -4, -2);
+        const uint16x8_t C6_16AND = SIMD_VEC_SET1_EPI16(0x3F);
+
+        const int32x4_t C7_SHL0 = SIMD_VEC_SETR_EPI32(0, -7, -14, -21);
+        const int32x4_t C7_SHL1 = SIMD_VEC_SETR_EPI32(-4, -11, -18, -25);
+        const uint32x4_t C7_AND = SIMD_VEC_SET1_EPI32(0x7F);
+        const uint8x8_t C7_TBL0 = SIMD_VEC_SETR_PI8(0x0, 0x0, 0x0, 0x1, 0x1, 0x2, 0x2, 0x3);
+        const uint8x8_t C7_TBL1 = SIMD_VEC_SETR_PI8(0x3, 0x4, 0x4, 0x5, 0x5, 0x6, 0x6, 0x6);
+        const int16x8_t C7_16SHL = SIMD_VEC_SETR_EPI16(-8, -7, -6, -5, -4, -3, -2, -1);
+        const uint16x8_t C7_16AND = SIMD_VEC_SET1_EPI16(0x7F);
+
+        //-------------------------------------------------------------------------------------------------
+
+        template<int bits> SIMD_INLINE uint8x8_t LoadLast8(const uint8_t* src)
+        {
+            uint8x8_t val = LoadHalf<false>(src + bits - 8);
+            return vext_u8(val, val, 8 - bits);
+        }
+
+        template<int bits> SIMD_INLINE uint8x16_t LoadLast16(const uint8_t* src)
+        {
+            uint8x16_t val = Load<false>(src + bits * 2 - 16);
+            return vextq_u8(val, val, 16 - bits * 2);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SIMD_INLINE uint8x16_t Cvt4To8(uint8x8_t a)
+        {
+            uint8x8x2_t aa = vzip_u8(a, a);
+            return vandq_u8(vshlq_u8(*(uint8x16_t*)&aa, C4_8SHL), C4_8AND);
+        }
+
+        SIMD_INLINE uint16x8_t Cvt5To16(uint8x8_t src)
+        {
+            return vandq_u16(vshlq_u16((uint16x8_t)Shuffle(src, C5_TBL0, C5_TBL1), C5_16SHL), C5_16AND);
+        }
+
+        SIMD_INLINE uint8x8_t Cvt5To8(uint8x8_t src)
+        {
+            return vmovn_u16(Cvt5To16(src));
+        }
+
+        SIMD_INLINE uint16x8_t Cvt6To16(uint8x8_t src)
+        {
+            return vandq_u16(vshlq_u16((uint16x8_t)Shuffle(src, C6_TBL0, C6_TBL1), C6_16SHL), C6_16AND);
+        }
+
+        SIMD_INLINE uint8x8_t Cvt6To8(uint8x8_t src)
+        {
+            return vmovn_u16(Cvt6To16(src));
+        }
+
+        SIMD_INLINE uint16x8_t Cvt7To16(uint8x8_t src)
+        {
+            return vandq_u16(vshlq_u16((uint16x8_t)Shuffle(src, C7_TBL0, C7_TBL1), C7_16SHL), C7_16AND);
+        }
+
+        SIMD_INLINE uint8x8_t Cvt7To8(uint8x8_t src)
+        {
+            return vmovn_u16(Cvt7To16(src));
+        }
+
+        template<int bits> SIMD_INLINE uint16x8_t CvtTo16(uint8x8_t src);
+
+        template<> SIMD_INLINE uint16x8_t CvtTo16<5>(uint8x8_t src)
+        {
+            return vandq_u16(vshlq_u16((uint16x8_t)Shuffle(src, C5_TBL0, C5_TBL1), C5_16SHL), C5_16AND);
+        }
+
+        template<> SIMD_INLINE uint16x8_t CvtTo16<6>(uint8x8_t src)
+        {
+            return vandq_u16(vshlq_u16((uint16x8_t)Shuffle(src, C6_TBL0, C6_TBL1), C6_16SHL), C6_16AND);
+        }
+
+        template<> SIMD_INLINE uint16x8_t CvtTo16<7>(uint8x8_t src)
+        {
+            return vandq_u16(vshlq_u16((uint16x8_t)Shuffle(src, C7_TBL0, C7_TBL1), C7_16SHL), C7_16AND);
+        }
+        
+        template<int bits> SIMD_INLINE uint8x8_t CvtTo8(uint8x8_t src)
+        {
+            return vmovn_u16(CvtTo16<bits>(src));
+        }
+
+        template<> SIMD_INLINE uint8x8_t CvtTo8<4>(uint8x8_t src)
+        {
+            return Half<0>(Cvt4To8(src));
+        }
+
+        template<> SIMD_INLINE uint8x8_t CvtTo8<8>(uint8x8_t src)
+        {
+            return src;
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SIMD_INLINE void DecodeCosineDistances1x4(const uint8_t* a, const uint8_t* const* B, float32x4_t abSum, float* distances)
+        {
+            float32x4x2_t a0, a1, b0, b1;
+            b0.val[0] = Load<false>((float*)B[0]);
+            b0.val[1] = Load<false>((float*)B[1]);
+            b1.val[0] = Load<false>((float*)B[2]);
+            b1.val[1] = Load<false>((float*)B[3]);
+            a0 = vzipq_f32(b0.val[0], b1.val[0]);
+            a1 = vzipq_f32(b0.val[1], b1.val[1]);
+            b0 = vzipq_f32(a0.val[0], a1.val[0]);
+            b1 = vzipq_f32(a0.val[1], a1.val[1]);
+            a0.val[0] = vdupq_n_f32(((float*)a)[0]);
+            a0.val[1] = vdupq_n_f32(((float*)a)[1]);
+            a1.val[0] = vdupq_n_f32(((float*)a)[2]);
+            a1.val[1] = vdupq_n_f32(((float*)a)[3]);
+            float32x4_t ab = vmulq_f32(abSum, vmulq_f32(a0.val[0], b0.val[0]));
+            ab = vmlaq_f32(ab, a1.val[0], b0.val[1]);
+            ab = vmlaq_f32(ab, b1.val[0], a0.val[1]);
+            Store<false>(distances, vminq_f32(vmaxq_f32(vsubq_f32(vdupq_n_f32(1.0f), Div<2>(ab, vmulq_f32(a1.val[1], b1.val[1]))), vdupq_n_f32(0.0f)), vdupq_n_f32(2.0f)));
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SIMD_INLINE void DecodeCosineDistances1x4(const float* a, const float* b, size_t stride, uint32x4_t abSum, float* distances)
+        {
+            float32x4_t aScale = vdupq_n_f32(a[0]);
+            float32x4_t aShift = vdupq_n_f32(a[1]);
+            float32x4_t aMean = vdupq_n_f32(a[2]);
+            float32x4_t aNorm = vdupq_n_f32(a[3]);
+            float32x4_t bScale = Load<false>(b + 0 * stride);
+            float32x4_t bShift = Load<false>(b + 1 * stride);
+            float32x4_t bMean = Load<false>(b + 2 * stride);
+            float32x4_t bNorm = Load<false>(b + 3 * stride);
+            float32x4_t ab = vmulq_f32(vcvtq_f32_u32(abSum), vmulq_f32(aScale, bScale));
+            ab = vmlaq_f32(ab, aMean, bShift);
+            ab = vmlaq_f32(ab, bMean, aShift);
+            Store<false>(distances, vminq_f32(vmaxq_f32(vsubq_f32(vdupq_n_f32(1.0f), Div<2>(ab, vmulq_f32(aNorm, bNorm))), vdupq_n_f32(0.0f)), vdupq_n_f32(2.0f)));
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x4(const float* a, const float* b, size_t stride, uint32x4_t abSum, float* distances, size_t N)
+        {
+            float d[F];
+            DecodeCosineDistances1x4(a, b, stride, abSum, d);
+            for (size_t i = 0; i < N; ++i)
+                distances[i] = d[i];
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x8(const float* a, const float* b, size_t stride, uint32x4_t ab0, uint32x4_t ab1, float* distances)
+        {
+            DecodeCosineDistances1x4(a, b + 0 * 4, stride, ab0, distances + 0 * 4);
+            DecodeCosineDistances1x4(a, b + 1 * 4, stride, ab1, distances + 1 * 4);
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x8(const float* a, const float* b, size_t stride, uint32x4_t ab0, uint32x4_t ab1, float* distances, size_t N)
+        {
+            DecodeCosineDistances1x4(a, b + 0 * 4, stride, ab0, distances + 0 * 4);
+            DecodeCosineDistances1x4(a, b + 1 * 4, stride, ab1, distances + 1 * 4, N - 4);
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x12(const float* a, const float* b, size_t stride, uint32x4_t ab0, uint32x4_t ab1, uint32x4_t ab2, float* distances)
+        {
+            DecodeCosineDistances1x4(a, b + 0 * 4, stride, ab0, distances + 0 * 4);
+            DecodeCosineDistances1x4(a, b + 1 * 4, stride, ab1, distances + 1 * 4);
+            DecodeCosineDistances1x4(a, b + 2 * 4, stride, ab2, distances + 2 * 4);
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x12(const float* a, const float* b, size_t stride, uint32x4_t ab0, uint32x4_t ab1, uint32x4_t ab2, float* distances, size_t N)
+        {
+            DecodeCosineDistances1x4(a, b + 0 * 4, stride, ab0, distances + 0 * 4);
+            DecodeCosineDistances1x4(a, b + 1 * 4, stride, ab1, distances + 1 * 4);
+            DecodeCosineDistances1x4(a, b + 2 * 4, stride, ab2, distances + 2 * 4, N - 8);
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x16(const float* a, const float* b, size_t stride, uint32x4_t ab0, uint32x4_t ab1, uint32x4_t ab2, uint32x4_t ab3, float* distances)
+        {
+            DecodeCosineDistances1x4(a, b + 0 * 4, stride, ab0, distances + 0 * 4);
+            DecodeCosineDistances1x4(a, b + 1 * 4, stride, ab1, distances + 1 * 4);
+            DecodeCosineDistances1x4(a, b + 2 * 4, stride, ab2, distances + 2 * 4);
+            DecodeCosineDistances1x4(a, b + 3 * 4, stride, ab3, distances + 3 * 4);
+        }
+
+        SIMD_INLINE void DecodeCosineDistances1x16(const float* a, const float* b, size_t stride, uint32x4_t ab0, uint32x4_t ab1, uint32x4_t ab2, uint32x4_t ab3, float* distances, size_t N)
+        {
+            DecodeCosineDistances1x4(a, b + 0 * 4, stride, ab0, distances + 0 * 4);
+            DecodeCosineDistances1x4(a, b + 1 * 4, stride, ab1, distances + 1 * 4);
+            DecodeCosineDistances1x4(a, b + 2 * 4, stride, ab2, distances + 2 * 4);
+            DecodeCosineDistances1x4(a, b + 3 * 4, stride, ab3, distances + 3 * 4, N - 12);
         }
     }
 #endif

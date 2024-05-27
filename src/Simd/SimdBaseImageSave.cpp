@@ -37,10 +37,42 @@
 #endif
 
 namespace Simd
-{        
+{ 
+    SIMD_INLINE String ToLower(const String& src)
+    {
+        String dst(src);
+        for (size_t i = 0; i < dst.size(); ++i)
+        {
+            if (dst[i] <= 'Z' && dst[i] >= 'A')
+                dst[i] = dst[i] - ('Z' - 'z');
+        }
+        return dst;
+    }
+
     SimdBool ImageSaveToFile(const ImageSaveToMemoryPtr saver, const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, const char* path)
     {
         SimdBool result = SimdFalse;
+        if (file == SimdImageFileUndefined && path)
+        {
+            const String& str(path);
+            size_t pos = str.find_last_of(".");
+            if (pos != String::npos)
+            {
+                String ext = ToLower(str.substr(pos + 1));
+                if (ext == "pgm")
+                    file = SimdImageFilePgmBin;
+                else if (ext == "ppm")
+                    file = SimdImageFilePpmBin;
+                else if (ext == "png")
+                    file = SimdImageFilePng;
+                else if (ext == "jpg" || ext == "jpeg")
+                {
+                    file = SimdImageFileJpeg;
+                    if (quality == 100)
+                        quality = 85;
+                }
+            }
+        }
         size_t size;
         uint8_t * data = saver(src, stride, width, height, format, file, quality, &size);
         if (data)

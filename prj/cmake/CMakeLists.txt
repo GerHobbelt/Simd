@@ -16,6 +16,8 @@ option(SIMD_HIDE "Hide internal functions of Simd Library" OFF)
 option(SIMD_AMX_EMULATE "AMX emulation enable" OFF)
 option(SIMD_RUNTIME "Runtime faster algorithm choise enable" ON)
 option(SIMD_OPENCV "OpenCV tests enable" OFF)
+option(SIMD_INSTALL "Enabling of install target" ON)
+option(SIMD_UNINSTALL "Enabling of uninstall target" ON)
 set(MAX_ERRORS 5)
 
 if((NOT DEFINED SIMD_ROOT) OR (SIMD_ROOT STREQUAL ""))
@@ -64,6 +66,8 @@ if(SIMD_INFO)
 	message("AMX emulation: ${SIMD_AMX_EMULATE}")
 	message("Runtime algorithm choise: ${SIMD_RUNTIME}")
 	message("OpenCV tests: ${SIMD_OPENCV}")
+	message("Install target: ${SIMD_INSTALL}")
+	message("Uninstall target: ${SIMD_UNINSTALL}")
 	if(NOT ${SIMD_TEST_FLAGS} STREQUAL "")
 		message("Test flags: ${SIMD_TEST_FLAGS}")
 	endif()
@@ -164,15 +168,19 @@ else()
 	endif()
 endif()
 
-file(GLOB_RECURSE SIMD_LIB_HPP ${SIMD_ROOT}/src/Simd/Simd*.hpp)
-set_target_properties(Simd PROPERTIES PUBLIC_HEADER "${SIMD_ROOT}/src/Simd/SimdLib.h;${SIMD_LIB_HPP}")
-install(TARGETS Simd EXPORT simdtargets 
-	LIBRARY DESTINATION "lib" 
-	ARCHIVE DESTINATION "lib" 
-	PUBLIC_HEADER DESTINATION "include/Simd")
-install(EXPORT simdtargets DESTINATION share/simd)
+if(SIMD_INSTALL)
+	file(GLOB_RECURSE SIMD_LIB_HPP ${SIMD_ROOT}/src/Simd/Simd*.hpp)
+	set_target_properties(Simd PROPERTIES PUBLIC_HEADER "${SIMD_ROOT}/src/Simd/SimdLib.h;${SIMD_LIB_HPP}")
+	install(TARGETS Simd EXPORT simdtargets 
+		LIBRARY DESTINATION "lib" 
+		ARCHIVE DESTINATION "lib" 
+		PUBLIC_HEADER DESTINATION "include/Simd")
+	install(EXPORT simdtargets DESTINATION share/simd)
+endif()
 
-add_custom_target("uninstall")
-add_custom_command(TARGET "uninstall" POST_BUILD COMMENT "Uninstall Simd Library..."
-	COMMAND cat install_manifest.txt | sudo xargs rm -v
-	COMMAND cat install_manifest.txt | xargs -L1 dirname | grep '/[Ss]imd' | uniq | sudo xargs rmdir -v)
+if(SIMD_UNINSTALL)
+	add_custom_target("uninstall")
+	add_custom_command(TARGET "uninstall" POST_BUILD COMMENT "Uninstall Simd Library..."
+		COMMAND cat install_manifest.txt | sudo xargs rm -v
+		COMMAND cat install_manifest.txt | xargs -L1 dirname | grep '/[Ss]imd' | uniq | sudo xargs rmdir -v)
+endif()

@@ -33,7 +33,116 @@
 </center>
 
 <hr/>
-<h3 id="R130">October X, 2023 (version X.X.130)</h3>
+<h3 id="R132">December 2, 2023 (version 5.4.132)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Support of RGBA-32 input image format in base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of function SynetSetInput.</li>
+</ul>
+
+<h5>Bug fixing</h5>
+<ul>
+ <li>Wrong order of SIMD_DEPRECATED macro.</li>
+ <li>Error in AVX-512BW optimizations of function SynetSoftmaxLayerForward.</li>
+</ul>
+
+<h4>Python wrapper</h4>
+<h5>New features</h5>
+<ul>
+ <li>Wrapper for function SimdVersion.</li>
+ <li>Wrapper for function SimdRelease.</li>
+ <li>Wrapper for function SimdCpuDesc.</li>
+ <li>Wrapper for function SimdCpuInfo.</li>
+ <li>Wrapper for enumeration SimdCpuDescType.</li>
+ <li>Wrapper for enumeration SimdCpuInfoType.</li>
+ <li>Wrapper for function SimdPerformanceStatistic.</li>
+ <li>Wrapper for function SimdAllocate.</li>
+ <li>Wrapper for function SimdFree.</li>
+ <li>Wrapper for function SimdAlign.</li>
+ <li>Wrapper for function SimdAlignment.</li>
+ <li>Wrapper for function SimdGetThreadNumber.</li>
+ <li>Wrapper for function SimdSetThreadNumber.</li>
+ <li>Wrapper for function SimdEmpty.</li>
+ <li>Wrapper for function SimdGetFastMode.</li>
+ <li>Wrapper for function SimdSetFastMode.</li>
+ <li>Wrapper for enumeration SimdPixelFormatType.</li>
+ <li>Class Simd.Image.</li>
+ <li>Wrapper for function SimdCrc32.</li>
+ <li>Wrapper for function SimdCrc32c.</li>
+ <li>Wrapper for enumeration SimdImageFileType.</li>
+ <li>Wrapper for function SimdImageSaveToFile.</li>
+ <li>Wrapper for function SimdImageLoadFromFile.</li>
+ <li>Wrapper for enumeration Simd::View::Position.</li>
+ <li>Method Simd.Image.Region.</li>
+ <li>Method Simd.Image.RegionAt.</li>
+ <li>Wrapper for enumeration Simd.ResizeMethod.</li>
+ <li>Wrapper for enumeration Simd.ResizeChannel.</li>
+ <li>Wrapper for function SimdResizerInit.</li>
+ <li>Wrapper for function SimdResizerRun.</li>
+ <li>Function Simd.Resize.</li>
+ <li>Function Simd.Resized.</li>
+ <li>Wrapper for function SimdSynetSetInput.</li>
+ <li>Function Simd.SynetSetInput.</li>
+ <li>Wrapper for enumeration Simd.TensorFormat.</li>
+ <li>Wrapper for enumeration Simd.TensorData.</li>
+ <li>Wrapper for enumeration Simd.YuvType.</li>
+ <li>Wrapper for function SimdFillPixel.</li>
+ <li>Function Simd.FillPixel.</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>New features</h5>
+<ul>
+ <li>SimdPy MSVS project.</li>
+</ul>
+
+<h4>Documentation</h4>
+<h5>New features</h5>
+<ul>
+ <li>Doxygen generation of documentation for Python wrapper.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R131">November 1, 2023 (version 5.3.131)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>NEON optimizations of function DescrIntCosineDistance.</li>
+ <li>NEON optimizations of function DescrIntCosineDistancesMxNa.</li>
+ <li>NEON optimizations of function DescrIntCosineDistancesMxNp.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>NEON optimizations of function DescrIntDecode32f.</li>
+ <li>NEON optimizations of function CorrelationSum.</li>
+ <li>Base implementation and SSE4.1 optimizations of ImageJpegLoader class.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in defenition of SIMD_CPP_2011_ENABLE macro for Visual Studio.</li>
+ <li>Error in defenition of SIMD_CPP_2014_ENABLE macro for Visual Studio.</li>
+ <li>Error in defenition of SIMD_CPP_2017_ENABLE macro for Visual Studio.</li>
+ <li>Compiler warning in method Detection::InitLevels.</li>
+ <li>Compiler warning in method Detection::FillLevels.</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>New features</h5>
+<ul>
+ <li>Cmake SIMD_UNINSTALL option.</li>
+ <li>Cmake SIMD_INSTALL option.</li>
+</ul>
+
+<h4>The use examples</h4>
+<h5>New features</h5>
+<ul>
+ <li>An example how to use Simd::ImageMatcher to find image duplicates.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R130">October 2, 2023 (version 5.3.130)</h3>
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>
@@ -55,6 +164,11 @@
  <li>The mark of function SimdYuv420pToRgb as deprecated.</li>
  <li>The mark of function SimdYuv422pToRgb as deprecated.</li>
  <li>The mark of function SimdYuv444pToRgb as deprecated.</li>
+ <li>NEON optimizations of function AlphaBlendingBgraToYuv420p.</li>
+ <li>NEON optimizations of function DescrIntEncode32f.</li>
+ <li>NEON optimizations of function DescrIntEncode16f.</li>
+ <li>NEON optimizations of function DescrIntDecode32f.</li>
+ <li>NEON optimizations of function DescrIntDecode16f.</li>
 </ul>
 <h5>Bug fixing</h5>
 <ul>
@@ -63,6 +177,7 @@
  <li>Error in function Simd::BgraToYuv420p.</li>
  <li>Error in function Simd::BgraToYuv422p.</li>
  <li>Error in function Simd::BgraToYuv444p.</li>
+ <li>Error in NEON optimizations of class MergedConvolution32fCd.</li>
 </ul>
 
 <h4>Test framework</h4>

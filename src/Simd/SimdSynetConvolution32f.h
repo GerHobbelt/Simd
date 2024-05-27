@@ -42,7 +42,7 @@ namespace Simd
     const bool NHWC_GEMM_RUNTIME = true;
 #endif
 
-    //---------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     SIMD_INLINE bool IsKernel(const SimdConvolutionParameters& p, size_t value)
     {
@@ -94,7 +94,7 @@ namespace Simd
         return (p.padX + p.srcW - (p.kernelX - 1) * p.dilationX - 1) / p.strideX + 1;
     }
 
-    //---------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------
 
     struct ConvParam32f : public SimdConvolutionParameters
     {
@@ -212,7 +212,7 @@ namespace Simd
         } 
     };
 
-    //---------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     class SynetConvolution32f : public Deletable
     {
@@ -301,11 +301,13 @@ namespace Simd
         mutable String _info;
     };
 
-    //---------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     namespace Base
     {
         void ConvolutionBiasAndActivation(const float * bias, size_t count, size_t size, ::SimdConvolutionActivationType activation, const float * params, SimdBool trans, float * dst);
+
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fGemmNN : public SynetConvolution32f
         {
@@ -326,6 +328,8 @@ namespace Simd
             size_t _M, _N, _K, _ldW, _ldS, _ldD, _grW, _grS, _grD, _batch, _sizeS, _sizeB, _sizeD, _merge;
         };
 
+        //-------------------------------------------------------------------------------------------------
+
         class SynetConvolution32fGemmNT : public SynetConvolution32f
         {
         public:
@@ -342,6 +346,8 @@ namespace Simd
 
             size_t _M, _N, _K, _batch, _sizeS, _sizeB, _sizeD;
         };
+
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fWinograd : public SynetConvolution32f
         {
@@ -378,6 +384,8 @@ namespace Simd
             SetOutput _setOutput;
         };
 
+        //-------------------------------------------------------------------------------------------------
+
         class SynetConvolution32fDirectNchw : public SynetConvolution32f
         {
         public:
@@ -399,12 +407,14 @@ namespace Simd
             ConvolutionBiasActivationPtr _convolutionBiasActivation;
         };
 
+        //-------------------------------------------------------------------------------------------------
+
         class SynetConvolution32fDirectNhwc : public SynetConvolution32f
         {
         public:
             SynetConvolution32fDirectNhwc(const ConvParam32f & p);
             virtual String Ext() const { return "Base"; }
-            virtual String Desc() const { return Ext() + "::DirectNhwc"; }
+            virtual String Desc() const { return Ext() + "::DirectNhwc" + (_param.IsDepthwise() ? "-Depthwise" : "-Default"); }
             virtual void Forward(const float * src, float * buf, float * dst);
 
             static bool Preferable(const ConvParam32f & p);
@@ -416,6 +426,8 @@ namespace Simd
             size_t _batch, _sizeS, _sizeD;
             ConvolutionBiasActivationPtr _convolutionBiasActivation;
         };
+
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fDepthwiseDotProduct : public SynetConvolution32f
         {
@@ -429,7 +441,30 @@ namespace Simd
 
         protected:
             size_t _count, _size, _batch, _sizeS, _sizeD;
-        }; 
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class SynetConvolution32fNhwcGroupedBlock1x2 : public SynetConvolution32f
+        {
+        public:
+            SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam32f& p);
+            virtual String Ext() const { return "Base"; }
+            virtual String Desc() const { return Ext() + "::NhwcGroupedBlock1x2"; }
+            virtual void SetParams(const float* weight, SimdBool* internal, const float* bias, const float* params);
+            virtual void Forward(const float* src, float* buf, float* dst);
+
+            static bool Preferable(const ConvParam32f& p);
+
+            typedef void(*ConvolutionPtr)(const float* src, const ConvParam32f& p, const float* weight, const float* bias, const float* params, float* dst);
+
+        protected:
+            size_t _batch, _sizeS, _sizeD;
+            Array32f _rWeight, _rBias;
+            ConvolutionPtr _convolution;
+        };
+
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fNhwcDirect : public SynetConvolution32f
         {
@@ -516,7 +551,7 @@ namespace Simd
             void ReorderWeight(const float* src, float* dst);
         };
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fBf16Gemm : public SynetConvolution32f
         {
@@ -536,6 +571,8 @@ namespace Simd
             Array16u _weight;
             size_t _M, _N, _K, _ldW, _ldS, _ldD, _grW, _grS, _grD, _batch, _sizeS, _sizeB, _sizeD;
         };
+
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fBf16Nhwc : public SynetConvolution32f
         {
@@ -579,7 +616,7 @@ namespace Simd
             ConvolutionPtr _convolutions[2];
         };
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
     }
@@ -641,6 +678,13 @@ namespace Simd
             virtual void Forward(const float* src, float* buf, float* dst);
         };
 
+        class SynetConvolution32fNhwcGroupedBlock1x2 : public Base::SynetConvolution32fNhwcGroupedBlock1x2
+        {
+        public:
+            SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam32f& p);
+            virtual String Ext() const { return "Sse41"; }
+        };
+
         class SynetConvolution32fNhwcDirect : public Base::SynetConvolution32fNhwcDirect
         {
         public:
@@ -655,7 +699,7 @@ namespace Simd
             static bool Set3r(const ConvParam32f& p, AlgParam& a);
         };
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         class SynetConvolution32fBf16Nhwc : public Base::SynetConvolution32fBf16Nhwc
         {
@@ -665,7 +709,7 @@ namespace Simd
             virtual String Ext() const { return "Sse41"; }
         };
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
     }
@@ -793,6 +837,13 @@ namespace Simd
             virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
+        class SynetConvolution32fNhwcGroupedBlock1x2 : public Sse41::SynetConvolution32fNhwcGroupedBlock1x2
+        {
+        public:
+            SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam32f& p);
+            virtual String Ext() const { return "Avx2"; }
+        };
+
         class SynetConvolution32fNhwcDirect : public Avx::SynetConvolution32fNhwcDirect
         {
         public:
@@ -873,6 +924,13 @@ namespace Simd
             virtual String Ext() const { return "Avx512bw"; }
         protected:
             virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
+        };
+
+        class SynetConvolution32fNhwcGroupedBlock1x2 : public Avx2::SynetConvolution32fNhwcGroupedBlock1x2
+        {
+        public:
+            SynetConvolution32fNhwcGroupedBlock1x2(const ConvParam32f& p);
+            virtual String Ext() const { return "Avx512bw"; }
         };
 
         class SynetConvolution32fNhwcDirect : public Avx2::SynetConvolution32fNhwcDirect

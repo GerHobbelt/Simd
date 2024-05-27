@@ -316,6 +316,21 @@
     <ClCompile Include="..\..\src\Simd\SimdNeonBgrToYuvV2.cpp">
       <Filter>Neon</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdNeonDescrInt.cpp">
+      <Filter>Neon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdNeonDescrIntEnc.cpp">
+      <Filter>Neon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdNeonDescrIntDec.cpp">
+      <Filter>Neon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdNeonDescrIntCdd.cpp">
+      <Filter>Neon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdNeonDescrIntCdu.cpp">
+      <Filter>Neon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Neon">

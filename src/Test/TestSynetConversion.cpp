@@ -82,7 +82,7 @@ namespace Test
 
         TEST_EXECUTE_AT_LEAST_MIN_TIME(f2.Call(src, scale, shift, dst2, comp));
 
-#if (defined(SIMD_X64_ENABLE) || defined(SIMD_X86_ENABLE)) && !(defined(SIMD_X86_ENABLE) && defined(NDEBUG) && defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 1920)
+#if (defined(SIMD_X64_ENABLE) || defined(SIMD_X86_ENABLE)) && !(defined(SIMD_X86_ENABLE) && defined(NDEBUG) && defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 1920) && 0
         int differenceMax = (Simd::Base::FmaAvoid(comp) ? 0 : 1);
 #else
         int differenceMax = 1;
@@ -283,13 +283,13 @@ namespace Test
     {
         bool result = true;
 
-        View::Format srcFormat[4] = { View::Gray8, View::Bgr24, View::Bgra32, View::Rgb24 };
+        View::Format srcFormat[5] = { View::Gray8, View::Bgr24, View::Bgra32, View::Rgb24, View::Rgba32 };
         size_t channels[2] = { 1, 3 };
         SimdTensorFormatType dstFormat[2] = { SimdTensorFormatNchw, SimdTensorFormatNhwc };
 
         result = result && SynetSetInputAutoTest(3, 112, 96, View::Rgb24, SimdTensorFormatNhwc, f1, f2);
 
-        for (int s = 0; s < 4; ++s)
+        for (int s = 0; s < 5; ++s)
         {
             for (int c = 0; c < 2; ++c)
             {

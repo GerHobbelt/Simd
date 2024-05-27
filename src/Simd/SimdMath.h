@@ -805,6 +805,11 @@ namespace Simd
 #endif
         }
 
+        SIMD_INLINE __m512 Square(__m512 value)
+        {
+            return _mm512_mul_ps(value, value);
+        }
+
         SIMD_INLINE __m512 Or(const __m512& a, const __m512& b)
         {
 #if defined(__clang__)
@@ -1615,6 +1620,11 @@ namespace Simd
             return vcvtq_s32_f32(vaddq_f32(value, round));
         }
 
+        SIMD_INLINE uint32x4_t RoundPositive(float32x4_t value)
+        {
+            return vcvtq_u32_f32(vaddq_f32(value, vdupq_n_f32(0.5f)));
+        }
+
         template<bool nofma> float32x4_t Fmadd(float32x4_t a, float32x4_t b, float32x4_t c);
 
         template <> SIMD_INLINE float32x4_t Fmadd<false>(float32x4_t a, float32x4_t b, float32x4_t c)
@@ -1630,6 +1640,18 @@ namespace Simd
         SIMD_INLINE uint8x16_t Combine(const uint8x8x2_t& a)
         {
             return vcombine_u8(a.val[0], a.val[1]);
+        }
+
+        SIMD_INLINE void MaxVal32f(float32x4_t src, float& dst)
+        {
+            float32x2_t half = vpmax_f32(vget_low_f32(src), vget_high_f32(src));
+            dst = vget_lane_f32(vpmax_f32(half, half), 0);
+        }
+
+        SIMD_INLINE void MinVal32f(float32x4_t src, float& dst)
+        {
+            float32x2_t half = vpmin_f32(vget_low_f32(src), vget_high_f32(src));
+            dst = vget_lane_f32(vpmin_f32(half, half), 0);
         }
     }
 #endif//SIMD_NEON_ENABLE

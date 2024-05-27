@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2023 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,11 @@ namespace Simd
 #ifdef SIMD_NEON_ENABLE
     namespace Neon
     {
+        SIMD_INLINE uint8x16_t Shuffle(const uint8x8_t& src, const uint8x8_t& idx0, const uint8x8_t& idx1)
+        {
+            return vcombine_u8(vtbl1_u8(src, idx0), vtbl1_u8(src, idx1));
+        }
+
         SIMD_INLINE uint8x16_t Shuffle(const uint8x16_t& src, const uint8x16_t& shuffle)
         {
             return vcombine_u8(vtbl2_u8((const uint8x8x2_t&)src, vget_low_u8(shuffle)), vtbl2_u8((const uint8x8x2_t&)src, vget_high_u8(shuffle)));
@@ -40,6 +45,7 @@ namespace Simd
         {
             return vcombine_u8(vtbl4_u8((const uint8x8x4_t&)src, vget_low_u8(shuffle)), vtbl4_u8((const uint8x8x4_t&)src, vget_high_u8(shuffle)));
         }
+
     }
 #endif// SIMD_NEON_ENABLE
 }

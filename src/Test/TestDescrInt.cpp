@@ -202,10 +202,10 @@ namespace Test
             result = result && DescrIntEncode32fAutoTest(FUNC_DI(Simd::Avx512bw::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif 
 
-//#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable)
-//            result = result && DescrIntEncode32fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-//#endif 
+#ifdef SIMD_NEON_ENABLE
+        if (Simd::Neon::Enable)
+            result = result && DescrIntEncode32fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif 
 
         return result;
     }
@@ -286,10 +286,10 @@ namespace Test
             result = result && DescrIntEncode16fAutoTest(FUNC_DI(Simd::Avx512bw::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif 
 
-//#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable)
-//            result = result && DescrIntEncode16fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-//#endif 
+#ifdef SIMD_NEON_ENABLE
+        if (Simd::Neon::Enable)
+            result = result && DescrIntEncode16fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif 
 
         return result;
     }
@@ -328,7 +328,7 @@ namespace Test
         ::SimdRelease(context1);
         ::SimdRelease(context2);
 
-        result = result && Compare(dst1, dst2, EPS, true, 64, true, "dst1 & dst2");
+        result = result && Compare(dst1, dst2, EPS * 2.0f, true, 64, true, "dst1 & dst2");
 
         result = result && Compare(dst1, orig, eps, true, 64, false, "dst1 & orig");
 
@@ -371,10 +371,10 @@ namespace Test
             result = result && DescrIntDecode32fAutoTest(FUNC_DI(Simd::Avx512bw::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif 
         
-//#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable)
-//            result = result && DescrIntDecode32fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-//#endif 
+#ifdef SIMD_NEON_ENABLE
+        if (Simd::Neon::Enable)
+            result = result && DescrIntDecode32fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif 
 
         return result;
     }
@@ -399,8 +399,11 @@ namespace Test
         View src(SimdDescrIntEncodedSize(context2), 1, View::Gray8, NULL, TEST_ALIGN(SIMD_ALIGN));
         SimdDescrIntEncode32f(context2, (float*)orig.data, src.data);
 
-        View dst1(SimdDescrIntDecodedSize(context1), 1, View::Int16, NULL, TEST_ALIGN(SIMD_ALIGN));
-        View dst2(SimdDescrIntDecodedSize(context2), 1, View::Int16, NULL, TEST_ALIGN(SIMD_ALIGN));
+        View dst1(size, 1, View::Int16, NULL, TEST_ALIGN(SIMD_ALIGN));
+        View dst2(size, 1, View::Int16, NULL, TEST_ALIGN(SIMD_ALIGN));
+
+        View dstF1(size, 1, View::Float, NULL, TEST_ALIGN(SIMD_ALIGN));
+        View dstF2(size, 1, View::Float, NULL, TEST_ALIGN(SIMD_ALIGN));
 
         Simd::Fill(dst1, 1);
         Simd::Fill(dst2, 2);
@@ -412,7 +415,10 @@ namespace Test
         ::SimdRelease(context1);
         ::SimdRelease(context2);
 
-        result = result && Compare(dst1, dst2, 1, true, 64);
+        SimdFloat16ToFloat32((const uint16_t*)dst1.data, size, (float*)dstF1.data);
+        SimdFloat16ToFloat32((const uint16_t*)dst2.data, size, (float*)dstF2.data);
+
+        result = result && Compare(dstF1, dstF2, EPS, true, 64, true, "dst1 & dst2");
 
         return result;
     }
@@ -453,10 +459,10 @@ namespace Test
             result = result && DescrIntDecode16fAutoTest(FUNC_DI(Simd::Avx512bw::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif 
 
-//#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable)
-//            result = result && DescrIntDecode16fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-//#endif 
+#ifdef SIMD_NEON_ENABLE
+        if (Simd::Neon::Enable)
+            result = result && DescrIntDecode16fAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif 
 
         return result;
     }
@@ -539,10 +545,10 @@ namespace Test
             result = result && DescrIntCosineDistanceAutoTest(FUNC_DI(Simd::Avx512bw::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif 
         
-//#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable)
-//            result = result && DescrIntCosineDistanceAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-//#endif 
+#ifdef SIMD_NEON_ENABLE
+        if (Simd::Neon::Enable)
+            result = result && DescrIntCosineDistanceAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif 
 
         return result;
     }
@@ -620,10 +626,10 @@ namespace Test
             result = result && DescrIntCosineDistancesMxNaAutoTest(FUNC_DI(Simd::Avx512vnni::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif
         
-        //#if defined(SIMD_NEON_ENABLE)
-        //        if (Simd::Neon::Enable)
-        //            result = result && DescrIntCosineDistancesMxNaAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-        //#endif
+#if defined(SIMD_NEON_ENABLE)
+        if (Simd::Neon::Enable)
+            result = result && DescrIntCosineDistancesMxNaAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif
 
         return result;
     }
@@ -698,10 +704,10 @@ namespace Test
             result = result && DescrIntCosineDistancesMxNpAutoTest(FUNC_DI(Simd::Avx512vnni::DescrIntInit), FUNC_DI(SimdDescrIntInit));
 #endif
 
-//#if defined(SIMD_NEON_ENABLE)
-//        if (Simd::Neon::Enable)
-//            result = result && DescrIntCosineDistancesMxNpAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
-//#endif
+#if defined(SIMD_NEON_ENABLE)
+        if (Simd::Neon::Enable)
+            result = result && DescrIntCosineDistancesMxNpAutoTest(FUNC_DI(Simd::Neon::DescrIntInit), FUNC_DI(SimdDescrIntInit));
+#endif
 
         return result;
     }

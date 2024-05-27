@@ -66,6 +66,19 @@ typedef signed __int64    int64_t;
 typedef unsigned __int64  uint64_t;
 #endif
 
+#if defined(_MSVC_LANG) 
+#if _MSVC_LANG >= 201103L
+#define SIMD_CPP_2011_ENABLE
+#endif
+
+#if _MSVC_LANG >= 201402L
+#define SIMD_CPP_2014_ENABLE
+#endif
+
+#if _MSVC_LANG >= 201703L
+#define SIMD_CPP_2017_ENABLE
+#endif
+#else
 #if __cplusplus >= 201103L
 #define SIMD_CPP_2011_ENABLE
 #endif
@@ -76,6 +89,7 @@ typedef unsigned __int64  uint64_t;
 
 #if __cplusplus >= 201703L
 #define SIMD_CPP_2017_ENABLE
+#endif
 #endif
 
 #if defined(SIMD_CPP_2014_ENABLE)
@@ -548,6 +562,9 @@ typedef enum
     SimdTensorData32i, /*!< 32-bit signed integer. */
     SimdTensorData8i, /*!< 8-bit signed integer. */
     SimdTensorData8u, /*!< 8-bit unsigned integer. */
+    SimdTensorData64i, /*!< 64-bit signed integer. */
+    SimdTensorData64u, /*!< 64-bit unsigned integer. */
+    SimdTensorDataBool, /*!< 8-bit Boolean. */
     SimdTensorData16b, /*!< 16-bit BFloat16 (Brain Floating Point). */
     SimdTensorData16f, /*!< 16-bit floating point (Half Precision). */
 } SimdTensorDataType;
@@ -1803,7 +1820,7 @@ extern "C"
         \param [out] v - a pointer to pixels data of output 8-bit image with V color plane.
         \param [in] vStride - a row size of the v image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgraToYuv420p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
+    SIMD_DEPRECATED SIMD_API void SimdBgraToYuv420p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
 
     /*! @ingroup bgra_conversion
 
@@ -1812,7 +1829,7 @@ extern "C"
         \short Converts 32-bit BGRA image to YUV420P.
 
         The input BGRA and output Y images must have the same width and height.
-        The input U and V images must have the same width and height (half size relative to Y component).
+        The output U and V images must have the same width and height (half size relative to Y component).
 
         \note This function has a C++ wrapper Simd::BgraToYuv420p(const View<A>& bgra, View<A>& y, View<A>& u, View<A>& v, SimdYuvType yuvType = SimdYuvBt601).
 
@@ -1852,7 +1869,7 @@ extern "C"
         \param [out] v - a pointer to pixels data of output 8-bit image with V color plane.
         \param [in] vStride - a row size of the v image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgraToYuv422p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
+    SIMD_DEPRECATED SIMD_API void SimdBgraToYuv422p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
 
     /*! @ingroup bgra_conversion
 
@@ -1900,7 +1917,7 @@ extern "C"
         \param [out] v - a pointer to pixels data of output 8-bit image with V color plane.
         \param [in] vStride - a row size of the v image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgraToYuv444p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
+    SIMD_DEPRECATED SIMD_API void SimdBgraToYuv444p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
 
     /*! @ingroup bgra_conversion
 
@@ -1951,7 +1968,7 @@ extern "C"
         \param [out] a - a pointer to pixels data of output 8-bit image with alpha plane.
         \param [in] aStride - a row size of the a image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgraToYuva420p(const uint8_t * bgra, size_t bgraStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdBgraToYuva420p(const uint8_t * bgra, size_t bgraStride, size_t width, size_t height,
         uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride, uint8_t * a, size_t aStride);
 
     /*! @ingroup bgra_conversion
@@ -2146,7 +2163,7 @@ extern "C"
         \param [out] v - a pointer to pixels data of output 8-bit image with V color plane.
         \param [in] vStride - a row size of the v image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgrToYuv420p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
+    SIMD_DEPRECATED SIMD_API void SimdBgrToYuv420p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
 
     /*! @ingroup bgr_conversion
 
@@ -2195,7 +2212,7 @@ extern "C"
         \param [out] v - a pointer to pixels data of output 8-bit image with V color plane.
         \param [in] vStride - a row size of the v image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgrToYuv422p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
+    SIMD_DEPRECATED SIMD_API void SimdBgrToYuv422p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
 
     /*! @ingroup bgr_conversion_old
 
@@ -2244,7 +2261,7 @@ extern "C"
         \param [out] v - a pointer to pixels data of output 8-bit image with V color plane.
         \param [in] vStride - a row size of the v image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdBgrToYuv444p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
+    SIMD_DEPRECATED SIMD_API void SimdBgrToYuv444p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride);
 
     /*! @ingroup bgr_conversion
 
@@ -3099,7 +3116,7 @@ extern "C"
         \param [in, out] background - a pointer to pixels data of feature value of edge dynamic background.
         \param [in] backgroundStride - a row size of the background image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundGrowRangeSlow(const uint8_t * value, size_t valueStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundGrowRangeSlow(const uint8_t * value, size_t valueStride, size_t width, size_t height,
         uint8_t * background, size_t backgroundStride);
 
     /*! @ingroup edge_background
@@ -3128,7 +3145,7 @@ extern "C"
         \param [in, out] background - a pointer to pixels data of feature value of edge dynamic background.
         \param [in] backgroundStride - a row size of the background image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundGrowRangeFast(const uint8_t * value, size_t valueStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundGrowRangeFast(const uint8_t * value, size_t valueStride, size_t width, size_t height,
         uint8_t * background, size_t backgroundStride);
 
     /*! @ingroup edge_background
@@ -3159,7 +3176,7 @@ extern "C"
         \param [in, out] backgroundCount - a pointer to pixels data of count of feature of edge dynamic background.
         \param [in] backgroundCountStride - a row size of the backgroundCount image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundIncrementCount(const uint8_t * value, size_t valueStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundIncrementCount(const uint8_t * value, size_t valueStride, size_t width, size_t height,
         const uint8_t * backgroundValue, size_t backgroundValueStride, uint8_t * backgroundCount, size_t backgroundCountStride);
 
     /*! @ingroup edge_background
@@ -3191,7 +3208,7 @@ extern "C"
         \param [in] backgroundValueStride - a row size of the backgroundValue image.
         \param [in] threshold - a count threshold.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundAdjustRange(uint8_t * backgroundCount, size_t backgroundCountStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundAdjustRange(uint8_t * backgroundCount, size_t backgroundCountStride, size_t width, size_t height,
         uint8_t * backgroundValue, size_t backgroundValueStride, uint8_t threshold);
 
     /*! @ingroup edge_background
@@ -3228,7 +3245,7 @@ extern "C"
         \param [in] mask - a pointer to pixels data of adjust range mask.
         \param [in] maskStride - a row size of the mask image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundAdjustRangeMasked(uint8_t * backgroundCount, size_t backgroundCountStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundAdjustRangeMasked(uint8_t * backgroundCount, size_t backgroundCountStride, size_t width, size_t height,
         uint8_t * backgroundValue, size_t backgroundValueStride, uint8_t threshold, const uint8_t * mask, size_t maskStride);
 
     /*! @ingroup edge_background
@@ -3257,7 +3274,7 @@ extern "C"
         \param [in, out] background - a pointer to pixels data of feature of edge dynamic background.
         \param [in] backgroundStride - a row size of the background image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundShiftRange(const uint8_t * value, size_t valueStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundShiftRange(const uint8_t * value, size_t valueStride, size_t width, size_t height,
         uint8_t * background, size_t backgroundStride);
 
     /*! @ingroup edge_background
@@ -3289,7 +3306,7 @@ extern "C"
         \param [in] mask - a pointer to pixels data of shift range mask.
         \param [in] maskStride - a row size of the mask image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdEdgeBackgroundShiftRangeMasked(const uint8_t * value, size_t valueStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdEdgeBackgroundShiftRangeMasked(const uint8_t * value, size_t valueStride, size_t width, size_t height,
         uint8_t * background, size_t backgroundStride, const uint8_t * mask, size_t maskStride);
 
     /*! @ingroup filling
@@ -4268,7 +4285,9 @@ extern "C"
 
         \fn SimdBool SimdImageSaveToFile(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, const char * path);
 
-        \short Saves an image to memory in given image file format.
+        \short Saves an image to file in given image file format.
+
+        \note This function has a C++ wrapper Simd::View::Save(const std::string & path, ::SimdImageFileType type = ::SimdImageFileUndefined, int quality = 100).
 
         \param [in] src - a pointer to pixels data of input image.
         \param [in] stride - a row size of input image in bytes.
@@ -4332,6 +4351,8 @@ extern "C"
 
         \short Loads an image from memory buffer.
 
+        \note This function has a C++ wrapper Simd::View::Load(const uint8_t * src, size_t size, Simd::View::Format format = Simd::View::None).
+
         \param [in] data - a pointer to memory buffer with input image file.
         \param [in] size - a size of input image file in bytes.
         \param [out] stride - a pointer to row size of output image in bytes.
@@ -4350,6 +4371,8 @@ extern "C"
         \fn uint8_t* SimdImageLoadFromFile(const char* path, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType * format);
 
         \short Loads an image from file.
+
+        \note This function has a C++ wrapper Simd::View::Load(const std::string & path, Simd::View::Format format = Simd::View::None).
 
         \param [in] path - a path to input image file.
         \param [out] stride - a pointer to row size of output image in bytes.
@@ -4442,7 +4465,7 @@ extern "C"
         \param [in] increment - an increment of statistic.
         \param [in] saturation - an upper saturation of statistic.
     */
-    SIMD_API SIMD_DEPRECATED void SimdInterferenceIncrement(uint8_t * statistic, size_t stride, size_t width, size_t height, uint8_t increment, int16_t saturation);
+    SIMD_DEPRECATED SIMD_API void SimdInterferenceIncrement(uint8_t * statistic, size_t stride, size_t width, size_t height, uint8_t increment, int16_t saturation);
 
     /*! @ingroup interference
 
@@ -4473,7 +4496,7 @@ extern "C"
         \param [in] maskStride - a row size of mask image.
         \param [in] index - an index of mask.
     */
-    SIMD_API SIMD_DEPRECATED void SimdInterferenceIncrementMasked(uint8_t * statistic, size_t statisticStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdInterferenceIncrementMasked(uint8_t * statistic, size_t statisticStride, size_t width, size_t height,
         uint8_t increment, int16_t saturation, const uint8_t * mask, size_t maskStride, uint8_t index);
 
     /*! @ingroup interference
@@ -4500,7 +4523,7 @@ extern "C"
         \param [in] decrement - a decrement of statistic.
         \param [in] saturation - a lower saturation of statistic.
     */
-    SIMD_API SIMD_DEPRECATED void SimdInterferenceDecrement(uint8_t * statistic, size_t stride, size_t width, size_t height, uint8_t decrement, int16_t saturation);
+    SIMD_DEPRECATED SIMD_API void SimdInterferenceDecrement(uint8_t * statistic, size_t stride, size_t width, size_t height, uint8_t decrement, int16_t saturation);
 
     /*! @ingroup interference
 
@@ -4531,7 +4554,7 @@ extern "C"
         \param [in] maskStride - a row size of mask image.
         \param [in] index - an index of mask.
     */
-    SIMD_API SIMD_DEPRECATED void SimdInterferenceDecrementMasked(uint8_t * statistic, size_t statisticStride, size_t width, size_t height,
+    SIMD_DEPRECATED SIMD_API void SimdInterferenceDecrementMasked(uint8_t * statistic, size_t statisticStride, size_t width, size_t height,
         uint8_t decrement, int16_t saturation, const uint8_t * mask, size_t maskStride, uint8_t index);
 
     /*! @ingroup interleave_conversion
@@ -5814,7 +5837,7 @@ extern "C"
         \param [in] dstStride - a row size of the output image.
         \param [in] channelCount - a channel count.
     */
-    SIMD_API SIMD_DEPRECATED void SimdResizeBilinear(const uint8_t *src, size_t srcWidth, size_t srcHeight, size_t srcStride,
+    SIMD_DEPRECATED SIMD_API void SimdResizeBilinear(const uint8_t *src, size_t srcWidth, size_t srcHeight, size_t srcStride,
         uint8_t *dst, size_t dstWidth, size_t dstHeight, size_t dstStride, size_t channelCount);
 
     /*! @ingroup resizing
@@ -6728,7 +6751,7 @@ extern "C"
         \param [in] count - a count of support vectors.
         \param [out] sum - a pointer to result sum.
     */
-    SIMD_API SIMD_DEPRECATED void SimdSvmSumLinear(const float * x, const float * svs, const float * weights, size_t length, size_t count, float * sum);
+    SIMD_DEPRECATED SIMD_API void SimdSvmSumLinear(const float * x, const float * svs, const float * weights, size_t length, size_t count, float * sum);
 
     /*! @ingroup synet_other
 
@@ -7164,7 +7187,7 @@ extern "C"
         \param [out] dst - a pointer to the 32-bit float array with output image tensor. The size of the array is equal to channels * spatial.
         \param [in] format - a format of (input/output) image tensor.
     */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward0(const float * src, const float * bias, const float * scale, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward0(const float * src, const float * bias, const float * scale, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
 
     /*! @ingroup synet_fused
 
@@ -7196,7 +7219,7 @@ extern "C"
         \param [out] dst - a pointer to the 32-bit float array with output image tensor. The size of the array is equal to channels * spatial.
         \param [in] format - a format of (input/output) image tensor.
         */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward1(const float * src, const float * bias0, const float * scale1, const float * bias1, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward1(const float * src, const float * bias0, const float * scale1, const float * bias1, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
 
     /*! @ingroup synet_fused
 
@@ -7228,7 +7251,7 @@ extern "C"
         \param [out] dst - a pointer to the 32-bit float array with output image tensor. The size of the array is equal to channels * spatial.
         \param [in] format - a format of (input/output) image tensor.
         */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward2(const float * src, const float * scale, const float * bias, size_t channels, size_t spatial, const float * slope, float * dst, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward2(const float * src, const float * scale, const float * bias, size_t channels, size_t spatial, const float * slope, float * dst, SimdTensorFormatType format);
 
     /*! @ingroup synet_fused
 
@@ -7259,7 +7282,7 @@ extern "C"
         \param [out] dst - a pointer to the 32-bit float array with output image tensor. The size of the array is equal to channels * spatial.
         \param [in] format - a format of (input/output) image tensor.
         */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward3(const float * src, const float * scale, const float * bias, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward3(const float * src, const float * scale, const float * bias, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
 
     /*! @ingroup synet_fused
 
@@ -7291,7 +7314,7 @@ extern "C"
         \param [out] dst - a pointer to the 32-bit float array with output image tensor. The size of the array is is equal to 2 * channels * spatial.
         \param [in] format - a format of (input/output) image tensor.
         */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward4(const float * src, const float * bias0, const float * scale1, const float * bias1, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward4(const float * src, const float * bias0, const float * scale1, const float * bias1, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
 
     /*! @ingroup synet_fused
 
@@ -7321,7 +7344,7 @@ extern "C"
         \param [out] dst - a pointer to the output 32-bit float array. The size of the array is equal to channels * spatial.
         \param [in] format - a format of (input/output) image tensor.
         */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward8(const float * src0, const float * src1, const float * src2, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward8(const float * src0, const float * src1, const float * src2, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
 
     /*! @ingroup synet_fused
 
@@ -7362,7 +7385,7 @@ extern "C"
         \param [out] dst1 - a pointer to the second output 32-bit float array. The size of the array is equal to (channels0 + channels1) * spatial. The pointer can be NULL.
         \param [in] format - a format of (input/output) image tensor.
     */
-    SIMD_API SIMD_DEPRECATED void SimdSynetFusedLayerForward9(const float * src0, const float * src1, const float * scale, const float * bias, size_t channels0, size_t channels1, size_t spatial, float * dst0, float * dst1, SimdTensorFormatType format);
+    SIMD_DEPRECATED SIMD_API void SimdSynetFusedLayerForward9(const float * src0, const float * src1, const float * scale, const float * bias, size_t channels0, size_t channels1, size_t spatial, float * dst0, float * dst1, SimdTensorFormatType format);
 
     /*! @ingroup synet_activation
 
@@ -7919,6 +7942,50 @@ extern "C"
     SIMD_API void SimdSynetNormalizeLayerForwardV3(const float* src, size_t batch, size_t channels, size_t spatial,
         const float* scale, const float* shift, const float* eps, SimdTensorFormatType format, float* buf, float* dst);
 
+    /*! @ingroup synet_normalize
+
+        \fn void SimdSynetNormalizeLayerForwardV4(const float* src, size_t batch, size_t channels, size_t spatial, const float* scale, const float* shift, const float* eps, SimdTensorFormatType format, float* buf, float* dst);
+
+        \short Performs forward propagation of NormalizeLayer (Version 4).
+
+        Algorithm's details:
+        \verbatim
+        for(b = 0; b < batch; ++b)
+        {
+            sum = 0;
+            for (c = 0; c < channels; ++c)
+            {
+                sqsum = 0;
+                for (s = 0; s < spatial; ++s)
+                    sqsum += Square(src[b, c, s]);
+                buf[c] = sqrt(sqsum);
+                sum += buf[c];
+            }
+            for (c = 0; c < channels; ++c)
+            {
+                buf[c] = 1 + scale[c] * buf[c] / (sum / channels + eps);
+                for (s = 0; s < spatial; ++s)
+                    dst[b, c, s] = src[b, c, s] * buf[c] + shift[c];
+            }
+        }
+        \endverbatim
+
+        \note This function is used in <a href="http://github.com/ermig1979/Synet">Synet Framework</a>.
+
+        \param [in] src - a pointer to the input 32-bit float tensor.
+        \param [in] batch - a batch size of input and output tensor.
+        \param [in] channels - a number of channels in input and output tensor.
+        \param [in] spatial - a spatial size (height*width) of input and output tensor.
+        \param [in] scale - an array with scale parameters. The size of the array is equal to channels.
+        \param [in] shift - an array with shift parameters. The size of the array is equal to channels.
+        \param [in] eps - a pointer to epsilon parameter. It is used to prevent division by zero.
+        \param [in] format - a format of input and output tensor. It can be ::SimdTensorFormatNchw, ::SimdTensorFormatNhwc.
+        \param [out] buf - a pointer to external temporary buffer. The size of the buffer must be equal to channels. Can be NULL (it causes usage of internal buffer).
+        \param [out] dst - a pointer to the output 32-bit float tensor.
+    */
+    SIMD_API void SimdSynetNormalizeLayerForwardV4(const float* src, size_t batch, size_t channels, size_t spatial,
+        const float* scale, const float* shift, const float* eps, SimdTensorFormatType format, float* buf, float* dst);
+
     /*! @ingroup synet_permute
 
         \fn void* SimdSynetPermuteInit(const size_t * shape, const size_t* order, size_t count, SimdTensorDataType type);
@@ -8217,7 +8284,7 @@ extern "C"
         \param [in] width - a width of input image and output image tensor.
         \param [in] height - a height of input image and output image tensor.
         \param [in] stride - a row size of input image.
-        \param [in] srcFormat - a pixel format of input image. There are supported following pixel formats: ::SimdPixelFormatGray8, ::SimdPixelFormatBgr24, ::SimdPixelFormatBgra32, ::SimdPixelFormatRgb24.
+        \param [in] srcFormat - a pixel format of input image. There are supported following pixel formats: ::SimdPixelFormatGray8, ::SimdPixelFormatBgr24, ::SimdPixelFormatBgra32, ::SimdPixelFormatRgb24, ::SimdPixelFormatRgba32.
         \param [in] lower - a pointer to the array with lower bound of values of the output tensor. The size of the array have to correspond number of channels in the output image tensor.
         \param [in] upper - a pointer to the array with upper bound of values of the output tensor. The size of the array have to correspond number of channels in the output image tensor.
         \param [out] dst - a pointer to the output 32-bit float image tensor.
@@ -8581,7 +8648,7 @@ extern "C"
         \param [in] channels - a channel number of input and output image. Its value must be in range [1..4].
         \param [in] mat - a pointer to 2x3 matrix with coefficients of affine warp.
         \param [in] flags - a flags of algorithm parameters.
-        \param [in] border - a pointer to to the array with color of border. The size of the array mast be equal to channels.
+        \param [in] border - a pointer to to the array with color of border. The size of the array must be equal to channels.
                              It parameter is actual for SimdWarpAffineBorderConstant flag. It can be NULL.
         \return a pointer to warp affine context. On error it returns NULL.
                 This pointer is used in functions ::SimdWarpAffineRun.
@@ -9070,7 +9137,7 @@ extern "C"
         \param [out] bgr - a pointer to pixels data of output 24-bit BGR image.
         \param [in] bgrStride - a row size of the bgr image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv420pToBgr(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv420pToBgr(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
         size_t width, size_t height, uint8_t * bgr, size_t bgrStride);
 
     /*! @ingroup yuv_conversion
@@ -9121,7 +9188,7 @@ extern "C"
         \param [out] bgr - a pointer to pixels data of output 24-bit BGR image.
         \param [in] bgrStride - a row size of the bgr image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv422pToBgr(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv422pToBgr(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
         size_t width, size_t height, uint8_t * bgr, size_t bgrStride);
 
     /*! @ingroup yuv_conversion
@@ -9171,7 +9238,7 @@ extern "C"
         \param [out] bgr - a pointer to pixels data of output 24-bit BGR image.
         \param [in] bgrStride - a row size of the bgr image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv444pToBgr(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv444pToBgr(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
         size_t width, size_t height, uint8_t * bgr, size_t bgrStride);
 
     /*! @ingroup yuv_conversion
@@ -9222,7 +9289,7 @@ extern "C"
         \param [in] bgraStride - a row size of the bgra image.
         \param [in] alpha - a value of alpha channel.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv420pToBgra(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv420pToBgra(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
         size_t width, size_t height, uint8_t * bgra, size_t bgraStride, uint8_t alpha);
 
     /*! @ingroup yuv_conversion
@@ -9275,7 +9342,7 @@ extern "C"
         \param [in] bgraStride - a row size of the bgra image.
         \param [in] alpha - a value of alpha channel.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv422pToBgra(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv422pToBgra(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
         size_t width, size_t height, uint8_t * bgra, size_t bgraStride, uint8_t alpha);
 
     /*! @ingroup yuv_conversion
@@ -9327,7 +9394,7 @@ extern "C"
         \param [in] bgraStride - a row size of the bgra image.
         \param [in] alpha - a value of alpha channel.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv444pToBgra(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv444pToBgra(const uint8_t * y, size_t yStride, const uint8_t * u, size_t uStride, const uint8_t * v, size_t vStride,
         size_t width, size_t height, uint8_t * bgra, size_t bgraStride, uint8_t alpha);
 
     /*! @ingroup yuv_conversion
@@ -9475,7 +9542,7 @@ extern "C"
         \param [out] rgb - a pointer to pixels data of output 24-bit RGB image.
         \param [in] rgbStride - a row size of the rgb image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv420pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv420pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
         size_t width, size_t height, uint8_t* rgb, size_t rgbStride);
 
     /*! @ingroup yuv_conversion
@@ -9526,7 +9593,7 @@ extern "C"
         \param [out] rgb - a pointer to pixels data of output 24-bit RGB image.
         \param [in] rgbStride - a row size of the rgb image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv422pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv422pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
         size_t width, size_t height, uint8_t* rgb, size_t rgbStride);
 
     /*! @ingroup yuv_conversion
@@ -9576,7 +9643,7 @@ extern "C"
         \param [out] rgb - a pointer to pixels data of output 24-bit RGB image.
         \param [in] rgbStride - a row size of the rgb image.
     */
-    SIMD_API SIMD_DEPRECATED void SimdYuv444pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
+    SIMD_DEPRECATED SIMD_API void SimdYuv444pToRgb(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
         size_t width, size_t height, uint8_t* rgb, size_t rgbStride);
 
     /*! @ingroup yuv_conversion
