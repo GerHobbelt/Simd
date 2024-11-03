@@ -4,7 +4,8 @@
 * Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2022-2022 Souriya Trinh,
 *               2022-2022 Fabien Spindler,
-*               2024-2024 Jan Rysavy.
+*               2024-2024 Jan Rysavy,
+*               2024-2024 Jamil Halabi.
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -272,6 +273,7 @@ namespace Simd
         size_t CpuSocketNumber()
         {
             uint32_t number = 0;
+#if !defined(__APPLE__)
             ::FILE * p = ::popen("lscpu -b -p=Socket 2>/dev/null | grep -v '^#' | sort -u 2>/dev/null | wc -l 2>/dev/null", "r");
             if (p)
             {
@@ -280,12 +282,14 @@ namespace Simd
                 number = ::atoi(buffer);
                 ::pclose(p);
             }
+#endif
             return number;
         }
 
         size_t CpuCoreNumber()
         {
             uint32_t number = 0;
+#if !defined(__APPLE__)
             ::FILE * p = ::popen("lscpu -b -p=Core 2>/dev/null | grep -v '^#' | sort -u 2>/dev/null | wc -l 2>/dev/null", "r");
             if (p)
             {
@@ -294,6 +298,7 @@ namespace Simd
                 number = ::atoi(buffer);
                 ::pclose(p);
             }
+#endif
             return number;
         }
 
@@ -342,6 +347,7 @@ namespace Simd
         uint64_t CpuRamSize()
         {
             uint64_t size = 0;
+#if !defined(__APPLE__)
             ::FILE* file = ::popen("grep MemTotal /proc/meminfo | awk '{printf \"%d\", $2 }'", "r");
             if (file)
             {
@@ -350,12 +356,14 @@ namespace Simd
                 size = atoll(buf) * 1024;
                 ::pclose(file);
             }
+#endif
             return size;
         }
 
         std::string CpuModel()
         {
             std::string model;
+#if !defined(__APPLE__)
             ::FILE* file = ::popen("lscpu | grep 'Model name:' | sed -r 's/Model name:\\s{1,}//g'", "r");
             if (file)
             {
@@ -365,11 +373,13 @@ namespace Simd
                 model = model.substr(0, model.find('\n'));
                 ::pclose(file);
             }
+#endif
             return model;
         }
 
         uint64_t CpuCurrentFrequency()
         {
+#if !defined(__APPLE__)
             int core = sched_getcpu();
             std::string scaling_cur_freq = "/sys/devices/system/cpu/cpu" + std::to_string(core) + "/cpufreq/scaling_cur_freq";
             if (::access(scaling_cur_freq.c_str(), F_OK) != -1)
@@ -401,6 +411,7 @@ namespace Simd
                         return Round(::atof(output.substr(beg + 1).c_str())) * uint64_t(1000000);
                 }
             }
+#endif
             return 0;
         }
 #else

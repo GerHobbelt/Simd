@@ -71,7 +71,7 @@ namespace Simd
 
             struct AlgParam
             {
-                size_t miC, maC, miK, yStep[3], yStart[3], bufH[3], dp[2], dw[3];
+                size_t miC, maC, miK, yStep[3], yStart[3], bufH[3], dp[2], dw[3], elem[2];
             };
 
             typedef void(*ConvertPtr)(const uint8_t* src, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint16_t* dst);
@@ -104,7 +104,6 @@ namespace Simd
             DepthwiseConvolutionPtr _depthwise;
             OutputConvolutionPtr _output[2];
             size_t _sizeS, _sizeD, _sizeB[4];
-            size_t _elemS, _elemD, _stepS, _stepD;
             AlgParam _alg;
             Array8u _buffer;
             Array16u _weightI, _weightO;
@@ -154,5 +153,157 @@ namespace Simd
 
         void* SynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
     }
+
+#ifdef SIMD_SSE41_ENABLE    
+    namespace Sse41
+    {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution16b::InputConvolutionPtr& input);
+
+        void SetDepthwise(const ConvParam& p, Base::SynetMergedConvolution16b::DepthwiseConvolutionPtr& depthwise);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution16b::OutputConvolutionPtr* output);
+
+        //-------------------------------------------------------------------------------------------------
+
+        class SynetMergedConvolution16bCdc : public Base::SynetMergedConvolution16bCdc
+        {
+        public:
+            SynetMergedConvolution16bCdc(const MergConvParam& p);
+            virtual String Ext() const { return "Sse41"; }
+        };
+
+        class SynetMergedConvolution16bCd : public Base::SynetMergedConvolution16bCd
+        {
+        public:
+            SynetMergedConvolution16bCd(const MergConvParam& p);
+            virtual String Ext() const { return "Sse41"; }
+        };
+
+        class SynetMergedConvolution16bDc : public Base::SynetMergedConvolution16bDc
+        {
+        public:
+            SynetMergedConvolution16bDc(const MergConvParam& p);
+            virtual String Ext() const { return "Sse41"; }
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        void* SynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
+    }
+#endif
+
+#ifdef SIMD_AVX2_ENABLE    
+    namespace Avx2
+    {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution16b::InputConvolutionPtr& input);
+
+        void SetDepthwise(const ConvParam& p, Base::SynetMergedConvolution16b::DepthwiseConvolutionPtr& depthwise);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution16b::OutputConvolutionPtr* output);
+
+        //-------------------------------------------------------------------------------------------------
+
+        class SynetMergedConvolution16bCdc : public Sse41::SynetMergedConvolution16bCdc
+        {
+        public:
+            SynetMergedConvolution16bCdc(const MergConvParam& p);
+            virtual String Ext() const { return "Avx2"; }
+        };
+
+        class SynetMergedConvolution16bCd : public Sse41::SynetMergedConvolution16bCd
+        {
+        public:
+            SynetMergedConvolution16bCd(const MergConvParam& p);
+            virtual String Ext() const { return "Avx2"; }
+        };
+
+        class SynetMergedConvolution16bDc : public Sse41::SynetMergedConvolution16bDc
+        {
+        public:
+            SynetMergedConvolution16bDc(const MergConvParam& p);
+            virtual String Ext() const { return "Avx2"; }
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        void* SynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
+    }
+#endif
+
+#ifdef SIMD_AVX512BW_ENABLE    
+    namespace Avx512bw
+    {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution16b::InputConvolutionPtr& input);
+
+        void SetDepthwise(const ConvParam& p, Base::SynetMergedConvolution16b::DepthwiseConvolutionPtr& depthwise);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution16b::OutputConvolutionPtr* output);
+
+        //-------------------------------------------------------------------------------------------------
+
+        class SynetMergedConvolution16bCdc : public Avx2::SynetMergedConvolution16bCdc
+        {
+        public:
+            SynetMergedConvolution16bCdc(const MergConvParam& p);
+            virtual String Ext() const { return "Avx512bw"; }
+        };
+
+        class SynetMergedConvolution16bCd : public Avx2::SynetMergedConvolution16bCd
+        {
+        public:
+            SynetMergedConvolution16bCd(const MergConvParam& p);
+            virtual String Ext() const { return "Avx512bw"; }
+        };
+
+        class SynetMergedConvolution16bDc : public Avx2::SynetMergedConvolution16bDc
+        {
+        public:
+            SynetMergedConvolution16bDc(const MergConvParam& p);
+            virtual String Ext() const { return "Avx512bw"; }
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        void* SynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
+    }
+#endif
+
+#if defined(SIMD_AMXBF16_ENABLE) || (defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_AMX_EMULATE))    
+    namespace AmxBf16
+    {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution16b::InputConvolutionPtr& input);
+
+        void SetDepthwise(const ConvParam& p, Base::SynetMergedConvolution16b::DepthwiseConvolutionPtr& depthwise);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution16b::OutputConvolutionPtr* output);
+
+        //-------------------------------------------------------------------------------------------------
+
+        class SynetMergedConvolution16bCdc : public Avx512bw::SynetMergedConvolution16bCdc
+        {
+        public:
+            SynetMergedConvolution16bCdc(const MergConvParam& p);
+            virtual String Ext() const { return "AmxBf16"; }
+        };
+
+        class SynetMergedConvolution16bCd : public Avx512bw::SynetMergedConvolution16bCd
+        {
+        public:
+            SynetMergedConvolution16bCd(const MergConvParam& p);
+            virtual String Ext() const { return "AmxBf16"; }
+        };
+
+        class SynetMergedConvolution16bDc : public Avx512bw::SynetMergedConvolution16bDc
+        {
+        public:
+            SynetMergedConvolution16bDc(const MergConvParam& p);
+            virtual String Ext() const { return "AmxBf16"; }
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        void* SynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
+    }
+#endif
 }
 #endif

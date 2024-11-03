@@ -310,10 +310,10 @@ namespace Simd
             const ConvParam& dw = _dw0 ? p.conv[0] : p.conv[1];
             _src16b = beg.srcT == SimdTensorData16b;
             _dst16b = end.dstT == SimdTensorData16b;
-            _elemS = _src16b ? 2 : 4;
-            _elemD = _dst16b ? 2 : 4;
-            _sizeS = beg.srcH * beg.srcW * beg.srcC * _elemS;
-            _sizeD = end.dstH * end.dstW * end.dstC * _elemD;
+            _alg.elem[0] = _src16b ? 2 : 4;
+            _alg.elem[1] = _dst16b ? 2 : 4;
+            _sizeS = beg.srcH * beg.srcW * beg.srcC;
+            _sizeD = end.dstH * end.dstW * end.dstC;
 
             _sizeB[0] = _dw0 || _src16b ? 0 : p.conv[0].srcH * p.conv[0].srcW * p.conv[0].srcC;
             _sizeB[1] = _dw0 ? 0 : dw.srcH * dw.srcW * dw.srcC;
@@ -342,7 +342,7 @@ namespace Simd
 
         size_t SynetMergedConvolution16b::ExternalBufferSize() const
         {
-            return (_sizeB[0] + _sizeB[2]) * 2 + (_sizeB[1] + _sizeB[3])* 4 + SIMD_ALIGN;
+            return (_sizeB[0] + _sizeB[2]) * 2 + (_sizeB[1] + _sizeB[3]) * 4 + SIMD_ALIGN * 2;
         }
 
         size_t SynetMergedConvolution16b::InternalBufferSize() const
@@ -381,7 +381,7 @@ namespace Simd
         Base::PerformanceMeasurer* SynetMergedConvolution16b::Perf(const char* func)
         {
             if (_perf == NULL)
-                _perf = Simd::Base::PerformanceMeasurerStorage::s_storage.Get(func, Param().Info() + " " + Desc(), Param().Flop());
+                _perf = Simd::Base::PerformanceMeasurerStorage::s_storage.Get(func, Param().Info(true) + " " + Desc(), Param().Flop());
             return _perf;
         }
 #endif
@@ -398,7 +398,7 @@ namespace Simd
             if (_alg.miC)
             {
                 assert(Is1x1(p));
-                size_t F = _alg.miC * 2, C = AlignHi(p.srcC, _alg.miK), D = DivHi(p.dstC, F);
+                size_t F = _alg.miC, C = AlignHi(p.srcC, _alg.miK), D = DivHi(p.dstC, F);
                 _weightI.Resize(C * D * F, true);
                 uint16_t* dst = _weightI.data;
                 for (size_t d = 0; d < D; d++)
@@ -459,7 +459,7 @@ namespace Simd
             assert(p.group == 1 && Is1x1(p));
             if (_alg.miC)
             {
-                size_t F = _alg.miC * 2, C = DivHi(AlignHi(p.srcC, _alg.miK), 2), D = DivHi(p.dstC, F), M = DivHi(_alg.maC, 2);
+                size_t F = _alg.miC, C = DivHi(AlignHi(p.srcC, _alg.miK), 2), D = DivHi(p.dstC, F), M = DivHi(_alg.maC, 2);
                 _weightO.Resize(C * D * F * 2, true);
                 uint16_t* dst = _weightO.data;
                 for (size_t cB = 0; cB < C; cB += M)
@@ -587,8 +587,8 @@ namespace Simd
                     else
                         _depthwise((uint8_t*)buf1, c1, a, 0, 0, c1.dstH, _weightD.data, _bias[1].data, _params[1].data, dst);
                 }
-                src += _sizeS;
-                dst += _sizeD;
+                src += _sizeS * _alg.elem[0];
+                dst += _sizeD * _alg.elem[1];
             }
         };
 
@@ -624,6 +624,7 @@ namespace Simd
             float* buf1 = Allocate<float>(buf, _sizeB[1]);
             uint16_t* buf2 = Allocate<uint16_t>(buf, _sizeB[2]);
             SetGap(buf);
+            float* buf3 = Allocate<float>(buf, _sizeB[3]);
 
             for (size_t b = 0; b < c0.batch; ++b)
             {
@@ -635,29 +636,26 @@ namespace Simd
                         size_t yEnd2 = Simd::RestrictRange(yBeg2 + a.yStep[2], a.yStart[2], c1.dstH);
                         size_t yEnd1 = Simd::RestrictRange(yBeg1 + a.yStep[1], a.yStart[1], c1.srcH);
                         size_t yEnd0 = Simd::RestrictRange(yBeg0 + a.yStep[0], a.yStart[0], c0.srcH);
-                        //_convert(src, c0, a, yBeg0, yEnd0, buf0);
-                        //_input(buf0, c0, a, maC, yBeg1, yEnd1, _weightI.data + c * a.dw[0], 
-                        //    _bias[0].data + c, _params[0].data + c * a.dp[0], buf1);
-                        //_depthwise(buf1, c1, a, maC, yBeg2, yEnd2, _weightD.data + c * a.dw[1], 
-                        //    _bias[1].data + c, _params[1].data + c * a.dp[1], buf2);
-                        //if (p.add && c == 0)
-                        //{
-                        //    size_t offset = yBeg1 * p.conv[2].dstW * p.conv[2].dstC, size = (yEnd1 - yBeg1) * p.conv[2].dstW * p.conv[2].dstC;
-                        //    memcpy(dst + offset, src + offset, sizeof(float) * size);
-                        //}
-                        //if (c + maC == C)
-                        //    _output[0](buf2, c2, a, maC, yBeg2, yEnd2, _weightO.data + c * a.dw[2], 
-                        //        _bias[2].data, _params[2].data, dst, (maC != C || p.add) ? 0 : 1);
-                        //else
-                        //    _output[1](buf2, c2, a, maC, yBeg2, yEnd2, _weightO.data + c * a.dw[2], 
-                        //        _bias[2].data, _params[2].data, dst, (c != 0 || p.add) ? 0 : 1);
+                        if (_convert)
+                            _convert(src, c0, a, yBeg0, yEnd0, buf0);
+                        const uint16_t* src16b = _convert ? buf0 : (uint16_t*)src;
+                        _input(src16b, c0, a, maC, yBeg1, yEnd1, _weightI.data + c * a.dw[0],
+                            _bias[0].data + c, _params[0].data + c * a.dp[0], buf1);
+                        _depthwise((uint8_t*)buf1, c1, a, maC, yBeg2, yEnd2, _weightD.data + c * a.dw[1],
+                            _bias[1].data + c, _params[1].data + c * a.dp[1], (uint8_t*)buf2);
+                        if (c + maC == C)
+                            _output[0](buf2, c2, a, maC, yBeg2, yEnd2, (maC != C) ? 0 : 1, 
+                                _weightO.data + c * a.dw[2], _bias[2].data, _params[2].data, buf3, dst);
+                        else
+                            _output[1](buf2, c2, a, maC, yBeg2, yEnd2, (c != 0) ? 0 : 1, 
+                                _weightO.data + c * a.dw[2], _bias[2].data, _params[2].data, buf3, dst);
                         yBeg2 = yEnd2;
                         yBeg1 = yEnd1;
                         yBeg0 = yEnd0;
                     }
                 }
-                src += _sizeS;
-                dst += _sizeD;
+                src += _sizeS * a.elem[0];
+                dst += _sizeD * a.elem[1];
             }
         }
 
@@ -702,7 +700,7 @@ namespace Simd
                 a.yStart[0] = Simd::Min(a.yStart[1], c0.srcH);
                 a.bufH[0] = Pow2Hi(Simd::Max(a.yStep[1], a.yStart[0]));
 
-                _sizeB[0] = a.bufH[0] * p.conv[0].srcW * AlignHi(p.conv[0].srcC, a.miK);
+                _sizeB[0] = _src16b && Aligned(c0.srcC, a.miK) ? 0 : a.bufH[0] * p.conv[0].srcW * AlignHi(p.conv[0].srcC, a.miK);
                 _sizeB[1] = a.bufH[1] * p.conv[1].srcW * a.maC;
                 _sizeB[2] = a.bufH[2] * p.conv[1].dstW * a.maC;
                 if (_sizeB[0] * 2 + _sizeB[1] * 4 + _sizeB[2] * 2 <= L2)
@@ -712,7 +710,8 @@ namespace Simd
             a.dp[1] = c1.activation == ::SimdConvolutionActivationPrelu ? 1 : 0;
             a.dw[0] = AlignHi(c0.srcC, a.miK);
             a.dw[1] = c1.kernelY * c1.kernelX;
-            a.dw[2] = AlignHi(c2.dstC, 2 * a.miC);
+            a.dw[2] = AlignHi(c2.dstC, a.miC);
+            _sizeB[3] = count > 1 || (a.miK == 32 && _dst16b) ? _sizeD : 0;
             
             ((ConvParam&)c1).dstT = SimdTensorData16b;
             ((ConvParam&)c2).srcT = SimdTensorData16b;
@@ -747,18 +746,20 @@ namespace Simd
                         size_t yEnd2 = Simd::RestrictRange(yBeg2 + a.yStep[2], a.yStart[2], c1.dstH);
                         size_t yEnd1 = Simd::RestrictRange(yBeg1 + a.yStep[1], a.yStart[1], c1.srcH);
                         size_t yEnd0 = Simd::RestrictRange(yBeg0 + a.yStep[0], a.yStart[0], c0.srcH);
-                        //_convert(src, c0, a, yBeg0, yEnd0, buf0);
-                        //_input(buf0, c0, a, maC, yBeg1, yEnd1, _weightI.data + c * a.dw[0],
-                        //    _bias[0].data + c, _params[0].data + c * a.dp[0], buf1);
-                        //_depthwise(buf1, c1, a, maC, yBeg2, yEnd2, _weightD.data + c * a.dw[1],
-                        //    _bias[1].data + c, _params[1].data + c * a.dp[1], (uint16_t*)(dst + c));
+                        if(_convert)
+                            _convert(src, c0, a, yBeg0, yEnd0, buf0);
+                        const uint16_t* src16b = _convert ? buf0 : (uint16_t*)src;
+                        _input(src16b, c0, a, maC, yBeg1, yEnd1, _weightI.data + c * a.dw[0],
+                            _bias[0].data + c, _params[0].data + c * a.dp[0], buf1);
+                        _depthwise((uint8_t*)buf1, c1, a, maC, yBeg2, yEnd2, _weightD.data + c * a.dw[1],
+                            _bias[1].data + c, _params[1].data + c * a.dp[1], dst + c * a.elem[1]);
                         yBeg2 = yEnd2;
                         yBeg1 = yEnd1;
                         yBeg0 = yEnd0;
                     }
                 }
-                src += _sizeS;
-                dst += _sizeD;
+                src += _sizeS * a.elem[0];
+                dst += _sizeD * a.elem[1];
             }
         }
 
@@ -801,7 +802,7 @@ namespace Simd
                 a.yStart[0] = Simd::Min(a.yStart[1], c0.srcH);
                 a.bufH[0] = Pow2Hi(Simd::Max(a.yStep[1], a.yStart[0]));
 
-                _sizeB[0] = a.bufH[0] * p.conv[0].srcW * AlignHi(p.conv[0].srcC, a.miK);
+                _sizeB[0] = _src16b && Aligned(c0.srcC, a.miK) ? 0 : a.bufH[0] * p.conv[0].srcW * AlignHi(p.conv[0].srcC, a.miK);
                 _sizeB[1] = a.bufH[1] * p.conv[1].srcW * a.maC;
                 if (_sizeB[0] * 2 + _sizeB[1] * 4 <= L2)
                     break;
@@ -813,6 +814,7 @@ namespace Simd
             a.dw[2] = 0;
             a.bufH[2] = 0;
             _sizeB[2] = 0;
+            _sizeB[3] = 0;
         }
 
         //-----------------------------------------------------------------------------------------
@@ -831,6 +833,7 @@ namespace Simd
 
             buf = Buffer(buf);
             uint16_t* buf2 = Allocate<uint16_t>(buf, _sizeB[2]);
+            float* buf3 = Allocate<float>(buf, _sizeB[3]);
             SetGap(buf);
 
             for (size_t b = 0; b < c0.batch; ++b)
@@ -842,20 +845,20 @@ namespace Simd
                     {
                         size_t yEnd2 = Simd::RestrictRange(yBeg2 + a.yStep[2], a.yStart[2], c0.dstH);
                         size_t yEnd1 = Simd::RestrictRange(yBeg1 + a.yStep[1], a.yStart[1], c0.srcH);
-                        //_depthwise(src + c, c0, a, maC, yBeg2, yEnd2, _weightD.data + c * a.dw[0], _bias[0].data + c,
-                        //    _params[0].data + c * a.dp[0], buf2);
-                        //if (c + maC == C)
-                        //    _output[0](buf2, c1, a, maC, yBeg2, yEnd2, _weightO.data + c * a.dw[1],
-                        //        _bias[1].data, _params[1].data, dst, maC != C ? 0 : 1);
-                        //else
-                        //    _output[1](buf2, c1, a, maC, yBeg2, yEnd2, _weightO.data + c * a.dw[1],
-                        //        _bias[1].data, _params[1].data, dst, c != 0 ? 0 : 1);
+                        _depthwise(src + c * a.elem[0], c0, a, maC, yBeg2, yEnd2, _weightD.data + c * a.dw[0], _bias[0].data + c,
+                            _params[0].data + c * a.dp[0], (uint8_t*)buf2);
+                        if (c + maC == C)
+                            _output[0](buf2, c1, a, maC, yBeg2, yEnd2, maC != C ? 0 : 1, _weightO.data + c * a.dw[1],
+                                _bias[1].data, _params[1].data, buf3, dst);
+                        else
+                            _output[1](buf2, c1, a, maC, yBeg2, yEnd2, c != 0 ? 0 : 1, _weightO.data + c * a.dw[1],
+                                _bias[1].data, _params[1].data, buf3, dst);
                         yBeg2 = yEnd2;
                         yBeg1 = yEnd1;
                     }
                 }
-                src += _sizeS;
-                dst += _sizeD;
+                src += _sizeS * a.elem[0];
+                dst += _sizeD * a.elem[1];
             }
         }
 
@@ -903,10 +906,11 @@ namespace Simd
             a.bufH[1] = 0;
             _sizeB[0] = 0;
             _sizeB[1] = 0;
+            _sizeB[3] = count > 1 || (a.miK == 32 && _dst16b)  ? _sizeD : 0;
             a.dp[0] = c0.activation == ::SimdConvolutionActivationPrelu ? 1 : 0;
             a.dp[1] = c1.activation == ::SimdConvolutionActivationPrelu ? 1 : 0;
             a.dw[0] = c0.kernelY * c0.kernelX;
-            a.dw[1] = AlignHi(c1.dstC, 2 * a.miC);
+            a.dw[1] = AlignHi(c1.dstC, a.miC);
 
             ((ConvParam&)c0).dstT = SimdTensorData16b;
             ((ConvParam&)c1).srcT = SimdTensorData16b;
