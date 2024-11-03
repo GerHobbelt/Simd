@@ -25,6 +25,7 @@
 #define __SimdBFloat16_h__
 
 #include "Simd/SimdStore.h"
+#include "Simd/SimdUnpack.h"
 
 namespace Simd
 {
@@ -100,6 +101,33 @@ namespace Simd
         {
             return _mm_castsi128_ps(_mm_slli_epi32(value, Base::Bf16::SHIFT));
         }
+
+        SIMD_INLINE __m128i Float32ToBFloat16(__m128 lo, __m128 hi)
+        {
+            return _mm_packus_epi32(Float32ToBFloat16(lo), Float32ToBFloat16(hi));
+        }
+
+        template<int part> SIMD_INLINE __m128 BFloat16ToFloat32(__m128i value)
+        {
+            return _mm_castsi128_ps(UnpackU16<part>(K_ZERO, value));
+        }
+
+        SIMD_INLINE __m128 BFloat16ToFloat32Even(__m128i value)
+        {
+            return _mm_castsi128_ps(_mm_slli_epi32(value, Base::Bf16::SHIFT));
+        }
+
+        SIMD_INLINE __m128 BFloat16ToFloat32Odd(__m128i value)
+        {
+            return _mm_castsi128_ps(_mm_and_si128(Bf16::MASK, value));
+        }
+
+        SIMD_INLINE __m128i Float32ToBFloat16Interlived(__m128 even, __m128 odd)
+        {
+            __m128i _even = _mm_srli_epi32(_mm_add_epi32(_mm_castps_si128(even), Bf16::ROUND), Base::Bf16::SHIFT);
+            __m128i _odd = _mm_and_si128(_mm_add_epi32(_mm_castps_si128(odd), Bf16::ROUND), Bf16::MASK);
+            return _mm_or_si128(_even, _odd);
+        }
     }
 #endif   
 
@@ -127,6 +155,23 @@ namespace Simd
         SIMD_INLINE __m256 BFloat16ToFloat32(__m256i value)
         {
             return _mm256_castsi256_ps(_mm256_slli_epi32(value, Base::Bf16::SHIFT));
+        }
+
+        SIMD_INLINE __m256 BFloat16ToFloat32Even(__m256i value)
+        {
+            return _mm256_castsi256_ps(_mm256_slli_epi32(value, Base::Bf16::SHIFT));
+        }
+
+        SIMD_INLINE __m256 BFloat16ToFloat32Odd(__m256i value)
+        {
+            return _mm256_castsi256_ps(_mm256_and_si256(Bf16::MASK, value));
+        }
+
+        SIMD_INLINE __m256i Float32ToBFloat16Interlived(__m256 even, __m256 odd)
+        {
+            __m256i _even = _mm256_srli_epi32(_mm256_add_epi32(_mm256_castps_si256(even), Bf16::ROUND), Base::Bf16::SHIFT);
+            __m256i _odd = _mm256_and_si256(_mm256_add_epi32(_mm256_castps_si256(odd), Bf16::ROUND), Bf16::MASK);
+            return _mm256_or_si256(_even, _odd);
         }
     }
 #endif  
@@ -175,6 +220,23 @@ namespace Simd
             __m512i d0 = Float32ToBFloat16(s0);
             __m512i d1 = Float32ToBFloat16(s1);
             _mm512_mask_storeu_epi16(dst, saveMask, _mm512_permutexvar_epi64(K64_PERMUTE_FOR_PACK, _mm512_packus_epi32(d0, d1)));
+        }
+
+        SIMD_INLINE __m512 BFloat16ToFloat32Even(__m512i value)
+        {
+            return _mm512_castsi512_ps(_mm512_slli_epi32(value, Base::Bf16::SHIFT));
+        }
+
+        SIMD_INLINE __m512 BFloat16ToFloat32Odd(__m512i value)
+        {
+            return _mm512_castsi512_ps(_mm512_and_si512(Bf16::MASK, value));
+        }
+
+        SIMD_INLINE __m512i Float32ToBFloat16Interlived(__m512 even, __m512 odd)
+        {
+            __m512i _even = _mm512_srli_epi32(_mm512_add_epi32(_mm512_castps_si512(even), Bf16::ROUND), Base::Bf16::SHIFT);
+            __m512i _odd = _mm512_and_si512(_mm512_add_epi32(_mm512_castps_si512(odd), Bf16::ROUND), Bf16::MASK);
+            return _mm512_or_si512(_even, _odd);
         }
     }
 #endif 

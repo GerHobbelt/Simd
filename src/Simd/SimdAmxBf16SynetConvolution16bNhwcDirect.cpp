@@ -82,7 +82,7 @@ namespace Simd
                     src += p.srcC;
                     dst += sD;
                 }
-                if (p.padX)
+                if (p.padW)
                 {
                     for (size_t s = 0; s < p.padW; ++s)
                         for (size_t c = 0; c < a.srcC; c += a.microC)
@@ -140,7 +140,7 @@ namespace Simd
                     src += p.srcC;
                     dst += sD;
                 }
-                if (p.padX)
+                if (p.padW)
                 {
                     for (size_t s = 0; s < p.padW; ++s)
                         for (size_t c = 0; c < a.srcC; c += a.microC)
@@ -341,7 +341,6 @@ namespace Simd
             conf.rows[4] = uint8_t(dstS);
             conf.rows[6] = 16;
             conf.colsb[0] = 64;
-            conf.colsb[1] = 64;
             conf.colsb[4] = 64;
             conf.colsb[6] = 64;
             _tile_loadconfig(&conf);
