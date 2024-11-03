@@ -21,26 +21,39 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetConvolution16b.h"
+#ifndef __SimdSynetAdd16bCommon_h__
+#define __SimdSynetAdd16bCommon_h__
+
+#include "Simd/SimdBFloat16.h"
 
 namespace Simd
 {
-#if (defined(SIMD_AMXBF16_ENABLE) || (defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_AMX_EMULATE)))
-    namespace AmxBf16
+    namespace Base
     {
-        void* SynetConvolution16bInit(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility)
+        template <class S, class D> SIMD_INLINE D Convert16b(const S& src)
         {
-            ConvParam param(batch, conv, compatibility);
-            if (!param.Valid(SimdTensorData32f, SimdTensorData16b))
-                return NULL;
-            if (SynetConvolution16bNhwcDirect::Preferable(param))
-                return new AmxBf16::SynetConvolution16bNhwcDirect(param);
-            if (SynetConvolution16bNhwcGemm::Preferable(param))
-                return new AmxBf16::SynetConvolution16bNhwcGemm(param);
-            if (Base::SynetConvolution16bNchwGemm::Preferable(param))
-                return new Sse41::SynetConvolution16bNchwGemm(param);
-            return new Base::SynetConvolution16bGemm(param);
+            return (D)src;
+        }
+
+        template <> SIMD_INLINE float Convert16b(const uint16_t& src)
+        {
+            return BFloat16ToFloat32(src);
+        }
+
+        template <> SIMD_INLINE uint16_t Convert16b(const float& src)
+        {
+            return Float32ToBFloat16(src);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        template <typename A, typename B, typename D> void Add16b(const A& a, const B& b, D& dst)
+        {
+            float _a = Convert16b<A, float>(a);
+            float _b = Convert16b<B, float>(b);
+            dst = Convert16b<float, D>(_a + _b);
         }
     }
-#endif
 }
+
+#endif

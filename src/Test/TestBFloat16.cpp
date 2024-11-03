@@ -60,13 +60,16 @@ namespace Test
         View dst1(size, 1, View::Int16, NULL, TEST_ALIGN(SIMD_ALIGN));
         View dst2(size, 1, View::Int16, NULL, TEST_ALIGN(SIMD_ALIGN));
 
-        FillRandom32f(src, -10.0, 10.0);
+        FillRandom32f(src, -4096.0, 4096.0);
+
+        for(size_t i = 0, n = size / 16; i < n; ++i)
+            ((uint32_t*)src.data)[i] = ((uint32_t*)src.data)[i] & 0xFFFF8000;
 
         TEST_EXECUTE_AT_LEAST_MIN_TIME(f1.Call(src, dst1));
 
         TEST_EXECUTE_AT_LEAST_MIN_TIME(f2.Call(src, dst2));
 
-        result = result && Compare(dst1, dst2, 1, true, 32);
+        result = result && Compare(dst1, dst2, 0, true, 64);
 
         return result;
     }
