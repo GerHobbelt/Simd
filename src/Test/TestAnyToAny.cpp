@@ -26,6 +26,12 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestFile.h"
+
+#ifdef SIMD_OPENCV_ENABLE
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#endif
 
 namespace Test
 {
@@ -78,6 +84,9 @@ namespace Test
 
         View dst1(width, height, dstType, NULL, TEST_ALIGN(width));
         View dst2(width, height, dstType, NULL, TEST_ALIGN(width));
+
+        Simd::Fill(dst1, 1);
+        Simd::Fill(dst2, 2);
 
         TEST_EXECUTE_AT_LEAST_MIN_TIME(f1.Call(src, dst1));
 
@@ -264,6 +273,31 @@ namespace Test
 
         if (TestBase())
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Hsv24, FUNC_O(Simd::Base::BgrToHsv), FUNC_O(SimdBgrToHsv));
+
+        return result;
+    }
+
+    bool BgrToLabAutoTest()
+    {
+        bool result = true;
+
+        if (TestBase())
+            result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Base::BgrToLab), FUNC_N(SimdBgrToLab));
+
+#ifdef SIMD_SSE41_ENABLE
+        if (Simd::Sse41::Enable && TestSse41())
+            result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Sse41::BgrToLab), FUNC_N(SimdBgrToLab));
+#endif 
+
+#ifdef SIMD_AVX2_ENABLE
+        if (Simd::Avx2::Enable && TestAvx2())
+            result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Avx2::BgrToLab), FUNC_N(SimdBgrToLab));
+#endif 
+
+#ifdef SIMD_AVX512BW_ENABLE
+        if (Simd::Avx512bw::Enable && TestAvx512bw())
+            result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Avx512bw::BgrToLab), FUNC_N(SimdBgrToLab));
+#endif 
 
         return result;
     }
@@ -478,7 +512,7 @@ namespace Test
         return result;
     }
 
-    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------
 
     bool ConvertImageSpecialTest(size_t width, size_t height, View::Format srcFormat, View::Format dstFormat)
     {
@@ -518,4 +552,37 @@ namespace Test
 
         return result;
     }
+
+    //-----------------------------------------------------------------------------------------------------
+
+    bool BgrToLabSpecialTest()
+    {
+        bool result = true;
+#ifdef SIMD_OPENCV_ENABLE
+        TEST_LOG_SS(Info, "Test OpenCV and Simd image conversion from BGR to LAB pixel format.");
+
+        View src(W, H, View::Bgr24, NULL, TEST_ALIGN(W));
+        FillRandom(src);
+
+        View dst1(W, H, View::Lab24, NULL, TEST_ALIGN(W));
+        View dst2(W, H, View::Lab24, NULL, TEST_ALIGN(W));
+
+        Simd::Fill(dst1, 1);
+        Simd::Fill(dst2, 2);
+
+        TEST_EXECUTE_AT_LEAST_MIN_TIME(TEST_PERFORMANCE_TEST("OpenCV"); cv::cvtColor((cv::Mat)src, (cv::Mat)(dst1.Ref()), cv::COLOR_BGR2Lab, 3));
+
+        TEST_EXECUTE_AT_LEAST_MIN_TIME(TEST_PERFORMANCE_TEST("Simd"); Simd::BgrToLab(src, dst2));
+
+        result = result && Compare(dst1, dst2, 0, true, 64);
+
+#ifdef TEST_PERFORMANCE_TEST_ENABLE
+        TEST_LOG_SS(Info, PerformanceMeasurerStorage::s_storage.ConsoleReport(false, true));
+        PerformanceMeasurerStorage::s_storage.Clear();
+#endif
+
+#endif
+        return result;
+    }
+
 }

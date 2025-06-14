@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar,
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
 *               2014-2019 Antonenka Mikhail,
 *               2019-2019 Artur Voronkov,
 *               2022-2022 Souriya Trinh.
@@ -69,7 +69,11 @@ namespace Simd
             Rgba32,
             /*! Three planes (8-bit full size Y, U, V planes) YUV444P pixel format. */
             Yuv444p,
+            /*! One plane 24-bit (3 8-bit channels) Lab (CIELAB) pixel format. */
+            Lab24,
         };
+
+        typedef void (*DeleterPtr)(void* context); /*!< Deleter callback definition. */
 
         const size_t width; /*!< \brief A width of the frame. */
         const size_t height; /*!< \brief A height of the frame. */
@@ -162,9 +166,11 @@ namespace Simd
             \param [in] flipped_ - a flag of vertically flipped image of created frame. It is equal to false by default.
             \param [in] timestamp_ - a timestamp of created frame. It is equal to 0 by default.
             \param [in] yuvType_ - a YUV format type of created frame. It is equal to ::SimdYuvUnknown by default.
+            \param [in] deleter - an optional callback to delete external buffer after using. It is equal to NULL by default.
+            \param [in] context - a context of callback to delete external buffer after using. It is equal to NULL by default.
         */
-        Frame(size_t width_, size_t height_, Format format_, uint8_t * data0, size_t stride0,
-            uint8_t * data1, size_t stride1, uint8_t * data2, size_t stride2, bool flipped_ = false, double timestamp_ = 0, SimdYuvType yuvType_ = SimdYuvUnknown);
+        Frame(size_t width_, size_t height_, Format format_, uint8_t * data0, size_t stride0, uint8_t * data1, size_t stride1, uint8_t * data2, size_t stride2, 
+            bool flipped_ = false, double timestamp_ = 0, SimdYuvType yuvType_ = SimdYuvUnknown, DeleterPtr deleter = NULL, void *context = NULL);
 
         /*!
             A Frame destructor.
@@ -363,6 +369,10 @@ namespace Simd
             Captures image planes (copies to internal buffers) if this Frame is not owner of current image planes.
         */
         void Capture();
+
+        private:
+            DeleterPtr _deleter;
+            void* _context;
     };
 
     /*! @ingroup cpp_frame_functions
@@ -426,6 +436,8 @@ namespace Simd
         , flipped(false)
         , timestamp(0)
         , yuvType(SimdYuvUnknown)
+        , _deleter(NULL)
+        , _context(NULL)
     {
     }
 
@@ -436,6 +448,8 @@ namespace Simd
         , flipped(frame.flipped)
         , timestamp(frame.timestamp)
         , yuvType(frame.yuvType)
+        , _deleter(NULL)
+        , _context(NULL)
     {
         for (size_t i = 0, n = PlaneCount(); i < n; ++i)
             planes[i] = frame.planes[i];
@@ -449,6 +463,8 @@ namespace Simd
         , flipped(false)
         , timestamp(0)
         , yuvType(SimdYuvUnknown)
+        , _deleter(NULL)
+        , _context(NULL)
     {
         Swap(frame);
     }
@@ -461,6 +477,8 @@ namespace Simd
         , flipped(flipped_)
         , timestamp(timestamp_)
         , yuvType(SimdYuvUnknown)
+        , _deleter(NULL)
+        , _context(NULL)
     {
         switch (view.format)
         {
@@ -469,6 +487,7 @@ namespace Simd
         case View<A>::Bgra32: (Format&)format = Bgra32; break;
         case View<A>::Rgb24: (Format&)format = Rgb24; break;
         case View<A>::Rgba32: (Format&)format = Rgba32; break;
+        case View<A>::Lab24: (Format&)format = Lab24; break;
         default:
             assert(0);
         }
@@ -483,6 +502,8 @@ namespace Simd
         , flipped(flipped_)
         , timestamp(timestamp_)
         , yuvType(SimdYuvUnknown)
+        , _deleter(NULL)
+        , _context(NULL)
     {
         switch (view.format)
         {
@@ -491,6 +512,7 @@ namespace Simd
         case View<A>::Bgra32: (Format&)format = Bgra32; break;
         case View<A>::Rgb24: (Format&)format = Rgb24; break;
         case View<A>::Rgba32: (Format&)format = Rgba32; break;
+        case View<A>::Lab24: (Format&)format = Lab24; break;
         default:
             assert(0);
         }
@@ -505,6 +527,8 @@ namespace Simd
         , flipped(flipped_)
         , timestamp(timestamp_)
         , yuvType(SimdYuvUnknown)
+        , _deleter(NULL)
+        , _context(NULL)
     {
         Recreate(width_, height_, format_, yuvType_);
     }
@@ -516,18 +540,22 @@ namespace Simd
         , flipped(flipped_)
         , timestamp(timestamp_)
         , yuvType(SimdYuvUnknown)
+        , _deleter(NULL)
+        , _context(NULL)
     {
         Recreate(size, format_, yuvType_);
     }
 
     template <template<class> class A> SIMD_INLINE Frame<A>::Frame(size_t width_, size_t height_, Format format_, uint8_t * data0, size_t stride0,
-        uint8_t * data1, size_t stride1, uint8_t * data2, size_t stride2, bool flipped_, double timestamp_, SimdYuvType yuvType_)
+        uint8_t * data1, size_t stride1, uint8_t * data2, size_t stride2, bool flipped_, double timestamp_, SimdYuvType yuvType_, DeleterPtr deleter, void* context)
         : width(width_)
         , height(height_)
         , format(format_)
         , flipped(flipped_)
         , timestamp(timestamp_)
         , yuvType(yuvType_)
+        , _deleter(deleter)
+        , _context(context)
     {
         switch (format)
         {
@@ -580,6 +608,11 @@ namespace Simd
             if (yuvType == SimdYuvUnknown)
                 *(SimdYuvType*)&yuvType = SimdYuvBt601;
             break;
+        case Lab24:
+            planes[0] = View<A>(width, height, stride0, View<A>::Lab24, data0);
+            if (yuvType != SimdYuvUnknown)
+                *(SimdYuvType*)&yuvType = SimdYuvUnknown;
+            break;
         default:
             assert(0);
         }
@@ -587,6 +620,8 @@ namespace Simd
 
     template <template<class> class A> SIMD_INLINE Frame<A>::~Frame()
     {
+        if (_deleter)
+            _deleter(_context);
     }
 
     template <template<class> class A> SIMD_INLINE Frame<A> * Frame<A>::Clone() const
@@ -712,6 +747,11 @@ namespace Simd
             planes[2].Recreate(width, height, View<A>::Gray8);
             if (yuvType == SimdYuvUnknown)
                 *(SimdYuvType*)&yuvType = SimdYuvBt601;
+            break;
+        case Lab24:
+            planes[0].Recreate(width, height, View<A>::Lab24);
+            if (yuvType != SimdYuvUnknown)
+                *(SimdYuvType*)&yuvType = SimdYuvUnknown;
             break;
         default:
             assert(0);
@@ -839,6 +879,7 @@ namespace Simd
         case Rgb24:   return 1;
         case Rgba32:  return 1;
         case Yuv444p: return 3;
+        case Lab24:   return 1;
         default: assert(0); return 0;
         }
     }
@@ -870,6 +911,8 @@ namespace Simd
         std::swap(flipped, other.flipped);
         std::swap(timestamp, other.timestamp);
         std::swap((SimdYuvType&)yuvType, (SimdYuvType&)other.yuvType);
+        std::swap(_deleter, other._deleter);
+        std::swap(_context, other._context);
     }
 
     template <template<class> class A> SIMD_INLINE bool Frame<A>::Owner() const
@@ -980,6 +1023,15 @@ namespace Simd
                 Simd::StretchGray2x2(v, dst.planes[2]);
                 break;
             }
+            case Frame<A>::Lab24:
+            {
+                View<A> u(src.Size(), View<A>::Gray8), v(src.Size(), View<A>::Gray8);
+                DeinterleaveUv(src.planes[1], u, v);
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                Yuv420pToBgr(src.planes[0], u, v, bgr, src.yuvType);
+                BgrToLab(bgr, dst.planes[0]);
+                break;
+            }
             default:
                 assert(0);
             }
@@ -1023,6 +1075,13 @@ namespace Simd
                 Simd::StretchGray2x2(src.planes[1], dst.planes[2]);
                 break;
             }
+            case Frame<A>::Lab24:
+            {
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                Yuv420pToBgr(src.planes[0], src.planes[1], src.planes[2], bgr, src.yuvType);
+                BgrToLab(bgr, dst.planes[0]);
+                break;
+            }
             default:
                 assert(0);
             }
@@ -1056,6 +1115,13 @@ namespace Simd
             case Frame<A>::Yuv444p:
                 BgraToYuv444p(src.planes[0], dst.planes[0], dst.planes[1], dst.planes[2], dst.yuvType);
                 break;
+            case Frame<A>::Lab24:
+            {
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                BgraToBgr(src.planes[0], bgr);
+                BgrToLab(bgr, dst.planes[0]);
+                break;
+            }
             default:
                 assert(0);
             }
@@ -1088,6 +1154,9 @@ namespace Simd
                 break;
             case Frame<A>::Yuv444p:
                 BgrToYuv444p(src.planes[0], dst.planes[0], dst.planes[1], dst.planes[2], dst.yuvType);
+                break;
+            case Frame<A>::Lab24:
+                BgrToLab(src.planes[0], dst.planes[0]);
                 break;
             default:
                 assert(0);
@@ -1125,6 +1194,13 @@ namespace Simd
             case Frame<A>::Rgba32:
                 GrayToRgba(src.planes[0], dst.planes[0]);
                 break;
+            case Frame<A>::Lab24:
+            {
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                GrayToBgr(src.planes[0], bgr);
+                BgrToLab(bgr, dst.planes[0]);
+                break;
+            }
             default:
                 assert(0);
             }
@@ -1168,6 +1244,13 @@ namespace Simd
                 BgrToYuv444p(bgr, dst.planes[0], dst.planes[1], dst.planes[2], dst.yuvType);
                 break;
             }
+            case Frame<A>::Lab24:
+            {
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                RgbToBgr(src.planes[0], bgr);
+                BgrToLab(bgr, dst.planes[0]);
+                break;
+            }
             default:
                 assert(0);
             }
@@ -1209,6 +1292,13 @@ namespace Simd
                 View<A> bgr(src.Size(), View<A>::Bgr24);
                 RgbaToBgr(src.planes[0], bgr);
                 BgrToYuv444p(bgr, dst.planes[0], dst.planes[1], dst.planes[2], dst.yuvType);
+                break;
+            }
+            case Frame<A>::Lab24:
+            {
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                RgbaToBgr(src.planes[0], bgr);
+                BgrToLab(bgr, dst.planes[0]);
                 break;
             }
             default:
@@ -1257,6 +1347,13 @@ namespace Simd
                 View<A> bgr(src.Size(), View<A>::Bgr24);
                 Yuv444pToBgr(src.planes[0], src.planes[1], src.planes[2], bgr, src.yuvType);
                 BgrToRgba(bgr, dst.planes[0]);
+                break;
+            }
+            case Frame<A>::Lab24:
+            {
+                View<A> bgr(src.Size(), View<A>::Bgr24);
+                Yuv444pToBgr(src.planes[0], src.planes[1], src.planes[2], bgr, src.yuvType);
+                BgrToLab(bgr, dst.planes[0]);
                 break;
             }
             default:

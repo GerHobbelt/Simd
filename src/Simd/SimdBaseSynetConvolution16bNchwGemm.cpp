@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -258,7 +258,7 @@ namespace Simd
             const AlgParam& a = _alg;
             size_t size = a.bufN * a.bufK * sizeof(uint16_t);
             if (a.sumBuf)
-                size += a.macroD * a.bufN * sizeof(float);
+                size += a.bufD * a.bufN * sizeof(float);
             return size;
         }
 
@@ -313,7 +313,6 @@ namespace Simd
         {
             const ConvParam& p = _param;
             const AlgParam& a = _alg;
-            const float* bias = _bias.data, * params = _params.data;
             for (size_t yBeg = 0; yBeg < p.dstH;)
             {
                 size_t yEnd = Simd::Min(yBeg + a.macroH, p.dstH);
@@ -325,10 +324,11 @@ namespace Simd
                     if (_is1x1)
                         _convert(src, p, a, yBeg, yEnd, mak, mak + macroK, buf);
                     size_t bufOffs = _is1x1 ? 0 : mak * a.F;
+                    const float* bias = _bias.data, * params = _params.data;
                     for (size_t dc = 0; dc < p.dstC; dc += a.macroD)
                     {
                         size_t macroD = Simd::Min(p.dstC, dc + a.macroD) - dc;
-                        size_t sumOffs = a.macroK < a.bufK ? (dc * p.dstH + yBeg) * p.dstW : 0;
+                        size_t sumOffs = a.macroK < a.bufK ? (dc * p.dstH + yBeg) * AlignHi(p.dstW, a.F) : 0;
                         size_t dstOffs = (dc * p.dstH + yBeg) * p.dstW * _elemD;
                         const uint16_t* weight = _weight.data + a.bufD * mak + dc * macroK;
                         if (mak + macroK == a.bufK)
@@ -337,6 +337,9 @@ namespace Simd
                         else
                             _convolutions[0](weight, p, a, macroD, yEnd - yBeg, macroK, mak == 0 ? 1 : 0,
                                 buf + bufOffs, bias, params, sum + sumOffs, dst + dstOffs);
+                        bias += macroD;
+                        if (p.activation == ::SimdConvolutionActivationPrelu)
+                            params += macroD;
                     }
                 }
                 yBeg = yEnd;

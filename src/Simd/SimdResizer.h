@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -183,6 +183,7 @@ namespace Simd
         class ResizerFloatBilinear : public Resizer
         {
         protected:
+            bool _rowBuf;
             Array32i _ix, _iy;
             Array32f _ax, _ay, _bx[2];
 
@@ -347,6 +348,7 @@ namespace Simd
 
         class ResizerFloatBilinear : public Base::ResizerFloatBilinear
         {
+        protected:
             virtual void Run(const float* src, size_t srcStride, float* dst, size_t dstStride);
         public:
             ResizerFloatBilinear(const ResParam& param);
@@ -356,6 +358,7 @@ namespace Simd
 
         class ResizerBf16Bilinear : public Base::ResizerBf16Bilinear
         {
+        protected:
             virtual void Run(const uint16_t* src, size_t srcStride, uint16_t* dst, size_t dstStride);
         public:
             ResizerBf16Bilinear(const ResParam& param);
@@ -409,7 +412,7 @@ namespace Simd
 
         void * ResizerInit(size_t srcX, size_t srcY, size_t dstX, size_t dstY, size_t channels, SimdResizeChannelType type, SimdResizeMethodType method);
     }
-#endif //SIMD_SSE41_ENABLE
+#endif
 
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
@@ -449,6 +452,8 @@ namespace Simd
             virtual void Run(const uint8_t * src, size_t srcStride, uint8_t * dst, size_t dstStride);
         };
 
+        //-------------------------------------------------------------------------------------------------
+
         class ResizerShortBilinear : public Sse41::ResizerShortBilinear
         {
         protected:
@@ -460,11 +465,24 @@ namespace Simd
             ResizerShortBilinear(const ResParam& param);
         };
 
+        //-------------------------------------------------------------------------------------------------
+
         class ResizerFloatBilinear : public Sse41::ResizerFloatBilinear
         {
+        protected:
             virtual void Run(const float * src, size_t srcStride, float * dst, size_t dstStride);
         public:
             ResizerFloatBilinear(const ResParam & param);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerBf16Bilinear : public Sse41::ResizerBf16Bilinear
+        {
+        protected:
+            virtual void Run(const uint16_t* src, size_t srcStride, uint16_t* dst, size_t dstStride);
+        public:
+            ResizerBf16Bilinear(const ResParam& param);
         };
 
         //-------------------------------------------------------------------------------------------------
@@ -508,7 +526,7 @@ namespace Simd
 
         void * ResizerInit(size_t srcX, size_t srcY, size_t dstX, size_t dstY, size_t channels, SimdResizeChannelType type, SimdResizeMethodType method);
     }
-#endif //SIMD_AVX2_ENABLE 
+#endif 
 
 #ifdef SIMD_AVX512BW_ENABLE    
     namespace Avx512bw
@@ -549,6 +567,8 @@ namespace Simd
             virtual void Run(const uint8_t * src, size_t srcStride, uint8_t * dst, size_t dstStride);
         };
 
+        //-------------------------------------------------------------------------------------------------
+
         class ResizerShortBilinear : public Avx2::ResizerShortBilinear
         {
         protected:
@@ -560,11 +580,25 @@ namespace Simd
             ResizerShortBilinear(const ResParam& param);
         };
 
-        class ResizerFloatBilinear : public Base::ResizerFloatBilinear
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerFloatBilinear : public Avx2::ResizerFloatBilinear
         {
+            bool _fastLoad1, _fastLoad2;
+        protected:
             virtual void Run(const float * src, size_t srcStride, float * dst, size_t dstStride);
         public:
             ResizerFloatBilinear(const ResParam & param);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerBf16Bilinear : public Avx2::ResizerBf16Bilinear
+        {
+        protected:
+            virtual void Run(const uint16_t* src, size_t srcStride, uint16_t* dst, size_t dstStride);
+        public:
+            ResizerBf16Bilinear(const ResParam& param);
         };
 
         //-------------------------------------------------------------------------------------------------
@@ -608,7 +642,7 @@ namespace Simd
 
         void * ResizerInit(size_t srcX, size_t srcY, size_t dstX, size_t dstY, size_t channels, SimdResizeChannelType type, SimdResizeMethodType method);
     }
-#endif //SIMD_AVX512BW_ENABLE 
+#endif 
 
 #ifdef SIMD_NEON_ENABLE    
     namespace Neon
@@ -648,6 +682,7 @@ namespace Simd
 
         class ResizerFloatBilinear : public Base::ResizerFloatBilinear
         {
+        protected:
             virtual void Run(const float * src, size_t srcStride, float * dst, size_t dstStride);
         public:
             ResizerFloatBilinear(const ResParam & param);
@@ -669,6 +704,6 @@ namespace Simd
 
         void * ResizerInit(size_t srcX, size_t srcY, size_t dstX, size_t dstY, size_t channels, SimdResizeChannelType type, SimdResizeMethodType method);
     }
-#endif //SIMD_NEON_ENABLE 
+#endif 
 }
-#endif//__SimdResizer_h__
+#endif

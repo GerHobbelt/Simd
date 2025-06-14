@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,11 @@ namespace Simd
         template <> SIMD_INLINE __m128 Load<true>(const float * p)
         {
             return _mm_load_ps(p);
+        }
+
+        SIMD_INLINE __m128 LoadHalf(const float* p)
+        {
+            return _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)p));
         }
 
         SIMD_INLINE __m128 Load(const float * p0, const float * p1)
@@ -96,7 +101,7 @@ namespace Simd
 
         SIMD_INLINE __m128i LoadHalf(const __m128i* p)
         {
-            return _mm_castps_si128(_mm_loadl_pi(_mm_setzero_ps(), (__m64*)p));
+            return _mm_loadl_epi64(p);
         }
 
         SIMD_INLINE __m128i Load(const __m128i* p0, const __m128i* p1)
@@ -148,6 +153,11 @@ namespace Simd
         SIMD_INLINE __m256 Load(const float* p0, const float* p1, const float* p2, const float* p3)
         {
             return _mm256_insertf128_ps(_mm256_castps128_ps256(Sse41::Load(p0, p1)), Sse41::Load(p2, p3), 1);
+        }
+
+        SIMD_INLINE __m256i Load(const __m128i* p0, const __m128i* p1, const __m128i* p2, const __m128i* p3)
+        {
+            return _mm256_insertf128_si256(_mm256_castsi128_si256(Sse41::Load(p0, p1)), Sse41::Load(p2, p3), 1);
         }
 
         SIMD_INLINE __m256 Load(const float* ptr, size_t size)
@@ -309,6 +319,11 @@ namespace Simd
             return _mm512_castpd_ps(_mm512_insertf64x4(_mm512_castps_pd(_mm512_castps256_ps512(Avx2::Load<align>(p0))), _mm256_castps_pd(Avx2::Load<align>(p1)), 1));
         }
 
+        SIMD_INLINE __m512 Load(const float* p0, const float* p1, __mmask8 m)
+        {
+            return _mm512_castpd_ps(_mm512_insertf64x4(_mm512_castps_pd(_mm512_castps256_ps512(_mm256_maskz_loadu_ps(m, p0))), _mm256_castps_pd(_mm256_maskz_loadu_ps(m, p1)), 1));
+        }
+
         template<bool align> SIMD_INLINE __m512 Load(const float* p0, const float* p1, const float* p2, const float* p3)
         {
             return _mm512_insertf32x4(_mm512_insertf32x4(_mm512_insertf32x4(_mm512_castps128_ps512(Sse41::Load<align>(p0)), Sse41::Load<align>(p1), 1), Sse41::Load<align>(p2), 2), Sse41::Load<align>(p3), 3);
@@ -446,9 +461,20 @@ namespace Simd
             return _mm512_inserti32x8(_mm512_castsi256_si512(_mm256_maskz_loadu_epi8(mask, p0)), _mm256_maskz_loadu_epi8(mask, p1), 1);
         }
 
+        SIMD_INLINE __m512i Load(const uint16_t* p0, const uint16_t* p1, __mmask16 mask)
+        {
+            return _mm512_inserti32x8(_mm512_castsi256_si512(_mm256_maskz_loadu_epi16(mask, p0)), _mm256_maskz_loadu_epi16(mask, p1), 1);
+        }
+
         template<bool align> SIMD_INLINE __m512i Load(const __m128i* p0, const __m128i* p1, const __m128i* p2, const __m128i* p3)
         {
             return _mm512_inserti32x4(_mm512_inserti32x4(_mm512_inserti32x4(_mm512_castsi128_si512(Sse41::Load<align>(p0)), Sse41::Load<align>(p1), 1), Sse41::Load<align>(p2), 2), Sse41::Load<align>(p3), 3);
+        }
+
+        SIMD_INLINE __m512i Load(const uint16_t* p0, const uint16_t* p1, const uint16_t* p2, const uint16_t* p3, __mmask8 mask)
+        {
+            return _mm512_inserti32x4(_mm512_inserti32x4(_mm512_inserti32x4(_mm512_castsi128_si512(_mm_maskz_loadu_epi16(mask, p0)),
+                _mm_maskz_loadu_epi16(mask, p1), 1), _mm_maskz_loadu_epi16(mask, p2), 2), _mm_maskz_loadu_epi16(mask, p3), 3);
         }
 
         template <bool align, bool mask> SIMD_INLINE __m128i Load(const uint8_t* p, __mmask16 m)
@@ -466,7 +492,7 @@ namespace Simd
             return _mm_maskz_loadu_epi8(m, p);
         }
     }
-#endif//SIMD_AVX512BW_ENABLE
+#endif
 
 #ifdef SIMD_NEON_ENABLE
     namespace Neon

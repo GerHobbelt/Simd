@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -203,6 +203,20 @@ namespace Test
     bool WarpAffineAutoTest(const FuncWA & f1, const FuncWA & f2)
     {
         bool result = true;
+
+#if 0
+        {
+            SimdWarpAffineFlags flags = (SimdWarpAffineFlags)(SimdWarpAffineChannelByte | SimdWarpAffineInterpBilinear | SimdWarpAffineBorderConstant);
+            Buffer32f mat;
+            result = result && WarpAffineAutoTest(120, 122, 64, 64, 3, Mat(mat, 1.2060118f, 0.16919485f, -43.714424f, -0.16919485f, 1.2060118f, -34.546951f), flags, f1, f2);
+            result = result && WarpAffineAutoTest(128, 128, 64, 64, 3, Mat(mat, 1.1296055f, 0.042017862f, -38.324753f, -0.042017862f, 1.1296055f, -41.872875f), flags, f1, f2);
+            result = result && WarpAffineAutoTest(126, 128, 64, 64, 3, Mat(mat, 1.1199461f, 0.12258269f, -38.044056f, -0.12258269f, 1.1199461f, -36.121178f), flags, f1, f2);
+            result = result && WarpAffineAutoTest(120, 122, 96, 96, 3, Mat(mat, 1.8090162f, 0.25379285f, -65.571602f, -0.25379285f, 1.8090162f, -51.82029f), flags, f1, f2);
+            result = result && WarpAffineAutoTest(126, 128, 96, 96, 3, Mat(mat, 1.6799176f, 0.18387474f, -57.066051f, -0.18387474f, 1.6799176f, -54.181614f), flags, f1, f2);
+            result = result && WarpAffineAutoTest(200, 198, 96, 96, 3, Mat(mat, 1.075745f, -0.056597464f, -49.893478f, 0.056597464f, 1.075745f, -71.336411f), flags, f1, f2);
+            return result;
+        }
+#endif
 
         std::vector<SimdWarpAffineFlags> channel = { SimdWarpAffineChannelByte };
         std::vector<SimdWarpAffineFlags> interp = { SimdWarpAffineInterpNearest, SimdWarpAffineInterpBilinear };

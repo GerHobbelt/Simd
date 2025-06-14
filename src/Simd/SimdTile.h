@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -53,8 +53,8 @@ namespace Simd
             else
             {
                 dst[1] = 0x0000000000000000;
-                dst[2] = 0x0080008000800080;
-                dst[3] = 0x0080008000800080;
+                dst[2] = 0x0040004000400040;
+                dst[3] = 0x0040004000400040;
                 dst[4] = 0x0000000000000000;
                 dst[5] = 0x0000000000000000;
                 dst[6] = 0x1010101010101010;
@@ -130,6 +130,66 @@ namespace Simd
 #ifdef SIMD_AMXBF16_ENABLE
     namespace AmxBf16
     {
+        SIMD_INLINE void SetTileConfFull()
+        {
+            TileConf conf = TileConf(false);
+            _tile_loadconfig(&conf);
+        }
+
+        SIMD_INLINE void SetTileConf2x2(size_t rows, size_t cols)
+        {
+            TileConf conf = TileConf(false);
+            uint8_t tailR = uint8_t(rows - 16);
+            conf.rows[2] = tailR;
+            conf.rows[3] = tailR;
+            conf.rows[5] = tailR;
+            uint16_t tailC = uint16_t((cols - 16) * 4);
+            conf.colsb[1] = tailC;
+            conf.colsb[3] = tailC;
+            conf.colsb[7] = tailC;
+            _tile_loadconfig(&conf);
+        }
+
+        SIMD_INLINE void SetTileConf2x1(size_t rows, size_t cols)
+        {
+            TileConf conf = TileConf(false);
+            uint8_t tailR = uint8_t(rows - 16);
+            conf.rows[2] = tailR;
+            conf.rows[5] = tailR;
+            uint16_t tailC = uint16_t(cols * 4);
+            conf.colsb[0] = tailC;
+            conf.colsb[2] = tailC;
+            conf.colsb[6] = tailC;
+            _tile_loadconfig(&conf);
+        }
+
+        SIMD_INLINE void SetTileConf1x2(size_t rows, size_t cols)
+        {
+            TileConf conf = TileConf(false);
+            uint8_t tailR = uint8_t(rows);
+            conf.rows[0] = tailR;
+            conf.rows[1] = tailR;
+            conf.rows[4] = tailR;
+            uint16_t tailC = uint16_t((cols - 16) * 4);
+            conf.colsb[1] = tailC;
+            conf.colsb[7] = tailC;
+            _tile_loadconfig(&conf);
+        }
+
+        SIMD_INLINE void SetTileConf1x1(size_t rows, size_t cols)
+        {
+            TileConf conf = TileConf(false);
+            uint8_t tailR = uint8_t(rows);
+            conf.rows[0] = tailR;
+            conf.rows[4] = tailR;
+            uint16_t tailC = uint16_t(cols * 4);
+            conf.colsb[0] = tailC;
+            conf.colsb[6] = tailC;
+            _tile_loadconfig(&conf);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
         template<class T> SIMD_INLINE void TileMoveToMemory(const T* ptr, size_t stride, size_t count = 16)
         {
             for (const T* end = ptr + stride * count; ptr < end; ptr += 4 * stride)

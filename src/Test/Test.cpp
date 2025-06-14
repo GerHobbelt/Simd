@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar,
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
 *               2014-2017 Antonenka Mikhail,
 *               2019-2019 Facundo Galan.
 *
@@ -34,6 +34,10 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#endif
+
+#ifdef SIMD_OPENCV_ENABLE
+#include <opencv2/core/core.hpp>
 #endif
 
 namespace Test
@@ -95,6 +99,7 @@ namespace Test
     TEST_ADD_GROUP_A0(BgrToGray);
     TEST_ADD_GROUP_A0(BgrToHsl);
     TEST_ADD_GROUP_A0(BgrToHsv);
+    TEST_ADD_GROUP_AS(BgrToLab);
     TEST_ADD_GROUP_A0(BgrToRgb);
     TEST_ADD_GROUP_A0(GrayToBgr);
     TEST_ADD_GROUP_A0(GrayToY);
@@ -167,7 +172,7 @@ namespace Test
     TEST_ADD_GROUP_A0(DescrIntDecode32f);
     TEST_ADD_GROUP_A0(DescrIntDecode16f);
     TEST_ADD_GROUP_A0(DescrIntCosineDistance);
-    TEST_ADD_GROUP_A0(DescrIntCosineDistancesMxNa);
+    TEST_ADD_GROUP_AS(DescrIntCosineDistancesMxNa);
     TEST_ADD_GROUP_A0(DescrIntCosineDistancesMxNp);
 
     TEST_ADD_GROUP_A0(DeinterleaveUv);
@@ -622,14 +627,13 @@ namespace Test
 
         String text, html;
 
-        size_t testThreads, workThreads, testRepeats, testStatistics;
+        size_t workThreads, testRepeats, testStatistics;
 
         bool printAlign, printInternal, checkCpp;
 
         Options(int argc, char* argv[])
             : mode(Auto)
             , help(false)
-            , testThreads(0)
             , testRepeats(1)
             , workThreads(1)
             , testStatistics(0)
@@ -658,7 +662,7 @@ namespace Test
                 }
                 else if (arg.find("-tt=") == 0)
                 {
-                    testThreads = Simd::Min(FromString<size_t>(arg.substr(4, arg.size() - 4)), (size_t)std::thread::hardware_concurrency());
+                    TEST_THREADS = Simd::Min<int>(FromString<int>(arg.substr(4, arg.size() - 4)), (size_t)std::thread::hardware_concurrency());
                 }
                 else if (arg.find("-tr=") == 0)
                 {
@@ -771,11 +775,11 @@ namespace Test
 
     int MakeAutoTests(Groups & groups, const Options & options)
     {
-        if (options.testThreads > 0)
+        if (TEST_THREADS > 0)
         {
             Test::Log::s_log.SetLevel(Test::Log::Error);
 
-            size_t testThreads = Simd::Min(options.testThreads, groups.size());
+            size_t testThreads = Simd::Min<size_t>(TEST_THREADS, groups.size());
             size_t total = groups.size();
             size_t block = Simd::DivHi(total, testThreads);
             testThreads = Simd::Min(testThreads, Simd::DivHi(total, block));
@@ -931,6 +935,7 @@ namespace Test
     double MINIMAL_TEST_EXECUTION_TIME = 0.1;
     double WARM_UP_TIME = 0.0;
     int LITTER_CPU_CACHE = 0;
+    int TEST_THREADS = 0;
     uint32_t DISABLED_EXTENSIONS = 0;
 
     void CheckCpp();
@@ -974,6 +979,9 @@ int main(int argc, char* argv[])
     }
 
     ::SimdSetThreadNumber(options.workThreads);
+#ifdef SIMD_OPENCV_ENABLE
+    cv::setNumThreads(options.workThreads);
+#endif
 
     switch (options.mode)
     {

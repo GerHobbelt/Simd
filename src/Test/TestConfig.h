@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -85,6 +85,8 @@ namespace Test
     typedef std::vector<float, Simd::Allocator<float> > Buffer32f;
     typedef std::vector<uint8_t> Buffer8u;
     typedef std::vector<float*> FloatPtrs;
+    typedef std::vector<uint16_t*> UInt16Ptrs;
+    typedef std::vector<uint8_t*> UInt8Ptrs;
     typedef std::vector<size_t> Shape;
     typedef Tensor<float> Tensor32f;
     typedef Tensor<uint8_t> Tensor8u;
@@ -115,6 +117,7 @@ namespace Test
     extern String REAL_IMAGE;
 
     extern int LITTER_CPU_CACHE;
+    extern int TEST_THREADS;
 
     enum DifferenceType
     {

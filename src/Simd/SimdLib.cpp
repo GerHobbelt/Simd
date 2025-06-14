@@ -1298,6 +1298,27 @@ SIMD_API void SimdBgrToHsv(const uint8_t * bgr, size_t width, size_t height, siz
     Base::BgrToHsv(bgr, width, height, bgrStride, hsv, hsvStride);
 }
 
+SIMD_API void SimdBgrToLab(const uint8_t* bgr, size_t bgrStride, size_t width, size_t height, uint8_t* lab, size_t labStride)
+{
+    SIMD_EMPTY();
+#ifdef SIMD_AVX512BW_ENABLE
+    if (Avx512bw::Enable)
+        Avx512bw::BgrToLab(bgr, bgrStride, width, height, lab, labStride);
+    else
+#endif
+#ifdef SIMD_AVX2_ENABLE
+    if (Avx2::Enable)
+        Avx2::BgrToLab(bgr, bgrStride, width, height, lab, labStride);
+    else
+#endif
+#ifdef SIMD_SSE41_ENABLE
+    if (Sse41::Enable)
+        Sse41::BgrToLab(bgr, bgrStride, width, height, lab, labStride);
+    else
+#endif
+        Base::BgrToLab(bgr, bgrStride, width, height, lab, labStride);
+}
+
 SIMD_API void SimdBgrToRgb(const uint8_t *bgr, size_t width, size_t height, size_t bgrStride, uint8_t * rgb, size_t rgbStride)
 {
     SIMD_EMPTY();

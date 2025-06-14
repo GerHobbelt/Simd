@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -448,6 +448,8 @@ namespace Test
         std::stringstream message;
         message << std::fixed << std::setprecision(6);
         int errorCount = 0;
+        if (memcmp(a.Data(), b.Data(), a.Size() * sizeof(float)) == 0)
+            return true;
         Index index(a.Count(), 0);
         Compare(a, b, differenceMax, printError, errorCountMax, differenceType, description, index, 0, errorCount, message);
         if (printError && errorCount > 0)

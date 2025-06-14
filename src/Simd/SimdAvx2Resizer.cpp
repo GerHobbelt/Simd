@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,8 @@ namespace Simd
                 return new ResizerShortBilinear(param);
             else if (param.IsFloatBilinear())
                 return new ResizerFloatBilinear(param);
+            else if (param.IsBf16Bilinear())
+                return new ResizerBf16Bilinear(param);
             else if (param.IsByteBicubic())
                 return new ResizerByteBicubic(param);
             else if (param.IsByteArea2x2())
@@ -58,6 +60,6 @@ namespace Simd
                 return Sse41::ResizerInit(srcX, srcY, dstX, dstY, channels, type, method);
         }
     }
-#endif //SIMD_AVX2_ENABLE 
+#endif 
 }
 

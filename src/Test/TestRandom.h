@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,25 @@
 
 #include "Test/TestLog.h"
 
+#define TEST_RAND_VERSION 0
+
 namespace Test
 {
+    SIMD_INLINE int Rand()
+    {
+        return ::rand();
+    }
+
+    SIMD_INLINE void Srand(unsigned int seed)
+    {
+        ::srand(seed);
+    }
+
+    SIMD_INLINE int RandMax()
+    {
+        return INT16_MAX;
+    }
+
     void FillSequence(View& view);
 
     void FillPicture(View& view, uint64_t flag = 0x000000000000000F);
