@@ -60,6 +60,11 @@ namespace Simd
                 (method == SimdResizeMethodBicubic && (srcW == 2 || srcH == 2)));
         }
 
+        bool IsByteBilinearOpenCv() const
+        {
+            return type == SimdResizeChannelByte && (method == SimdResizeMethodBilinearOpenCv);
+        }
+
         bool IsShortBilinear() const
         {
             return type == SimdResizeChannelShort && method == SimdResizeMethodBilinear;
@@ -155,6 +160,30 @@ namespace Simd
             ResizerByteBilinear(const ResParam & param);
 
             virtual void Run(const uint8_t * src, size_t srcStride, uint8_t * dst, size_t dstStride);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        const int LINEAR_X_LSHIFT = 14;
+        const int LINEAR_X_RANGE = 1 << LINEAR_X_LSHIFT;
+        const int LINEAR_X_RSHIFT = LINEAR_X_LSHIFT - 7;
+
+        const int LINEAR_Y_LSHIFT = 14;
+        const int LINEAR_Y_RANGE = 1 << LINEAR_Y_LSHIFT;
+        const int LINEAR_Y_RSHIFT = LINEAR_X_LSHIFT - LINEAR_X_RSHIFT + LINEAR_Y_LSHIFT - 16;
+        const int LINEAR_Y_ROUND = 1 << (LINEAR_Y_RSHIFT - 1);
+
+        class ResizerByteBilinearOpenCv : public Resizer
+        {
+        protected:
+            Array16i _ax, _ay, _bx[2];
+            Array32i _ix, _iy;
+
+            void EstimateIndexAlpha(size_t srcSize, size_t dstSize, size_t channels, int32_t* indices, int16_t* alphas, int range);
+        public:
+            ResizerByteBilinearOpenCv(const ResParam& param);
+
+            virtual void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
         };
 
         //-------------------------------------------------------------------------------------------------
@@ -329,7 +358,31 @@ namespace Simd
             ResizerByteBilinear(const ResParam & param);
 
             virtual void Run(const uint8_t * src, size_t srcStride, uint8_t * dst, size_t dstStride);
-        };  
+        }; 
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerByteBilinearOpenCv : public Base::ResizerByteBilinearOpenCv
+        {
+        protected:
+            Array8u _sx;
+            size_t _blocks;
+            struct Idx
+            {
+                int32_t src, dst;
+                uint8_t shuffle[DA];
+            };
+            Array<Idx> _ixg;
+
+            size_t BlockCountMax(size_t align);
+            void EstimateParams();
+            template<size_t N> void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+            void RunG(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+        public:
+            ResizerByteBilinearOpenCv(const ResParam& param);
+
+            virtual void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+        };
 
         //-------------------------------------------------------------------------------------------------
 
@@ -454,6 +507,28 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
+        class ResizerByteBilinearOpenCv : public Sse41::ResizerByteBilinearOpenCv
+        {
+        protected:
+            struct Idx
+            {
+                int32_t src, dst;
+                uint8_t shuffle[DA];
+            };
+            Array<Idx> _ixg;
+            int _fast;
+
+            void EstimateParams();
+            template<size_t N> void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+            template<int fast> void RunG(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+        public:
+            ResizerByteBilinearOpenCv(const ResParam& param);
+
+            virtual void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
         class ResizerShortBilinear : public Sse41::ResizerShortBilinear
         {
         protected:
@@ -565,6 +640,19 @@ namespace Simd
             ResizerByteBilinear(const ResParam & param);
 
             virtual void Run(const uint8_t * src, size_t srcStride, uint8_t * dst, size_t dstStride);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerByteBilinearOpenCv : public Avx2::ResizerByteBilinearOpenCv
+        {
+        protected:
+            template<size_t N> void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+            template<int fast> void RunG(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
+        public:
+            ResizerByteBilinearOpenCv(const ResParam& param);
+
+            virtual void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
         };
 
         //-------------------------------------------------------------------------------------------------

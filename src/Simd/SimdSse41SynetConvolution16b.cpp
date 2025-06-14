@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,8 @@ namespace Simd
             ConvParam param(batch, conv, compatibility);
             if (!param.Valid(SimdTensorData32f, SimdTensorData16b))
                 return NULL;
-            if (SynetConvolution16bNhwcSpecV1::Preferable(param))
-                return new Sse41::SynetConvolution16bNhwcSpecV1(param);
+            //if (SynetConvolution16bNhwcSpecV1::Preferable(param))
+            //    return new Sse41::SynetConvolution16bNhwcSpecV1(param);
             if (SynetConvolution16bNhwcSpecV0::Preferable(param))
                 return new Sse41::SynetConvolution16bNhwcSpecV0(param);
             if (SynetConvolution16bNhwcGemm::Preferable(param))

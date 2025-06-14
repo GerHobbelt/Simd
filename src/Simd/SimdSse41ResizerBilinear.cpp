@@ -86,8 +86,8 @@ namespace Simd
                         dst = 0;
                         src = srcIndex - _ixg[block].src;
                     }
-                    _ixg[block].shuffle[dst] = src;
-                    _ixg[block].shuffle[dst + 1] = src + 1;
+                    _ixg[block].shuffle[dst] = (uint8_t)src;
+                    _ixg[block].shuffle[dst + 1] = (uint8_t)src + 1;
 
                     alphas[1] = (uint8_t)(alpha * Base::FRACTION_RANGE + 0.5);
                     alphas[0] = (uint8_t)(Base::FRACTION_RANGE - alphas[1]);
@@ -313,6 +313,320 @@ namespace Simd
         }
 
         void ResizerByteBilinear::Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride)
+        {
+            assert(_param.dstW >= A);
+
+            EstimateParams();
+            switch (_param.channels)
+            {
+            case 1:
+                if (_blocks)
+                    RunG(src, srcStride, dst, dstStride);
+                else
+                    Run<1>(src, srcStride, dst, dstStride);
+                break;
+            case 2: Run<2>(src, srcStride, dst, dstStride); break;
+            case 3: Run<3>(src, srcStride, dst, dstStride); break;
+            case 4: Run<4>(src, srcStride, dst, dstStride); break;
+            default:
+                assert(0);
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        ResizerByteBilinearOpenCv::ResizerByteBilinearOpenCv(const ResParam& param)
+            : Base::ResizerByteBilinearOpenCv(param)
+            , _blocks(0)
+        {
+        }
+
+        size_t ResizerByteBilinearOpenCv::BlockCountMax(size_t align)
+        {
+            return (size_t)Simd::Max(::ceil(float(_param.srcW) / (align - 1)), ::ceil(float(_param.dstW) * 2.0f / align));
+        }
+
+        void ResizerByteBilinearOpenCv::EstimateParams()
+        {
+            if (_ax.data)
+                return;
+            if (_param.channels == 1 && _param.srcW < 4 * _param.dstW)
+                _blocks = BlockCountMax(A);
+            float scale = (float)_param.srcW / _param.dstW;
+            _ax.Resize(AlignHi(_param.dstW, A) * _param.channels * 2, true, _param.align);
+            int16_t* alphas = _ax.data;
+            if (_blocks)
+            {
+                _ixg.Resize(_blocks);
+                int block = 0;
+                _ixg[0].src = 0;
+                _ixg[0].dst = 0;
+                for (int dstIndex = 0; dstIndex < (int)_param.dstW; ++dstIndex)
+                {
+                    float alpha = (float)((dstIndex + 0.5) * scale - 0.5);
+                    int srcIndex = (int)::floor(alpha);
+                    alpha -= srcIndex;
+
+                    if (srcIndex < 0)
+                    {
+                        srcIndex = 0;
+                        alpha = 0;
+                    }
+
+                    if (srcIndex > (int)_param.srcW - 2)
+                    {
+                        srcIndex = (int)_param.srcW - 2;
+                        alpha = 1;
+                    }
+
+                    int dst = 2 * dstIndex - _ixg[block].dst;
+                    int src = srcIndex - _ixg[block].src;
+                    if (src >= A - 1 || dst >= A)
+                    {
+                        block++;
+                        _ixg[block].src = Simd::Min(srcIndex, int(_param.srcW - A));
+                        _ixg[block].dst = 2 * dstIndex;
+                        dst = 0;
+                        src = srcIndex - _ixg[block].src;
+                    }
+                    int offs = dst * 2;
+                    _ixg[block].shuffle[offs + 0] = (uint8_t)src;
+                    _ixg[block].shuffle[offs + 1] = (uint8_t)-1;
+                    _ixg[block].shuffle[offs + 2] = (uint8_t)src + 1;
+                    _ixg[block].shuffle[offs + 3] = (uint8_t)-1;
+
+                    int16_t ialpha = (int16_t)Round(alpha * Base::LINEAR_X_RANGE);
+                    alphas[0] = int16_t(Base::LINEAR_X_RANGE) - ialpha;
+                    alphas[1] = ialpha;
+                    alphas += 2;
+                }
+                _blocks = block + 1;
+            }
+            else
+            {
+                _ix.Resize(_param.dstW + SIMD_ALIGN, true);
+                for (size_t i = 0; i < _param.dstW; ++i)
+                {
+                    float alpha = (float)((i + 0.5) * scale - 0.5);
+                    ptrdiff_t index = (ptrdiff_t)::floor(alpha);
+                    alpha -= index;
+
+                    if (index < 0)
+                    {
+                        index = 0;
+                        alpha = 0;
+                    }
+
+                    if (index > (ptrdiff_t)_param.srcW - 2)
+                    {
+                        index = _param.srcW - 2;
+                        alpha = 1;
+                    }
+
+                    _ix[i] = (int)index;
+                    int16_t ialpha = (int16_t)Round(alpha * Base::LINEAR_X_RANGE);
+                    alphas[0] = int16_t(Base::LINEAR_X_RANGE) - ialpha;
+                    alphas[1] = ialpha;
+
+                    for (size_t channel = 1; channel < _param.channels; channel++)
+                        ((uint32_t*)alphas)[channel] = *(uint32_t*)alphas;
+                    alphas += 2 * _param.channels;
+                }
+            }
+            size_t size = AlignHi(_param.dstW, _param.align) * _param.channels + SIMD_ALIGN;
+            _sx.Resize(size * 2, false, _param.align);
+            _bx[0].Resize(size, false, _param.align);
+            _bx[1].Resize(size, false, _param.align);
+        }
+
+        template <size_t N> void ResizerByteBilinearOpenCvInterpolateX(const __m128i* src, const __m128i* alpha, __m128i* dst);
+
+        template <> SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX<1>(const __m128i* src, const __m128i* alpha, __m128i* dst)
+        {
+            __m128i _s = _mm_loadu_si128(src);
+            __m128i d0 = _mm_srli_epi32(_mm_madd_epi16(_mm_unpacklo_epi8(_s, _mm_setzero_si128()), _mm_loadu_si128(alpha + 0)), Base::LINEAR_X_RSHIFT);
+            __m128i d1 = _mm_srli_epi32(_mm_madd_epi16(_mm_unpackhi_epi8(_s, _mm_setzero_si128()), _mm_loadu_si128(alpha + 1)), Base::LINEAR_X_RSHIFT);
+            _mm_storeu_si128(dst + 0, _mm_packs_epi32(d0, d1));
+        }
+
+        const __m128i K8_SFL_X2_0 = SIMD_MM_SETR_EPI8(0x0, -1, 0x2, -1, 0x1, -1, 0x3, -1, 0x4, -1, 0x6, -1, 0x5, -1, 0x7, -1);
+        const __m128i K8_SFL_X2_1 = SIMD_MM_SETR_EPI8(0x8, -1, 0xA, -1, 0x9, -1, 0xB, -1, 0xC, -1, 0xE, -1, 0xD, -1, 0xF, -1);
+
+        SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX2(const __m128i* src, const __m128i* alpha, __m128i* dst)
+        {
+            __m128i _s = _mm_loadu_si128(src);
+            __m128i d0 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(_s, K8_SFL_X2_0), _mm_loadu_si128(alpha + 0)), Base::LINEAR_X_RSHIFT);
+            __m128i d1 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(_s, K8_SFL_X2_1), _mm_loadu_si128(alpha + 1)), Base::LINEAR_X_RSHIFT);
+            _mm_storeu_si128(dst + 0, _mm_packs_epi32(d0, d1));
+        }
+
+        template <> SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX<2>(const __m128i* src, const __m128i* alpha, __m128i* dst)
+        {
+            ResizerByteBilinearOpenCvInterpolateX2(src + 0, alpha + 0, dst + 0);
+            ResizerByteBilinearOpenCvInterpolateX2(src + 1, alpha + 2, dst + 1);
+        }
+
+        const __m128i K8_SFL_X3_0 = SIMD_MM_SETR_EPI8(0x0, -1, 0x3, -1, 0x1, -1, 0x4, -1, 0x2, -1, 0x5, -1, 0x6, -1, 0x9, -1);
+        const __m128i K8_SFL_X3_1 = SIMD_MM_SETR_EPI8(0x3, -1, 0x6, -1, 0x4, -1, 0x7, -1, 0x8, -1, 0xB, -1, 0x9, -1, 0xC, -1);
+        const __m128i K8_SFL_X3_2 = SIMD_MM_SETR_EPI8(0x6, -1, 0x9, -1, 0xA, -1, 0xD, -1, 0xB, -1, 0xE, -1, 0xC, -1, 0xF, -1);
+
+        SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX3(const uint8_t* src0, __m128i shf0, const uint8_t* src1, __m128i shf1, const __m128i* alpha, __m128i* dst)
+        {
+            __m128i d0 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(_mm_loadu_si128((__m128i*)(src0)), shf0), _mm_loadu_si128(alpha + 0)), Base::LINEAR_X_RSHIFT);
+            __m128i d1 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(_mm_loadu_si128((__m128i*)(src1)), shf1), _mm_loadu_si128(alpha + 1)), Base::LINEAR_X_RSHIFT);
+            _mm_storeu_si128(dst + 0, _mm_packs_epi32(d0, d1));
+        }
+
+        template <> SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX<3>(const __m128i* src, const __m128i* alpha, __m128i* dst)
+        {
+            ResizerByteBilinearOpenCvInterpolateX3((uint8_t*)src + 0, K8_SFL_X3_0, (uint8_t*)src + 4, K8_SFL_X3_1, alpha + 0, dst + 0);
+            ResizerByteBilinearOpenCvInterpolateX3((uint8_t*)src + 8, K8_SFL_X3_2, (uint8_t*)src + 24, K8_SFL_X3_0, alpha + 2, dst + 1);
+            ResizerByteBilinearOpenCvInterpolateX3((uint8_t*)src + 28, K8_SFL_X3_1, (uint8_t*)src + 32, K8_SFL_X3_2, alpha + 4, dst + 2);
+        }
+
+        const __m128i K8_SFL_X4_0 = SIMD_MM_SETR_EPI8(0x0, -1, 0x4, -1, 0x1, -1, 0x5, -1, 0x2, -1, 0x6, -1, 0x3, -1, 0x7, -1);
+        const __m128i K8_SFL_X4_1 = SIMD_MM_SETR_EPI8(0x8, -1, 0xC, -1, 0x9, -1, 0xD, -1, 0xA, -1, 0xE, -1, 0xB, -1, 0xF, -1);
+
+        SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX4(const __m128i* src, const __m128i* alpha, __m128i* dst)
+        {
+            __m128i _s = _mm_loadu_si128(src);
+            __m128i d0 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(_s, K8_SFL_X4_0), _mm_loadu_si128(alpha + 0)), Base::LINEAR_X_RSHIFT);
+            __m128i d1 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(_s, K8_SFL_X4_1), _mm_loadu_si128(alpha + 1)), Base::LINEAR_X_RSHIFT);
+            _mm_storeu_si128(dst + 0, _mm_packs_epi32(d0, d1));
+        }
+
+        template <> SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateX<4>(const __m128i* src, const __m128i* alpha, __m128i* dst)
+        {
+            ResizerByteBilinearOpenCvInterpolateX4(src + 0, alpha + 0, dst + 0);
+            ResizerByteBilinearOpenCvInterpolateX4(src + 1, alpha + 2, dst + 1);
+            ResizerByteBilinearOpenCvInterpolateX4(src + 2, alpha + 4, dst + 2);
+            ResizerByteBilinearOpenCvInterpolateX4(src + 3, alpha + 6, dst + 3);
+        }
+
+        const __m128i K16_LINEAR_Y_ROUND = SIMD_MM_SET1_EPI16(Base::LINEAR_Y_ROUND);
+
+        SIMD_INLINE __m128i ResizerByteBilinearOpenCvInterpolateY(const __m128i* pbx0, const __m128i* pbx1, __m128i alpha[2])
+        {
+            __m128i sum = _mm_add_epi16(_mm_mulhi_epi16(_mm_loadu_si128(pbx0), alpha[0]), _mm_mulhi_epi16(_mm_loadu_si128(pbx1), alpha[1]));
+            return _mm_srli_epi16(_mm_add_epi16(sum, K16_LINEAR_Y_ROUND), Base::LINEAR_Y_RSHIFT);
+        }
+
+        SIMD_INLINE void ResizerByteBilinearOpenCvInterpolateY(const int16_t* bx0, const int16_t* bx1, __m128i alpha[2], uint8_t* dst)
+        {
+            __m128i lo = ResizerByteBilinearOpenCvInterpolateY((__m128i*)bx0 + 0, (__m128i*)bx1 + 0, alpha);
+            __m128i hi = ResizerByteBilinearOpenCvInterpolateY((__m128i*)bx0 + 1, (__m128i*)bx1 + 1, alpha);
+            _mm_storeu_si128((__m128i*)dst, _mm_packus_epi16(lo, hi));
+        }
+
+        template<size_t N> void ResizerByteBilinearOpenCv::Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride)
+        {
+            struct One { uint8_t val[N * 1]; };
+            struct Two { uint8_t val[N * 2]; };
+
+            size_t rs = _param.dstW * N, size = 2 * rs;
+            size_t aligned = AlignHi(rs, A) - A;
+            const size_t step = A * N;
+            ptrdiff_t previous = -2;
+            __m128i a[2];
+            int16_t* bx[2] = { _bx[0].data, _bx[1].data };
+            const int16_t* ax = _ax.data;
+            const int32_t* ix = _ix.data;
+            size_t dstW = _param.dstW;
+
+            for (size_t dy = 0; dy < _param.dstH; dy++, dst += dstStride)
+            {
+                a[0] = _mm_set1_epi16(_ay[dy * 2 + 0]);
+                a[1] = _mm_set1_epi16(_ay[dy * 2 + 1]);
+
+                ptrdiff_t sy = _iy[dy];
+                int k = 0;
+
+                if (sy == previous)
+                    k = 2;
+                else if (sy == previous + 1)
+                {
+                    Swap(bx[0], bx[1]);
+                    k = 1;
+                }
+
+                previous = sy;
+
+                for (; k < 2; k++)
+                {
+                    Two* ps = (Two*)_sx.data;
+                    const One* psrc = (const One*)(src + (sy + k) * srcStride);
+                    for (size_t x = 0; x < dstW; x++)
+                        ps[x] = *(Two*)(psrc + ix[x]);
+
+                    uint8_t* pb = (uint8_t*)bx[k];
+                    for (size_t i = 0; i < size; i += step)
+                        ResizerByteBilinearOpenCvInterpolateX<N>((__m128i*)(_sx.data + i), (__m128i*)(ax + i), (__m128i*)(pb + i));
+                }
+
+                for (size_t i = 0; i < aligned; i += A)
+                    ResizerByteBilinearOpenCvInterpolateY(bx[0] + i, bx[1] + i, a, dst + i);
+                size_t i = rs - A;
+                ResizerByteBilinearOpenCvInterpolateY(bx[0] + i, bx[1] + i, a, dst + i);
+            }
+        }
+
+        template <class Idx> SIMD_INLINE void ResizerByteBilinearOpenCvLoadGrayInterpolated(const uint8_t* src, const Idx& index, const int16_t* alpha, int16_t* dst)
+        {
+            __m128i src0 = _mm_loadu_si128((__m128i*)(src + index.src));
+            __m128i shuffle0 = _mm_loadu_si128((__m128i*) & index.shuffle + 0);
+            __m128i shuffle1 = _mm_loadu_si128((__m128i*) & index.shuffle + 1);
+            __m128i alpha0 = _mm_loadu_si128((__m128i*)(alpha + index.dst) + 0);
+            __m128i alpha1 = _mm_loadu_si128((__m128i*)(alpha + index.dst) + 1);
+            __m128i d0 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(src0, shuffle0), alpha0), Base::LINEAR_X_RSHIFT);
+            __m128i d1 = _mm_srli_epi32(_mm_madd_epi16(_mm_shuffle_epi8(src0, shuffle1), alpha1), Base::LINEAR_X_RSHIFT);
+            _mm_storeu_si128((__m128i*)((uint8_t*)dst + index.dst), _mm_packs_epi32(d0, d1));
+        }
+
+        void ResizerByteBilinearOpenCv::RunG(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride)
+        {
+            size_t rs = _param.dstW, size = 2 * rs;
+            size_t aligned = AlignHi(rs, A) - A;
+            size_t blocks = _blocks;
+            ptrdiff_t previous = -2;
+            __m128i a[2];
+            int16_t* bx[2] = { _bx[0].data, _bx[1].data };
+            const int16_t* ax = _ax.data;
+            const Idx* ixg = _ixg.data;
+
+            for (size_t dy = 0; dy < _param.dstH; dy++, dst += dstStride)
+            {
+                a[0] = _mm_set1_epi16(_ay[dy * 2 + 0]);
+                a[1] = _mm_set1_epi16(_ay[dy * 2 + 1]);
+
+                ptrdiff_t sy = _iy[dy];
+                int k = 0;
+
+                if (sy == previous)
+                    k = 2;
+                else if (sy == previous + 1)
+                {
+                    Swap(bx[0], bx[1]);
+                    k = 1;
+                }
+
+                previous = sy;
+
+                for (; k < 2; k++)
+                {
+                    const uint8_t* psrc = src + (sy + k) * srcStride;
+                    int16_t* pdst = bx[k];
+                    for (size_t i = 0; i < blocks; ++i)
+                        ResizerByteBilinearOpenCvLoadGrayInterpolated(psrc, ixg[i], ax, pdst);
+                }
+
+                for (size_t i = 0; i < aligned; i += A)
+                    ResizerByteBilinearOpenCvInterpolateY(bx[0] + i, bx[1] + i, a, dst + i);
+                size_t i = rs - A;
+                ResizerByteBilinearOpenCvInterpolateY(bx[0] + i, bx[1] + i, a, dst + i);
+            }
+        }
+
+        void ResizerByteBilinearOpenCv::Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride)
         {
             assert(_param.dstW >= A);
 

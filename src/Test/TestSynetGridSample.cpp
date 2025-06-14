@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -90,8 +90,28 @@ namespace Test
 
 #define FUNC_GS2D(function) FuncGS2D(function, #function)
 
-    template<class T> void Fill(Tensor<T>& tensor);
-    template<> void Fill<float>(Tensor<float>& tensor) { FillRandom(tensor, -1.1f, 1.1f); }
+    template<class T> void Fill(Tensor<T>& tensor, int grid);
+
+    template<> void Fill<float>(Tensor<float>& tensor, int grid)
+    {
+        if(grid)
+        {
+            const Shape& shape = tensor.Shape();
+            for (size_t b = 0; b < shape[0]; ++b)
+            {
+                for (size_t y = 0; y < shape[1]; ++y)
+                {
+                    for (size_t x = 0; x < shape[2]; ++x)
+                    {
+                        tensor.Data(Shp(b, y, x, 0))[0] = float(y) / shape[1] + 0.1f * (float)Random();
+                        tensor.Data(Shp(b, y, x, 1))[0] = float(x) / shape[2] + 0.1f * (float)Random();
+                    }
+                }
+            }
+        }
+        else
+            FillRandom(tensor, -1.1f, 1.1f);
+    }
 
     template <class T > bool SynetGridSample2dAutoTest(const Shape& srcShape, const Shape& grdShape,
         SimdTensorDataType type, SimdGridSampleInterpType interp, SimdGridSamplePaddingType padding, SimdBool align, FuncGS2D f1, FuncGS2D f2)
@@ -110,8 +130,8 @@ namespace Test
         Tensor<T> dst1(dstShape);
         Tensor<T> dst2(dstShape);
 
-        Fill(src);
-        Fill(grd);
+        Fill(src, 0);
+        Fill(grd, 1);
         memset(dst1.Data(), 1, dst1.Size() * sizeof(T));
         memset(dst2.Data(), 2, dst2.Size() * sizeof(T));
 
@@ -153,12 +173,27 @@ namespace Test
     {
         bool result = true;
 
+        SimdBool t = SimdTrue, f = SimdFalse;
+        SimdTensorDataType f32 = SimdTensorData32f;
+        SimdGridSampleInterpType Bl = SimdGridSampleInterpBilinear;
+        SimdGridSamplePaddingType Z = SimdGridSamplePaddingZeros;
+
+
 #ifdef NDEBUG
+#if 1
+        result = result && SynetGridSample2dAutoTest<float>(Shp(5188, 1, 54, 96), Shp(5188, 7, 7, 2), f32, Bl, Z, t, f1, f2);
+        result = result && SynetGridSample2dAutoTest<float>(Shp(5188, 1, 27, 48), Shp(5188, 7, 7, 2), f32, Bl, Z, t, f1, f2);
+        result = result && SynetGridSample2dAutoTest<float>(Shp(5188, 1, 13, 24), Shp(5188, 7, 7, 2), f32, Bl, Z, t, f1, f2);
+        result = result && SynetGridSample2dAutoTest<float>(Shp(5188, 1, 6, 12), Shp(5188, 7, 7, 2), f32, Bl, Z, t, f1, f2);
+#endif
+#if 0
         result = result && SynetGridSample2dAutoTest(Shp(8, 32, 20, 20), Shp(8, 300, 4, 2), f1, f2);
         result = result && SynetGridSample2dAutoTest(Shp(8, 32, 40, 40), Shp(8, 300, 4, 2), f1, f2);
         result = result && SynetGridSample2dAutoTest(Shp(8, 32, 80, 80), Shp(8, 300, 4, 2), f1, f2);
+#endif
 #else
-        result = result && SynetGridSample2dAutoTest(Shp(4, 16, 20, 20), Shp(4, 100, 4, 2), f1, f2);
+        result = result && SynetGridSample2dAutoTest<float>(Shp(5188, 1, 54, 96), Shp(5188, 7, 7, 2), f32, Bl, Z, t, f1, f2);
+        result = result && SynetGridSample2dAutoTest<float>(Shp(5188, 1, 13, 24), Shp(5188, 7, 7, 2), f32, Bl, Z, t, f1, f2);
 #endif
 
         return result;

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -109,7 +109,7 @@ namespace Simd
         {
         }
 
-        ConvParam(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility)
+        ConvParam(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility = SimdSynetCompatibilityDefault)
         {
             *((SimdConvolutionParameters*)this) = *conv;
             this->trans = (srcF == SimdTensorFormatNhwc ? SimdTrue : SimdFalse);
@@ -117,7 +117,7 @@ namespace Simd
             this->compatibility = compatibility;
         }
 
-        bool Valid(SimdTensorDataType type0, SimdTensorDataType type1 = SimdTensorData32f)
+        bool Valid(SimdTensorDataType type0, SimdTensorDataType type1 = SimdTensorData32f) const
         {
             return
                 dstH == (srcH + padY + padH - (dilationY * (kernelY - 1) + 1)) / strideY + 1 && dstH > 0 &&
@@ -224,7 +224,7 @@ namespace Simd
         size_t batch;
         SimdSynetCompatibilityType compatibility;
 
-        DeconvParam(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility)
+        DeconvParam(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility = SimdSynetCompatibilityDefault)
         {
             *((SimdConvolutionParameters*)this) = *conv;
             this->trans = (srcF == SimdTensorFormatNhwc ? SimdTrue : SimdFalse);
@@ -232,7 +232,7 @@ namespace Simd
             this->compatibility = compatibility;
         }
 
-        bool Valid(SimdTensorDataType type0, SimdTensorDataType type1 = SimdTensorData32f)
+        bool Valid(SimdTensorDataType type0, SimdTensorDataType type1 = SimdTensorData32f) const
         {
             return
                 dstH == strideY * (srcH - 1) + dilationY * (kernelY - 1) + 1 - padY - padH && dstH > 0 &&

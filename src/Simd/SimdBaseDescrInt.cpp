@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -773,7 +773,7 @@ namespace Simd
         {
             size_t macroM = AlignLoAny(Base::AlgCacheL2() / _unpSize, _microMu);
             size_t macroN = AlignLoAny(Base::AlgCacheL3() / _unpSize, _microNu);
-            size_t sizeA = Min(macroM, M), sizeB = AlignHi(Min(macroN, N), _microNu);
+            size_t sizeA = Simd::Min(macroM, M), sizeB = AlignHi(Simd::Min(macroN, N), _microNu);
             Array8u dA(sizeA * _unpSize), dB(sizeB * _unpSize);
             Array32f nA(sizeA * 4), nB(sizeB * 4);
             for (size_t i = 0; i < M; i += macroM)

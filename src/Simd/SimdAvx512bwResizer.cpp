@@ -39,6 +39,8 @@ namespace Simd
                 return new ResizerNearest(param);
             else if (param.IsByteBilinear() && dstX >= A)
                 return new ResizerByteBilinear(param);
+            else if (param.IsByteBilinearOpenCv() && dstX >= A)
+                return new ResizerByteBilinearOpenCv(param);
             else if (param.IsShortBilinear() && dstX > F)
                 return new ResizerShortBilinear(param);
             else if (param.IsFloatBilinear())
@@ -55,6 +57,6 @@ namespace Simd
                 return Avx2::ResizerInit(srcX, srcY, dstX, dstY, channels, type, method);
         }
     }
-#endif //SIMD_AVX512BW_ENABLE 
+#endif
 }
 

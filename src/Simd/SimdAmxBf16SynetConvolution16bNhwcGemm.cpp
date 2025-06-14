@@ -185,7 +185,7 @@ namespace Simd
             }
         }
 
-        static void Reorder16bNhwcGemm(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint16_t* dst)
+        static void Reorder16bNhwcGemmD(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint16_t* dst)
         {
             const uint16_t* src = (uint16_t*)src8;
             size_t srcC32 = AlignLo(p.srcC, 32);
@@ -223,6 +223,79 @@ namespace Simd
                     }
                     SetZero(row, gapMask);
                 }
+            }
+        }
+
+        static void Reorder16bNhwcGemmR(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint16_t* dst)
+        {
+            const uint16_t* src = (uint16_t*)src8;
+            size_t srcC32 = AlignLo(p.srcC, 32);
+            assert(p.srcC == srcC32);
+            for (size_t dy = yBeg, dr = 0; dy < yEnd; ++dy)
+            {
+                for (size_t dx = 0; dx < p.dstW; ++dx, ++dr)
+                {
+                    size_t drB = dr & (~15), drO = dr & 15;
+                    uint16_t* row = dst + drB * a.bufK + drO * 32;
+                    for (size_t ky = 0, k = 0; ky < p.kernelY; ky++)
+                    {
+                        size_t sy = dy * p.strideY + ky * p.dilationY - p.padY;
+                        if (sy < p.srcH)
+                        {
+                            for (size_t kx = 0; kx < p.kernelX; kx++)
+                            {
+                                size_t sx = dx * p.strideX + kx * p.dilationX - p.padX;
+                                if (sx < p.srcW)
+                                {
+                                    const uint16_t* ps = src + (sy * p.srcW + sx) * p.srcC;
+                                    for (size_t sc = 0; sc < srcC32; sc += 32, row += 512)
+                                        Avx512bw::Copy(ps + sc, row);
+                                }
+                                else
+                                {
+                                    for (size_t sc = 0; sc < srcC32; sc += 32, row += 512)
+                                        SetZero(row);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (size_t sc = 0, scN = p.kernelX * srcC32; sc < scN; sc += 32, row += 512)
+                                SetZero(row);
+                        }
+                    }
+                }
+            }
+        }
+
+        static void Reorder16bNhwcGemm1x1R(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint16_t* dst)
+        {
+            const uint16_t* src = (uint16_t*)src8;
+            size_t srcC32 = AlignLo(p.srcC, 32), n = (yEnd - yBeg) * p.dstW;
+            __mmask32 srcMask = TailMask32(p.srcC - srcC32);
+            src += yBeg * p.srcW * p.srcC;
+            for (size_t i = 0; i < n; i += 16)
+            {
+                size_t m = Min(i + 16, n) - i;
+                size_t sc = 0;
+                for (; sc < srcC32; sc += 32)
+                {
+                    size_t j = 0;
+                    for (; j < m; ++j)
+                        Avx512bw::Copy(src + sc + j * p.srcC, dst + j * 32 + sc * 16);
+                    for (; j < 16; ++j)
+                        SetZero(dst + j * 32 + sc * 16);
+                }
+                if (srcC32 < p.srcC)
+                {
+                    size_t j = 0;
+                    for (; j < m; ++j)
+                        Avx512bw::Copy(src + sc + j * p.srcC, dst + j * 32 + sc * 16, srcMask);
+                    for (; j < 16; ++j)
+                        SetZero(dst + j * 32 + sc * 16);
+                }
+                src += p.srcC * 16;
+                dst += a.bufK * 16;
             }
         }
 
@@ -289,7 +362,7 @@ namespace Simd
                 for (; ds < dstS; ++ds)
                     Apply16b2<type>(dst + ds * dD, buf + ds * dB, bias, params, tailD);
             }
-            else if (Term16bLast32f)
+            else if (term == Term16bLast32f)
             {
                 __mmask16 tailD = TailMask16(dstC - F);
                 size_t dstS8 = AlignLo(dstS, 8), ds = 0;
@@ -961,7 +1034,23 @@ namespace Simd
                 if (_is1x1 && a.K == a.bufK)
                     _convert = NULL;
                 else
-                    _convert = Reorder16bNhwcGemm;
+                {
+                    if (_is1x1 && a.batch == 1)
+                    {
+                        _convert = Reorder16bNhwcGemm1x1R;
+                        a.reorderType = 1;
+                    }
+                    else
+                    {
+                        if (Aligned(p.srcC, 32) && a.batch == 1 && Aligned(p.dstW, a.F))
+                        {
+                            _convert = Reorder16bNhwcGemmR;
+                            a.reorderType = 1;
+                        }
+                        else
+                            _convert = Reorder16bNhwcGemmD;
+                    }
+                }
             }
             else
             {

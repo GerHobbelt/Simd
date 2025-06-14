@@ -39,38 +39,38 @@ namespace Simd
         typedef Base::SynetConvolution16bNhwcSpecV0::AlgParam AlgParam;
         typedef Base::SynetConvolution16bNhwcSpecV0::PostprocessPtr PostprocessPtr;
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
-        static void Convert16bNhwcSpecV0(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t dyBeg, size_t dyEnd, uint16_t* dst)
+        static void Convert16bNhwcSpecV0(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t dyBeg, size_t dyEnd, int end, uint16_t* dst)
         {
             assert(a.microC == DF);
             const float* src = (float*)src8;
             size_t srcCDF = Simd::AlignLo(p.srcC, DF);
             __mmask32 tailC = TailMask32(p.srcC - srcCDF);
             size_t syPad = p.kernelY - 1 - p.padY, syBeg, syEnd = (dyEnd == p.dstH ? p.srcH : dyEnd + syPad);
-            size_t cD = a.batch * a.srcH * a.srcW, sD = a.microC;
+            size_t cD = a.batch * a.srcH * a.srcW + a.padE, sD = a.microC;
             if (dyBeg == 0)
             {
-                for (size_t s = 0, n = p.padY * a.srcW; s < n; ++s)
+                for (size_t s = 0, n = a.padV * a.srcW; s < n; ++s)
                     for (size_t c = 0; c < a.srcC; c += a.microC)
                         Avx512bw::SetZero(dst + c * cD + s * sD);
-                dst += p.padY * a.srcW * sD;
+                dst += a.padV * a.srcW * sD;
                 syBeg = 0;
             }
             else
             {
                 syBeg = dyBeg + syPad;
                 src += syBeg * p.srcW * p.srcC;
-                dst += (dyBeg + p.kernelY - 1) * a.srcW * sD;
+                dst += (dyBeg + p.kernelY - 1 + a.padV - p.padY) * a.srcW * sD;
             }
             for (size_t sy = syBeg; sy < syEnd; ++sy)
             {
-                if (p.padX)
+                if (a.padH)
                 {
-                    for (size_t s = 0; s < p.padX; ++s)
+                    for (size_t s = 0; s < a.padH; ++s)
                         for (size_t c = 0; c < a.srcC; c += a.microC)
                             Avx512bw::SetZero(dst + c * cD + s * sD);
-                    dst += p.padX * sD;
+                    dst += a.padH * sD;
                 }
                 for (size_t sx = 0; sx < p.srcW; ++sx)
                 {
@@ -82,53 +82,51 @@ namespace Simd
                     src += p.srcC;
                     dst += sD;
                 }
-                if (p.padW)
-                {
-                    for (size_t s = 0; s < p.padW; ++s)
-                        for (size_t c = 0; c < a.srcC; c += a.microC)
-                            Avx512bw::SetZero(dst + c * cD + s * sD);
-                    dst += p.padW * sD;
-                }
             }
-            if (dyEnd == p.dstH)
+            if (end)
             {
-                for (size_t s = 0, n = p.padH * a.srcW; s < n; ++s)
+                for (size_t s = 0, n = a.padE; s < n; ++s)
                     for (size_t c = 0; c < a.srcC; c += a.microC)
                         Avx512bw::SetZero(dst + c * cD + s * sD);
-                dst += p.padH * a.srcW * sD;
+            }
+            else if (dyEnd != p.dstH)
+            {
+                for (size_t s = 0, n = a.padH; s < n; ++s)
+                    for (size_t c = 0; c < a.srcC; c += a.microC)
+                        Avx512bw::SetZero(dst + c * cD + s * sD);
             }
         }
 
-        static void Reorder16bNhwcSpecV0(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t dyBeg, size_t dyEnd, uint16_t* dst)
+        static void Reorder16bNhwcSpecV0(const uint8_t* src8, const ConvParam& p, const AlgParam& a, size_t dyBeg, size_t dyEnd, int end, uint16_t* dst)
         {
             assert(a.microC == DF);
             const uint16_t* src = (uint16_t*)src8;
             size_t srcCDF = Simd::AlignLo(p.srcC, DF);
             __mmask32 tailC = TailMask32(p.srcC - srcCDF);
             size_t syPad = p.kernelY - 1 - p.padY, syBeg, syEnd = (dyEnd == p.dstH ? p.srcH : dyEnd + syPad);
-            size_t cD = a.batch * a.srcH * a.srcW, sD = a.microC;
+            size_t cD = a.batch * a.srcH * a.srcW + a.padE, sD = a.microC;
             if (dyBeg == 0)
             {
-                for (size_t s = 0, n = p.padY * a.srcW; s < n; ++s)
+                for (size_t s = 0, n = a.padV * a.srcW; s < n; ++s)
                     for (size_t c = 0; c < a.srcC; c += a.microC)
                         Avx512bw::SetZero(dst + c * cD + s * sD);
-                dst += p.padY * a.srcW * sD;
+                dst += a.padV * a.srcW * sD;
                 syBeg = 0;
             }
             else
             {
                 syBeg = dyBeg + syPad;
                 src += syBeg * p.srcW * p.srcC;
-                dst += (dyBeg + p.kernelY - 1) * a.srcW * sD;
+                dst += (dyBeg + p.kernelY - 1 + a.padV - p.padY) * a.srcW * sD;
             }
             for (size_t sy = syBeg; sy < syEnd; ++sy)
             {
-                if (p.padX)
+                if (a.padH)
                 {
-                    for (size_t s = 0; s < p.padX; ++s)
+                    for (size_t s = 0; s < a.padH; ++s)
                         for (size_t c = 0; c < a.srcC; c += a.microC)
                             Avx512bw::SetZero(dst + c * cD + s * sD);
-                    dst += p.padX * sD;
+                    dst += a.padH * sD;
                 }
                 for (size_t sx = 0; sx < p.srcW; ++sx)
                 {
@@ -140,30 +138,27 @@ namespace Simd
                     src += p.srcC;
                     dst += sD;
                 }
-                if (p.padW)
-                {
-                    for (size_t s = 0; s < p.padW; ++s)
-                        for (size_t c = 0; c < a.srcC; c += a.microC)
-                            Avx512bw::SetZero(dst + c * cD + s * sD);
-                    dst += p.padW * sD;
-                }
             }
-            if (dyEnd == p.dstH)
+            if (end)
             {
-                for (size_t s = 0, n = p.padH * a.srcW; s < n; ++s)
+                for (size_t s = 0, n = a.padE; s < n; ++s)
                     for (size_t c = 0; c < a.srcC; c += a.microC)
                         Avx512bw::SetZero(dst + c * cD + s * sD);
-                dst += p.padH * a.srcW * sD;
+            }
+            else if (dyEnd != p.dstH)
+            {
+                for (size_t s = 0, n = a.padH; s < n; ++s)
+                    for (size_t c = 0; c < a.srcC; c += a.microC)
+                        Avx512bw::SetZero(dst + c * cD + s * sD);
             }
         }
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
-        static void Convolution16bNhwcSpecV0_32x32(const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcCn, size_t dstS, int zero, const uint16_t* weight0, float* dst0)
+        template<int stub> void Convolution16bNhwcSpecV0_Direct32x32(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
         {
-            int dD = (int)a.macroD, dX = (int)a.microC, dY = (int)a.srcW * dX, dC = dY * int(a.srcH * a.batch);
-            int strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
-            const uint16_t* weight1 = weight0 + a.srcC * a.K * F;
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            const uint16_t* weight1 = weight0 + a.K * F;
             const uint16_t* src1 = src0 + 16 * dX;
             float* dst1 = dst0 + 16 * dD;
 
@@ -182,10 +177,10 @@ namespace Simd
                 _tile_stream_loadd(3, dst1 + F, strideD);
             }
 
-            int n1 = (int)srcCn - 1, *offs = a.offs.data;
-            _tile_stream_loadd(4, src0, strideS);
+            int n1 = (int)nK - 1, o = offs[0];
+            _tile_stream_loadd(4, src0 + o, strideS);
             _tile_loadd(6, weight0, strideW);
-            for (int i = 0, o = 0; i < n1; ++i)
+            for (int i = 0; i < n1; ++i)
             {
                 _tile_stream_loadd(5, src1 + o, strideS);
                 _tile_loadd(7, weight1, strideW);                        
@@ -201,6 +196,246 @@ namespace Simd
             }
             _tile_loadd(7, weight1, strideW);
             _tile_stream_loadd(5, src1 + offs[n1], strideS);
+
+            _tile_dpbf16ps(0, 4, 6);
+            _tile_stored(0, dst0 + 0, strideD);
+            TileMoveToMemory(dst0 + 0, dD);
+
+            _tile_dpbf16ps(1, 4, 7);
+            _tile_stored(1, dst0 + F, strideD);
+            TileMoveToMemory(dst0 + F, dD);
+
+            _tile_dpbf16ps(2, 5, 6);
+            _tile_stored(2, dst1 + 0, strideD);
+            TileMoveToMemory(dst1 + 0, dD);
+
+            _tile_dpbf16ps(3, 5, 7);
+            _tile_stored(3, dst1 + F, strideD);
+            TileMoveToMemory(dst1 + F, dD);
+        }
+
+        template<int stub> void Convolution16bNhwcSpecV0_Direct32x16(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
+        {
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            const uint16_t* src1 = src0 + 16 * dX;
+            float* dst1 = dst0 + 16 * dD;
+
+            if (zero)
+            {
+                _tile_zero(0);
+                _tile_zero(2);
+            }
+            else
+            {
+                _tile_stream_loadd(0, dst0 + 0, strideD);
+                _tile_stream_loadd(2, dst1 + 0, strideD);
+            }
+
+            int n1 = (int)nK - 1, o = offs[0];
+            _tile_loadd(4, src0 + o, strideS);
+            for (int i = 0; i < n1; ++i)
+            {
+                _tile_stream_loadd(6, weight0, strideW);
+                _tile_loadd(5, src1 + o, strideS);
+                _tile_dpbf16ps(0, 4, 6);
+                o = offs[i + 1];
+                _tile_loadd(4, src0 + o, strideS);
+                _tile_dpbf16ps(2, 5, 6);
+                weight0 += dW;
+            }
+            _tile_stream_loadd(6, weight0, strideW);
+            _tile_loadd(5, src1 + offs[n1], strideS);
+
+            _tile_dpbf16ps(0, 4, 6);
+            _tile_stored(0, dst0 + 0, strideD);
+            TileMoveToMemory(dst0 + 0, dD);
+
+            _tile_dpbf16ps(2, 5, 6);
+            _tile_stored(2, dst1 + 0, strideD);
+            TileMoveToMemory(dst1 + 0, dD);
+        }
+
+        template<int stub> void Convolution16bNhwcSpecV0_Direct16x32(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
+        {
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            const uint16_t* weight1 = weight0 + a.K * F;
+
+            if (zero)
+            {
+                _tile_zero(0);
+                _tile_zero(1);
+            }
+            else
+            {
+                _tile_stream_loadd(0, dst0 + 0, strideD);
+                _tile_stream_loadd(1, dst0 + F, strideD);
+            }
+
+            int n1 = (int)nK - 1;
+            _tile_loadd(6, weight0, strideW);
+            for (int i = 0; i < n1; ++i)
+            {
+                _tile_stream_loadd(4, src0 + offs[i], strideS);
+                _tile_loadd(7, weight1, strideW);
+                _tile_dpbf16ps(0, 4, 6);
+                weight0 += dW;
+                _tile_loadd(6, weight0, strideW);
+                _tile_dpbf16ps(1, 4, 7);
+                weight1 += dW;
+            }
+            _tile_stream_loadd(4, src0 + offs[n1], strideS);
+            _tile_loadd(7, weight1, strideW);
+
+            _tile_dpbf16ps(0, 4, 6);
+            _tile_stored(0, dst0 + 0, strideD);
+            TileMoveToMemory(dst0 + 0, dD);
+
+            _tile_dpbf16ps(1, 4, 7);
+            _tile_stored(1, dst0 + F, strideD);
+            TileMoveToMemory(dst0 + F, dD);
+        }
+
+        template<int stub> void Convolution16bNhwcSpecV0_Direct16x16(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
+        {
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+
+            if (zero)
+            {
+                _tile_zero(0);
+            }
+            else
+            {
+                _tile_stream_loadd(0, dst0 + 0, strideD);
+            }
+
+            int n = (int)nK;
+            for (int i = 0; i < n; ++i)
+            {
+                _tile_stream_loadd(4, src0 + offs[i], strideS);
+                _tile_loadd(6, weight0, strideW);
+                _tile_dpbf16ps(0, 4, 6);
+                weight0 += dW;
+            }
+
+            _tile_stored(0, dst0 + 0, strideD);
+            TileMoveToMemory(dst0 + 0, dD);
+        }
+
+        typedef void (*Convolution16bNhwcSpecV0DirectPtr)(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offset, size_t nK, int zero, const uint16_t* weight0, float* dst0);
+
+        static void Convolution16bNhwcSpecV0_Direct(const uint16_t* src, const ConvParam& p, const AlgParam& a, const int* offs, size_t dstC, size_t dstH, size_t nK, int zero, const uint16_t* weight, float* dst)
+        {
+            size_t n1 = dstH * a.srcW - a.gapH, n = 32;
+            size_t nn = AlignLoAny(n1, n), m = n1 - nn, dW = a.K * DF;
+            size_t dD = a.macroD, dS = a.microC;
+            Convolution16bNhwcSpecV0DirectPtr body_2 = Convolution16bNhwcSpecV0_Direct32x32<0>;
+            Convolution16bNhwcSpecV0DirectPtr tail_2 = m > 16 ? Convolution16bNhwcSpecV0_Direct32x32<0> : Convolution16bNhwcSpecV0_Direct16x32<0>;
+            Convolution16bNhwcSpecV0DirectPtr body_1 = Convolution16bNhwcSpecV0_Direct32x16<0>;
+            Convolution16bNhwcSpecV0DirectPtr tail_1 = m > 16 ? Convolution16bNhwcSpecV0_Direct32x16<0> : Convolution16bNhwcSpecV0_Direct16x16<0>;
+
+            SetTileConfFull();
+            for (size_t dc = 0; dc < dstC; dc += DF)
+            {
+                size_t dC = Simd::Min(DF, dstC - dc);
+                size_t i = 0;
+                if (dC > F)
+                {
+                    for (; i < nn; i += n)
+                        body_2(src + i * dS, p, a, offs, nK, zero, weight, dst + i * dD);
+                    if (m)
+                        tail_2(src + i * dS, p, a, offs, nK, zero, weight, dst + i * dD);
+                }
+                else
+                {
+                    for (; i < nn; i += n)
+                        body_1(src + i * dS, p, a, offs, nK, zero, weight, dst + i * dD);
+                    if (m)
+                        tail_1(src + i * dS, p, a, offs, nK, zero, weight, dst + i * dD);
+                }
+                weight += dW;
+                dst += DF;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+#ifdef _MSC_VER
+        template<int hint> SIMD_INLINE void PrefetchTile(const uint16_t* ptr)
+#else
+        template<_mm_hint hint> SIMD_INLINE void PrefetchTile(const uint16_t* ptr)
+#endif
+        {
+            _mm_prefetch((const char*)(ptr + 0x0 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x1 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x2 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x3 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x4 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x5 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x6 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x7 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x8 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0x9 * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0xA * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0xB * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0xC * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0xD * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0xE * 64), hint);
+            _mm_prefetch((const char*)(ptr + 0xF * 64), hint);
+        }
+
+        template<int first> void Convolution16bNhwcSpecV0_Inverse32x32(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
+        {
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            const uint16_t* weight1 = weight0 + a.K * F;
+            const uint16_t* src1 = src0 + 16 * dX;
+            float* dst1 = dst0 + 16 * dD;
+
+            if (zero)
+            {
+                _tile_zero(0);
+                _tile_zero(1);
+                _tile_zero(2);
+                _tile_zero(3);
+            }
+            else
+            {
+                _tile_stream_loadd(0, dst0 + 0, strideD);
+                _tile_stream_loadd(1, dst0 + F, strideD);
+                _tile_stream_loadd(2, dst1 + 0, strideD);
+                _tile_stream_loadd(3, dst1 + F, strideD);
+            }
+
+            int n1 = (int)nK - 1, o = offs[0];
+            _tile_loadd(4, src0 + o, strideS);
+            if(first)
+                _tile_loadd(6, weight0, strideW);
+            else
+                _tile_stream_loadd(6, weight0, strideW);
+            for (int i = 0; i < n1; ++i)
+            {
+                _tile_loadd(5, src1 + o, strideS);
+                if (first)
+                    _tile_loadd(7, weight1, strideW);
+                else
+                    _tile_stream_loadd(7, weight1, strideW);
+                _tile_dpbf16ps(0, 4, 6);
+                _tile_dpbf16ps(1, 4, 7);
+                o = offs[i + 1];
+                _tile_loadd(4, src0 + o, strideS);
+                _tile_dpbf16ps(2, 5, 6);
+                weight0 += dW;
+                if (first)
+                    _tile_loadd(6, weight0, strideW);
+                else
+                    _tile_stream_loadd(6, weight0, strideW);
+                _tile_dpbf16ps(3, 5, 7);
+                weight1 += dW;
+            }
+            if (first)
+                _tile_loadd(7, weight1, strideW);
+            else
+                _tile_stream_loadd(7, weight1, strideW);
+            _tile_loadd(5, src1 + offs[n1], strideS);
             _tile_dpbf16ps(0, 4, 6);
             _tile_dpbf16ps(1, 4, 7);
             _tile_dpbf16ps(2, 5, 6);
@@ -216,10 +451,9 @@ namespace Simd
             TileMoveToMemory(dst1 + F, dD);
         }
 
-        static void Convolution16bNhwcSpecV0_32x16(const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcCn, size_t dstS, int zero, const uint16_t* weight0, float* dst0)
+        template<int inv> void Convolution16bNhwcSpecV0_Inverse32x16(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
         {
-            int dD = (int)a.macroD, dX = (int)a.microC, dY = (int)a.srcW * dX, dC = dY * int(a.srcH * a.batch);
-            int strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
             const uint16_t* src1 = src0 + 16 * dX;
             float* dst1 = dst0 + 16 * dD;
 
@@ -234,22 +468,43 @@ namespace Simd
                 _tile_stream_loadd(2, dst1 + 0, strideD);
             }
 
-            int n1 = (int)srcCn - 1, * offs = a.offs.data;
-            _tile_stream_loadd(4, src0, strideS);
-            for (int i = 0, o = 0; i < n1; ++i)
+            int n1 = (int)nK - 1, o = offs[0];
+            if (inv)
             {
-                _tile_loadd(6, weight0, strideW);
-                _tile_stream_loadd(5, src1 + o, strideS);
+                _tile_loadd(4, src0 + o, strideS);
+                for (int i = 0; i < n1; ++i)
+                {
+                    _tile_stream_loadd(6, weight0, strideW);
+                    _tile_loadd(5, src1 + o, strideS);
+                    _tile_dpbf16ps(0, 4, 6);
+                    o = offs[i + 1];
+                    _tile_loadd(4, src0 + o, strideS);
+                    _tile_dpbf16ps(2, 5, 6);
+                    weight0 += dW;
+                }
+                _tile_stream_loadd(6, weight0, strideW);
+                _tile_loadd(5, src1 + offs[n1], strideS);
                 _tile_dpbf16ps(0, 4, 6);
-                o = offs[i + 1];
-                _tile_stream_loadd(4, src0 + o, strideS);
                 _tile_dpbf16ps(2, 5, 6);
-                weight0 += dW;
             }
-            _tile_loadd(6, weight0, strideW);
-            _tile_stream_loadd(5, src1 + offs[n1], strideS);
-            _tile_dpbf16ps(0, 4, 6);
-            _tile_dpbf16ps(2, 5, 6);
+            else
+            {
+                _tile_stream_loadd(4, src0 + o, strideS);
+                for (int i = 0; i < n1; ++i)
+                {
+                    _tile_loadd(6, weight0, strideW);
+                    _tile_stream_loadd(5, src1 + o, strideS);
+                    _tile_dpbf16ps(0, 4, 6);
+                    o = offs[i + 1];
+                    _tile_stream_loadd(4, src0 + o, strideS);
+                    _tile_dpbf16ps(2, 5, 6);
+                    weight0 += dW;
+                }
+                _tile_loadd(6, weight0, strideW);
+                _tile_stream_loadd(5, src1 + offs[n1], strideS);
+                _tile_dpbf16ps(0, 4, 6);
+                _tile_dpbf16ps(2, 5, 6);
+            }
 
             _tile_stored(0, dst0 + 0, strideD);
             _tile_stored(2, dst1 + 0, strideD);
@@ -257,11 +512,10 @@ namespace Simd
             TileMoveToMemory(dst1 + 0, dD);
         }
 
-        static void Convolution16bNhwcSpecV0_16x32(const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcCn, size_t dstS, int zero, const uint16_t* weight0, float* dst0)
+        template<int inv> void Convolution16bNhwcSpecV0_Inverse16x32(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
         {
-            int dD = (int)a.macroD, dX = (int)a.microC, dY = (int)a.srcW * dX, dC = dY * int(a.srcH * a.batch);
-            int strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
-            const uint16_t* weight1 = weight0 + a.srcC * a.K * F;
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            const uint16_t* weight1 = weight0 + a.K * F;
 
             if (zero)
             {
@@ -274,22 +528,43 @@ namespace Simd
                 _tile_stream_loadd(1, dst0 + F, strideD);
             }
 
-            int n1 = (int)srcCn - 1, * offs = a.offs.data;
-            _tile_loadd(6, weight0, strideW);
-            for (int i = 0, o = 0; i < n1; ++i)
+            int n1 = (int)nK - 1;
+            if (inv)
             {
-                _tile_stream_loadd(4, src0 + offs[i], strideS);
+                _tile_stream_loadd(6, weight0, strideW);
+                for (int i = 0; i < n1; ++i)
+                {
+                    _tile_loadd(4, src0 + offs[i], strideS);
+                    _tile_stream_loadd(7, weight1, strideW);
+                    _tile_dpbf16ps(0, 4, 6);
+                    weight0 += dW;
+                    _tile_stream_loadd(6, weight0, strideW);
+                    _tile_dpbf16ps(1, 4, 7);
+                    weight1 += dW;
+                }
+                _tile_loadd(4, src0 + offs[n1], strideS);
+                _tile_stream_loadd(7, weight1, strideW);
+                _tile_dpbf16ps(0, 4, 6);
+                _tile_dpbf16ps(1, 4, 7);
+            }
+            else
+            {
+                _tile_loadd(6, weight0, strideW);
+                for (int i = 0; i < n1; ++i)
+                {
+                    _tile_stream_loadd(4, src0 + offs[i], strideS);
+                    _tile_loadd(7, weight1, strideW);
+                    _tile_dpbf16ps(0, 4, 6);
+                    weight0 += dW;
+                    _tile_loadd(6, weight0, strideW);
+                    _tile_dpbf16ps(1, 4, 7);
+                    weight1 += dW;
+                }
+                _tile_stream_loadd(4, src0 + offs[n1], strideS);
                 _tile_loadd(7, weight1, strideW);
                 _tile_dpbf16ps(0, 4, 6);
-                weight0 += dW;
-                _tile_loadd(6, weight0, strideW);
                 _tile_dpbf16ps(1, 4, 7);
-                weight1 += dW;
             }
-            _tile_stream_loadd(4, src0 + offs[n1], strideS);
-            _tile_loadd(7, weight1, strideW);
-            _tile_dpbf16ps(0, 4, 6);
-            _tile_dpbf16ps(1, 4, 7);
 
             _tile_stored(0, dst0 + 0, strideD);
             _tile_stored(1, dst0 + F, strideD);
@@ -297,10 +572,9 @@ namespace Simd
             TileMoveToMemory(dst0 + F, dD);
         }
 
-        static void Convolution16bNhwcSpecV0_16x16(const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcCn, size_t dstS, int zero, const uint16_t* weight0, float* dst0)
+        template<int inv> void Convolution16bNhwcSpecV0_Inverse16x16(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offs, size_t nK, int zero, const uint16_t* weight0, float* dst0)
         {
-            int dD = (int)a.macroD, dX = (int)a.microC, dY = (int)a.srcW * dX, dC = dY * int(a.srcH * a.batch);
-            int strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
+            int dD = (int)a.macroD, dX = (int)a.microC, strideS = dX * 2, dW = 512, strideW = 64, strideD = dD * 4;
 
             if (zero)
             {
@@ -311,63 +585,77 @@ namespace Simd
                 _tile_stream_loadd(0, dst0 + 0, strideD);
             }
 
-            int n = (int)srcCn, * offs = a.offs.data;
-            for (int i = 0, o = 0; i < n; ++i)
+            int n = (int)nK;
+            if (inv)
             {
-                _tile_stream_loadd(4, src0 + offs[i], strideS);
-                _tile_loadd(6, weight0, strideW);
-                _tile_dpbf16ps(0, 4, 6);
-                weight0 += dW;
+                for (int i = 0; i < n; ++i)
+                {
+                    _tile_loadd(4, src0 + offs[i], strideS);
+                    _tile_stream_loadd(6, weight0, strideW);
+                    _tile_dpbf16ps(0, 4, 6);
+                    weight0 += dW;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < n; ++i)
+                {
+                    _tile_stream_loadd(4, src0 + offs[i], strideS);
+                    _tile_loadd(6, weight0, strideW);
+                    _tile_dpbf16ps(0, 4, 6);
+                    weight0 += dW;
+                }
             }
 
             _tile_stored(0, dst0 + 0, strideD);
             TileMoveToMemory(dst0 + 0, dD);
         }
 
-        typedef void (*Convolution16bNhwcSpecV0Ptr)(const uint16_t* src0, const ConvParam& p, const AlgParam& a, size_t srcC, size_t dstS, int zero, const uint16_t* weight0, float* dst0);
+        typedef void (*Convolution16bNhwcSpecV0_InversePtr)(const uint16_t* src0, const ConvParam& p, const AlgParam& a, const int* offset, size_t nK, int zero, const uint16_t* weight0, float* dst0);
 
-        static void Convolution16bNhwcSpecV0_2(const uint16_t* src, const ConvParam& p, const AlgParam& a, size_t dstC, size_t dstH, size_t srcC, int zero, const uint16_t* weight, float* dst)
+        static void Convolution16bNhwcSpecV0_Inverse(const uint16_t* src, const ConvParam& p, const AlgParam& a, const int* offs, size_t dstC, size_t dstH, size_t nK, int zero, const uint16_t* weight, float* dst)
         {
-            size_t n1 = dstH * a.srcW + 1 - p.kernelX, n = 32;
-            size_t nn = AlignLoAny(n1, n), m = n1 - nn, dW = a.srcC * a.K * DF;
-            size_t dD = a.macroD, dS = a.microC, srcCn = DivHi(srcC, 32) * p.kernelX * p.kernelY;
-            Convolution16bNhwcSpecV0Ptr body_2 = Convolution16bNhwcSpecV0_32x32;
-            Convolution16bNhwcSpecV0Ptr tail_2 = m > 16 ? Convolution16bNhwcSpecV0_32x32 : Convolution16bNhwcSpecV0_16x32;
-            Convolution16bNhwcSpecV0Ptr body_1 = Convolution16bNhwcSpecV0_32x16;
-            Convolution16bNhwcSpecV0Ptr tail_1 = m > 16 ? Convolution16bNhwcSpecV0_32x16 : Convolution16bNhwcSpecV0_16x16;
+            size_t n1 = dstH * a.srcW - a.gapH, n = 32;
+            size_t nn = AlignLoAny(n1, n), m = n1 - nn, dW = a.K * DF;
+            size_t dstCDF = AlignLo(dstC, DF), dC = dstC - dstCDF;
+            size_t dD = a.macroD, dS = a.microC;
+            Convolution16bNhwcSpecV0_InversePtr body = Convolution16bNhwcSpecV0_Direct32x32<1>;
+            Convolution16bNhwcSpecV0_InversePtr tail = dC > 16 ? Convolution16bNhwcSpecV0_Inverse32x32<1> : Convolution16bNhwcSpecV0_Inverse32x16<1>;
 
             SetTileConfFull();
-            for (size_t dc = 0; dc < dstC; dc += DF)
+            for (size_t i = 0; i < nn; i += n)
             {
-                size_t dC = Simd::Min(DF, dstC - dc);
-                size_t i = 0;
-                if (dC > F)
+                size_t dc = 0;
+                for (; dc < dstCDF; dc += DF)
+                    body(src, p, a, offs, nK, zero, weight + a.K * dc, dst + dc);
+                if (dc < dstC)
+                    tail(src, p, a, offs, nK, zero, weight + a.K * dc, dst + dc);
+                src += n * dS;
+                dst += n * dD;
+            }
+            if (m)
+            {
+                if (m <= F)
                 {
-                    for (; i < nn; i += n)
-                        body_2(src + i * dS, p, a, srcCn, n, zero, weight, dst + i * dD);
-                    if (m)
-                        tail_2(src + i * dS, p, a, srcCn, m, zero, weight, dst + i * dD);
+                    body = Convolution16bNhwcSpecV0_Inverse16x32<1>;
+                    tail = dC > 16 ? Convolution16bNhwcSpecV0_Inverse16x32<1> : Convolution16bNhwcSpecV0_Inverse16x16<1>;
                 }
-                else
-                {
-                    for (; i < nn; i += n)
-                        body_1(src + i * dS, p, a, srcCn, n, zero, weight, dst + i * dD);
-                    if (m)
-                        tail_1(src + i * dS, p, a, srcCn, m, zero, weight, dst + i * dD);
-                }
-                weight += dW;
-                dst += DF;
+                size_t dc = 0;
+                for (; dc < dstCDF; dc += DF)
+                    body(src, p, a, offs, nK, zero, weight + a.K * dc, dst + dc);
+                if (dc < dstC)
+                    tail(src, p, a, offs, nK, zero, weight + a.K * dc, dst + dc);
             }
         }
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         template<Term16bType term, SimdConvolutionActivationType type>  void Postprocess16bNhwcSpecV0(const float* src, const ConvParam& p,
             const AlgParam& a, size_t dstC, size_t dyBeg, size_t dyEnd, const float* bias, const float* params, uint8_t* dst)
         {
             size_t dstCF = AlignLo(dstC, F);
             __mmask16 tailD = TailMask16(dstC - dstCF);
-            size_t rowGap = (p.kernelX - 1) * a.macroD;
+            size_t rowGap = a.gapH * a.macroD;
             src += dyBeg * a.srcW * a.macroD;
             dst += dyBeg * p.dstW * p.dstC * a.elem;
             for (size_t dy = dyBeg; dy < dyEnd; ++dy)
@@ -376,9 +664,9 @@ namespace Simd
                 {
                     size_t dc = 0;
                     for (; dc < dstCF; dc += F)
-                        Avx512bw::Postprocess<term, type>(src, bias, params, dc, dst);
+                        AmxBf16::Postprocess<term, type>(src, bias, params, dc, dst);
                     if (tailD)
-                        Avx512bw::Postprocess<term, type>(src, bias, params, dc, dst, tailD);
+                        AmxBf16::Postprocess<term, type>(src, bias, params, dc, dst, tailD);
                     src += a.macroD;
                     dst += p.dstC * a.elem;
                 }
@@ -394,7 +682,7 @@ namespace Simd
                 postprocess = Postprocess16bNhwcSpecV0<Term16bLast32f, type>;
         }
 
-        //-----------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         SynetConvolution16bNhwcSpecV0::SynetConvolution16bNhwcSpecV0(const ConvParam & p)
             : Avx512bw::SynetConvolution16bNhwcSpecV0(p)
@@ -404,7 +692,7 @@ namespace Simd
                 _preprocess = Reorder16bNhwcSpecV0;
             else
                 _preprocess = Convert16bNhwcSpecV0;
-            _convolution = Convolution16bNhwcSpecV0_2;
+            _convolution = _alg.inv ? Convolution16bNhwcSpecV0_Inverse : Convolution16bNhwcSpecV0_Direct;
             switch (p.activation)
             {
             case SimdConvolutionActivationIdentity: SetPostprocess<SimdConvolutionActivationRestrictRange>(p, _alg, _postprocess); break;
@@ -420,14 +708,6 @@ namespace Simd
             case SimdConvolutionActivationGelu: SetPostprocess<SimdConvolutionActivationGelu>(p, _alg, _postprocess); break;
             default: assert(0);
             }
-            AlgParam& a = _alg;
-            int kX = (int)p.kernelX, kY = (int)p.kernelY, mC = (int)a.macroC;
-            int dX = (int)a.microC, dY = (int)a.srcW * dX, dC = dY * int(a.srcH * a.batch);
-            a.offs.Resize(DivHi(mC, a.microC) * kY * kX);
-            for (size_t c = 0, offsS = 0, i = 0; c < mC; c += dX, offsS += dC)
-                for (size_t y = 0, offsY = offsS; y < kY; y += 1, offsY += dY)
-                    for (size_t offsX = offsY, endX = offsY + kX * dX; offsX < endX; offsX += dX, i++)
-                        a.offs[i] = (int)offsX;
         }
     }
 #endif

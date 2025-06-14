@@ -319,6 +319,9 @@ namespace Test
 
     TEST_ADD_GROUP_A0(Resizer);
     TEST_ADD_GROUP_0S(ResizeYuv420p);
+#ifdef SIMD_OPENCV_ENABLE
+    TEST_ADD_GROUP_0S(ResizeOpenCv);
+#endif
 
     TEST_ADD_GROUP_A0(SegmentationShrinkRegion);
     TEST_ADD_GROUP_A0(SegmentationFillSingleHoles);
@@ -410,6 +413,8 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetPoolingAverage);
     TEST_ADD_GROUP_A0(SynetPoolingMax32f);
     TEST_ADD_GROUP_A0(SynetPoolingMax8u);
+
+    TEST_ADD_GROUP_A0(SynetQuantizedConvolutionForward);
 
     TEST_ADD_GROUP_A0(SynetScaleLayerForward);
     TEST_ADD_GROUP_A0(SynetScale8iForward);

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -209,6 +209,46 @@ namespace Simd
             }
             else if (format == SimdTensorFormatNchw)
             {
+                if (kernelY == 2 && kernelX == 2 && strideY == 2 && strideX == 2 && padY == 0 && padX == 0)
+                {
+                    size_t dstH2 = srcH / 2, dstW2 = srcW / 2, dstWF = AlignLo(dstW2, F);
+                    float mainA = 0.25f, edgeA = excludePad ? 0.5f : 0.25f, cornA = excludePad ? 1.0f : 0.25f;
+                    __m128 _mainA = _mm_set1_ps(mainA);
+                    for (size_t c = 0; c < srcC; ++c)
+                    {
+                        size_t dy = 0;
+                        const float* src0 = src;
+                        for (; dy < dstH2; ++dy)
+                        {
+                            size_t dx = 0, sx = 0;
+                            const float* src1 = src0 + srcW;
+                            for (; dx < dstWF; dx += F, sx += DF)
+                            {
+                                __m128 rs0 = _mm_add_ps(_mm_loadu_ps(src0 + sx + 0), _mm_loadu_ps(src1 + sx + 0));
+                                __m128 rs1 = _mm_add_ps(_mm_loadu_ps(src0 + sx + F), _mm_loadu_ps(src1 + sx + F));
+                                _mm_storeu_ps(dst + dx, _mm_mul_ps(_mm_add_ps(_mm_shuffle_ps(rs0, rs1, 0x88), _mm_shuffle_ps(rs0, rs1, 0xDD)), _mainA));
+                            }
+                            for (; dx < dstW2; ++dx, sx += 2)
+                                dst[dx] = (src0[sx] + src0[sx + 1] + src1[sx] + src1[sx + 1]) * mainA;
+                            if (dx < dstW)
+                                dst[dx] = (src0[sx] + src1[sx]) * edgeA;
+                            src0 += srcW * 2;
+                            dst += dstW;
+                        }
+                        for (; dy < dstH; ++dy)
+                        {
+                            size_t dx = 0, sx = 0;
+                            for (; dx < dstW2; ++dx, sx += 2)
+                                dst[dx] = (src0[sx] + src0[sx + 1]) * edgeA;
+                            if (dx < dstW)
+                                dst[dx] = src0[sx] * cornA;
+                            src0 += srcW;
+                            dst += dstW;
+                        }
+                        src += srcW * srcH;
+                    }
+                    return;
+                }
             }
             Base::SynetPoolingAverage(src, srcC, srcH, srcW, kernelY, kernelX, strideY, strideX, padY, padX, dst, dstH, dstW, excludePad, format);
         }

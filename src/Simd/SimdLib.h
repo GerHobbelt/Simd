@@ -483,6 +483,8 @@ typedef enum
     SimdResizeMethodBilinearCaffe,
     /*! Bilinear Pytorch compatible method. It is relevant only for ::SimdResizeChannelFloat (32-bit float channel type).*/
     SimdResizeMethodBilinearPytorch,
+    /*! Bilinear OpenCV compatible method. It is relevant only for ::SimdResizeChannelByte (8-bit integer channel type).*/
+    SimdResizeMethodBilinearOpenCv,
     /*! Bicubic method. */
     SimdResizeMethodBicubic,
     /*! Area method. */
@@ -941,6 +943,14 @@ extern "C"
         \param [in] value - a value of 'fast' mode.
     */
     SIMD_API void SimdSetFastMode(SimdBool value);
+
+    /*! @ingroup cpu_flags
+
+        \fn void SimdSetAmxFull();
+
+        \short Set configuration of AMX registers to maximat size. It is x86 specific functionality. Affect only on CPU with AMX support.
+    */
+    SIMD_API void SimdSetAmxFull();
 
     /*! @ingroup hash
 
@@ -7494,6 +7504,84 @@ extern "C"
         \param [in] format - a format of (input/output) image tensor.
     */
     SIMD_API void SimdSynetPreluLayerForward(const float * src, const float * slope, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+
+    /*! @ingroup synet_quantized_convolution
+
+        \fn void * SimdSynetQuantizedConvolutionInit(size_t batch, const SimdConvolutionParameters* conv);
+
+        \short Initilizes Quantized convolution algorithm.
+
+        \param [in] batch - a batch size.
+        \param [in] conv - a pointer to convolution parameters.
+        \return a pointer to Quantized convolution context. On error it returns NULL. It must be released with using of function ::SimdRelease.
+            This pointer is used in functions ::SimdSynetQuantizedConvolutionExternalBufferSize, ::SimdSynetQuantizedConvolutionInternalBufferSize,
+            ::SimdSynetQuantizedConvolutionInfo, ::SimdSynetQuantizedConvolutionSetParams and ::SimdSynetQuantizedConvolutionForward.
+    */
+    SIMD_API void* SimdSynetQuantizedConvolutionInit(size_t batch, const SimdConvolutionParameters* conv);
+
+    /*! @ingroup synet_quantized_convolution
+
+        \fn size_t SimdSynetQuantizedConvolutionExternalBufferSize(const void * context);
+
+        \short Gets size in bytes of external temporary buffer required for Quantized convolution algorithm.
+
+        \param [in] context - a pointer to Quantized convolution context. It must be created by function ::SimdSynetQuantizedConvolutionInit and released by function ::SimdRelease.
+        \return size of external temporary buffer required for Quantized convolution algorithm.
+    */
+    SIMD_API size_t SimdSynetQuantizedConvolutionExternalBufferSize(const void* context);
+
+    /*! @ingroup synet_quantized_convolution
+
+        \fn size_t SimdSynetQuantizedConvolutionInternalBufferSize(const void * context);
+
+        \short Gets size of internal buffer used inside Quantized convolution algorithm.
+
+        \param [in] context - a pointer to Quantized convolution context. It must be created by function ::SimdSynetQuantizedConvolutionInit and released by function ::SimdRelease.
+        \return size of internal buffer used inside Quantized convolution algorithm.
+    */
+    SIMD_API size_t SimdSynetQuantizedConvolutionInternalBufferSize(const void* context);
+
+    /*! @ingroup synet_quantized_convolution
+
+        \fn const char* SimdSynetQuantizedConvolutionInfo(const void* context);
+
+        \short Gets description of internal implementation of Quantized convolution algorithm.
+
+        \param [in] context - a pointer to Quantized convolution context. It must be created by function ::SimdSynetQuantizedConvolutionInit and released by function ::SimdRelease.
+        \return string with description of internal implementation of Quantized convolution algorithm.
+    */
+    SIMD_API const char* SimdSynetQuantizedConvolutionInfo(const void* context);
+
+    /*! @ingroup synet_quantized_convolution
+
+        \fn void SimdSynetQuantizedConvolutionSetParams(void* context, const float * srcScale, const uint8_t* srcZero, const int8_t* weight, const float* weightScale, const int32_t* bias, const float* params, const float* dstScale, const uint8_t* dstZero);
+
+        \short Sets weights, biases, input/output parameters required for Quantized convolution algorithm.
+
+        \param [in, out] context - a pointer to Quantized convolution context. It must be created by function ::SimdSynetQuantizedConvolutionInit and released by function ::SimdRelease.
+        \param [in] srcScale - a pointer to 32-bit float point input tensor scale. 
+        \param [in] srcZero - a pointer to 8-bit unsigned integer input tensor zero.
+        \param [in] weight - a pointer to 8-bit integer convolution weight.
+        \param [in] weightScale - a pointer to 32-bit float point weight scale.
+        \param [in] bias - a pointer to 32-bit integer bias. Can be NULL.
+        \param [in] params - a pointer to 32-bit float point parameters of activation functions (see ::SimdConvolutionActivationType). Can be NULL.
+        \param [in] dstScale - a pointer to 32-bit float point output tensor scale.
+        \param [in] dstZero - a pointer to 8-bit unsigned integer output tensor zero.
+    */
+    SIMD_API void SimdSynetQuantizedConvolutionSetParams(void* context, const float * srcScale, const uint8_t* srcZero, const int8_t* weight, const float* weightScale, const int32_t* bias, const float* params, const float* dstScale, const uint8_t* dstZero);
+
+    /*! @ingroup synet_quantized_convolution
+
+        \fn void SimdSynetQuantizedConvolutionForward(void * context, const uint8_t * src, uint8_t * buf, uint8_t * dst);
+
+        \short Performs forward propagation of Quantized convolution algorithm.
+
+        \param [in] context - a pointer to Quantized convolution context. It must be created by function ::SimdSynetQuantizedConvolutionInit and released by function ::SimdRelease.
+        \param [in] src - a pointer to input tensor.
+        \param [out] buf - a pointer to external temporary buffer. The size of the external temporary buffer is determined by function ::SimdSynetQuantizedConvolutionExternalBufferSize. Can be NULL (it causes usage of internal buffer).
+        \param [out] dst - a pointer to output tensor.
+    */
+    SIMD_API void SimdSynetQuantizedConvolutionForward(void* context, const uint8_t* src, uint8_t* buf, uint8_t* dst);
 
     /*! @ingroup synet_activation
 
