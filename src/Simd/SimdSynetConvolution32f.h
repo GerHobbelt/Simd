@@ -101,7 +101,12 @@ namespace Simd
         }
 
 #if defined(SIMD_PERFORMANCE_STATISTIC) && (defined(NDEBUG) || defined(SIMD_PERF_STAT_IN_DEBUG))
-        Base::PerformanceMeasurer* Perf(const char* func);
+        Base::PerformanceMeasurer* Perf(const char* func)
+        {
+            if (_perf == NULL)
+                _perf = Simd::Base::PerformanceMeasurerStorage::s_storage.Get(func, Param().Info() + " " + Desc(), Param().Flop());
+            return _perf;
+        }
 #endif
 
         const char* Info() const
@@ -239,22 +244,21 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        class SynetConvolution32fDirectNhwc : public SynetConvolution32f
+        class SynetConvolution32fNhwcDepthwise : public SynetConvolution32f
         {
         public:
-            SynetConvolution32fDirectNhwc(const ConvParam & p);
+            SynetConvolution32fNhwcDepthwise(const ConvParam & p);
             virtual String Ext() const { return "Base"; }
-            virtual String Desc() const { return Ext() + "::DirectNhwc" + (_param.IsDepthwise() ? "-Depthwise" : "-Default"); }
+            virtual String Desc() const { return Ext() + "::NhwcDepthwise"; }
             virtual void Forward(const float * src, float * buf, float * dst);
 
             static bool Preferable(const ConvParam & p);
 
-            typedef void(*ConvolutionBiasActivationPtr)(const float * src, const ConvParam & p, const float * weight, const float * bias, const float * params, float * dst);
+            typedef void(*ConvolutionPtr)(const float * src, const ConvParam & p, const float * weight, const float * bias, const float * params, float * dst);
         protected:
-            virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation(); 
 
             size_t _batch, _sizeS, _sizeD;
-            ConvolutionBiasActivationPtr _convolutionBiasActivation;
+            ConvolutionPtr _convolution;
         };
 
         //-------------------------------------------------------------------------------------------------
@@ -383,7 +387,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv);
     }
 
 #ifdef SIMD_SSE41_ENABLE    
@@ -424,15 +428,11 @@ namespace Simd
             virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
-        class SynetConvolution32fDirectNhwc : public Base::SynetConvolution32fDirectNhwc
+        class SynetConvolution32fNhwcDepthwise : public Base::SynetConvolution32fNhwcDepthwise
         {
         public:
-            SynetConvolution32fDirectNhwc(const ConvParam& p);
+            SynetConvolution32fNhwcDepthwise(const ConvParam& p);
             virtual String Ext() const { return "Sse41"; }
-
-            static bool Preferable(const ConvParam& p);
-        protected:
-            virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
         class SynetConvolution32fDepthwiseDotProduct : public Base::SynetConvolution32fDepthwiseDotProduct
@@ -466,7 +466,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv);
     }
 #endif
 
@@ -515,13 +515,11 @@ namespace Simd
             virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
-        class SynetConvolution32fDirectNhwc : public Sse41::SynetConvolution32fDirectNhwc
+        class SynetConvolution32fNhwcDepthwise : public Sse41::SynetConvolution32fNhwcDepthwise
         {
         public:
-            SynetConvolution32fDirectNhwc(const ConvParam & p);
+            SynetConvolution32fNhwcDepthwise(const ConvParam & p);
             virtual String Ext() const { return "Avx2"; }
-        protected:
-            virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
         class SynetConvolution32fDepthwiseDotProduct : public Sse41::SynetConvolution32fDepthwiseDotProduct
@@ -553,7 +551,7 @@ namespace Simd
 
         //-----------------------------------------------------------------------------------------
 
-        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv);
     }
 #endif
 
@@ -602,13 +600,11 @@ namespace Simd
             virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
-        class SynetConvolution32fDirectNhwc : public Avx2::SynetConvolution32fDirectNhwc
+        class SynetConvolution32fNhwcDepthwise : public Avx2::SynetConvolution32fNhwcDepthwise
         {
         public:
-            SynetConvolution32fDirectNhwc(const ConvParam& p);
+            SynetConvolution32fNhwcDepthwise(const ConvParam& p);
             virtual String Ext() const { return "Avx512bw"; }
-        protected:
-            virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
         class SynetConvolution32fNhwcGroupedBlock1x2 : public Avx2::SynetConvolution32fNhwcGroupedBlock1x2
@@ -632,14 +628,7 @@ namespace Simd
 
         //-----------------------------------------------------------------------------------------
 
-        void* SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility);
-    }
-#endif
-
-#if (defined(SIMD_AMXBF16_ENABLE) || (defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_AMX_EMULATE)))
-    namespace AmxBf16
-    {
-        void* SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility);
+        void* SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters* conv);
     }
 #endif
 
@@ -687,15 +676,11 @@ namespace Simd
             virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
-        class SynetConvolution32fDirectNhwc : public Base::SynetConvolution32fDirectNhwc
+        class SynetConvolution32fNhwcDepthwise : public Base::SynetConvolution32fNhwcDepthwise
         {
         public:
-            SynetConvolution32fDirectNhwc(const ConvParam & p);
+            SynetConvolution32fNhwcDepthwise(const ConvParam & p);
             virtual String Ext() const { return "Neon"; }
-
-            static bool Preferable(const ConvParam & p);
-        protected:
-            virtual ConvolutionBiasActivationPtr SetConvolutionBiasActivation();
         };
 
         class SynetConvolution32fDepthwiseDotProduct : public Base::SynetConvolution32fDepthwiseDotProduct
@@ -723,7 +708,7 @@ namespace Simd
 
         //-----------------------------------------------------------------------------------------
 
-        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+        void * SynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv);
     }
 #endif
 }

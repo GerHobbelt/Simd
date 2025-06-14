@@ -82,9 +82,6 @@
     <ClInclude Include="..\..\src\Simd\SimdSynetConvolution32f.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Simd\SimdSynetConvolution32fBf16Common.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Simd\SimdSynetConvolution32fCommon.h">
       <Filter>Inc</Filter>
     </ClInclude>
@@ -108,12 +105,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Simd\SimdAmxBf16.h">
       <Filter>AmxBf16</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Simd\SimdSynetConvolution32fBf16.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Simd\SimdSynetMergedConvolution32fBf16.h">
-      <Filter>Inc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Simd\SimdErf.h">
       <Filter>Inc</Filter>
@@ -154,6 +145,9 @@
     <ClInclude Include="..\..\src\Simd\SimdSynetActivation.h">
       <Filter>Inc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdSynetDeconvolution16b.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="AmxBf16">
@@ -185,25 +179,7 @@
     <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution8iOutput.cpp">
       <Filter>AmxBf16</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution32fBf16.cpp">
-      <Filter>AmxBf16</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution32fBf16Input.cpp">
-      <Filter>AmxBf16</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution32fBf16Output.cpp">
-      <Filter>AmxBf16</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetConvolution32f.cpp">
-      <Filter>AmxBf16</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetConvolution32fBf16NhwcGemm.cpp">
-      <Filter>AmxBf16</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAmxBf16BFloat16.cpp">
-      <Filter>AmxBf16</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution32fBf16Depthwise.cpp">
       <Filter>AmxBf16</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAmxBf16Histogram.cpp">
@@ -246,6 +222,24 @@
       <Filter>AmxBf16</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetConvolution16bNchwGemm.cpp">
+      <Filter>AmxBf16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetDeconvolution16bNhwcGemm.cpp">
+      <Filter>AmxBf16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetDeconvolution16b.cpp">
+      <Filter>AmxBf16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAmxBf16Deinterleave.cpp">
+      <Filter>AmxBf16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution16bDepthwise7x7.cpp">
+      <Filter>AmxBf16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution16bDepthwise5x5.cpp">
+      <Filter>AmxBf16</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdAmxBf16SynetMergedConvolution16bDepthwise3x3.cpp">
       <Filter>AmxBf16</Filter>
     </ClCompile>
   </ItemGroup>

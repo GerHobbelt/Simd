@@ -37,9 +37,54 @@ namespace Simd
         Term16bSize
     };
 
+    namespace Base
+    {
+        template <Term16bType term> struct Term16b
+        {
+            template<SimdConvolutionActivationType type> static SIMD_INLINE void Save(uint8_t* ptr, float value, const float* bias, const float* params, size_t offset);
+        };
+
+        template <> struct Term16b<Term16bLast16b>
+        {
+            template<SimdConvolutionActivationType type> static SIMD_INLINE void Save(uint8_t * ptr, float value, const float* bias, const float* params, size_t offset)
+            {
+                ((uint16_t*)ptr)[offset] = Float32ToBFloat16(Activate<type>(value + bias[offset], params, offset));
+            }
+        };
+
+        template <> struct Term16b<Term16bLast32f>
+        {
+            template<SimdConvolutionActivationType type> static SIMD_INLINE void Save(uint8_t* ptr, float value, const float* bias, const float* params, size_t offset)
+            {
+                ((float*)ptr)[offset] = Activate<type>(value + bias[offset], params, offset);
+            }
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        template<Term16bType term, SimdConvolutionActivationType type> SIMD_INLINE void Save1(uint8_t* ptr, float val0, const float* bias, const float* params, size_t offset)
+        {
+            Term16b<term>::template Save<type>(ptr, val0, bias, params, offset + 0);
+        }
+    }
+
 #ifdef SIMD_SSE41_ENABLE
     namespace Sse41
     {
+        template <class T> SIMD_INLINE __m128 LoadSrc(const T* src);
+
+        template <> SIMD_INLINE __m128 LoadSrc<float>(const float* src)
+        {
+            return _mm_loadu_ps(src);
+        }
+
+        template <> SIMD_INLINE __m128 LoadSrc<uint16_t>(const uint16_t* src)
+        {
+            return  _mm_castsi128_ps(UnpackU16<0>(K_ZERO, _mm_loadl_epi64((__m128i*)src)));
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
         template <Term16bType term> struct Term16b
         {
             template<SimdConvolutionActivationType type, int index> static SIMD_INLINE void Save(uint16_t* ptr, __m128 value, const __m128* bias, const __m128* params);
@@ -334,6 +379,20 @@ namespace Simd
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
     {
+        template <class T> SIMD_INLINE __m256 LoadSrc(const T* src);
+
+        template <> SIMD_INLINE __m256 LoadSrc<float>(const float* src)
+        {
+            return _mm256_loadu_ps(src);
+        }
+
+        template <> SIMD_INLINE __m256 LoadSrc<uint16_t>(const uint16_t* src)
+        {
+            return Avx2::BFloat16ToFloat32(_mm256_cvtepu16_epi32(_mm_loadu_si128((__m128i*)src)));
+        }
+
+        //-------------------------------------------------------------------------------------------------
+        
         template <Term16bType term> struct Term16b
         {
             template<SimdConvolutionActivationType type, int index> static SIMD_INLINE void Save(uint16_t* ptr, __m256 value, const __m256* bias, const __m256* params);
@@ -638,6 +697,20 @@ namespace Simd
 #ifdef SIMD_AVX512BW_ENABLE    
     namespace Avx512bw
     {
+        template <class T> SIMD_INLINE __m512 LoadSrc(const T* src, __mmask16 tail = __mmask16(-1));
+
+        template <> SIMD_INLINE __m512 LoadSrc<float>(const float* src, __mmask16 tail)
+        {
+            return _mm512_maskz_loadu_ps(tail, src);
+        }
+
+        template <> SIMD_INLINE __m512 LoadSrc<uint16_t>(const uint16_t* src, __mmask16 tail)
+        {
+            return BFloat16ToFloat32(_mm256_maskz_loadu_epi16(tail, src));
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
         template <Term16bType term> struct Term16b
         {
             template<SimdConvolutionActivationType type, int index> static SIMD_INLINE void Save(uint16_t* ptr, __m512 value, const __m512* bias, const __m512* params, __mmask16 tail = __mmask16(-1));
@@ -804,6 +877,63 @@ namespace Simd
 #ifdef SIMD_AMXBF16_ENABLE    
     namespace AmxBf16
     {
+        template <class T> SIMD_INLINE __m512 LoadSrc(const T* src, __mmask16 mask = -1);
+
+        template <> SIMD_INLINE __m512 LoadSrc<float>(const float* src, __mmask16 mask)
+        {
+            return _mm512_maskz_loadu_ps(mask, src);
+        }
+
+        template <> SIMD_INLINE __m512 LoadSrc<uint16_t>(const uint16_t* src, __mmask16 mask)
+        {
+            return BFloat16ToFloat32(_mm256_maskz_loadu_epi16(mask, src));
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        template <Term16bType term> struct DepthwiseTerm16b
+        {
+            template<SimdConvolutionActivationType type, int index> static SIMD_INLINE void Save(uint8_t* ptr, size_t stride, __m512 value, const __m512* bias, const __m512* params, __mmask32 tail);
+        };
+
+        template <> struct DepthwiseTerm16b<Term16bLast16b>
+        {
+            template<SimdConvolutionActivationType type, int index> static SIMD_INLINE void Save(uint8_t* ptr, size_t stride, __m512 value, const __m512* bias, const __m512* params, __mmask32 tail)
+            {
+                __m512 f32 = Activate<type>(_mm512_add_ps(value, bias[index]), params, index);
+                _mm512_mask_storeu_epi16(ptr + index * stride, tail, _mm512_castsi256_si512((__m256i)_mm512_cvtneps_pbh(f32)));
+            }
+        };
+
+        template <> struct DepthwiseTerm16b<Term16bLast32f>
+        {
+            template<SimdConvolutionActivationType type, int index> static SIMD_INLINE void Save(uint8_t* ptr, size_t stride, __m512 value, const __m512* bias, const __m512* params, __mmask32 tail)
+            {
+                _mm512_mask_storeu_ps((float*)(ptr + index * stride), __mmask16(tail), Activate<type>(_mm512_add_ps(value, bias[index]), params, index));
+            }
+        };
+
+        template<Term16bType term, SimdConvolutionActivationType type> SIMD_INLINE void Save1(uint8_t* ptr, size_t stride, __m512 val0, const __m512* bias, const __m512* params, __mmask32 tail)
+        {
+            DepthwiseTerm16b<term>::template Save<type, 0>(ptr, stride, val0, bias, params, tail);
+        }
+
+        template<Term16bType term, SimdConvolutionActivationType type> SIMD_INLINE void Save2(uint8_t* ptr, size_t stride, __m512 val0, __m512 val1, const __m512* bias, const __m512* params)
+        {
+            DepthwiseTerm16b<term>::template Save<type, 0>(ptr, stride, val0, bias, params, 0xFFFF);
+            DepthwiseTerm16b<term>::template Save<type, 1>(ptr, stride, val1, bias, params, 0xFFFF);
+        }
+
+        template<Term16bType term, SimdConvolutionActivationType type> SIMD_INLINE void Save4(uint8_t* ptr, size_t stride, __m512 val0, __m512 val1, __m512 val2, __m512 val3, const __m512* bias, const __m512* params)
+        {
+            DepthwiseTerm16b<term>::template Save<type, 0>(ptr, stride, val0, bias, params, 0xFFFF);
+            DepthwiseTerm16b<term>::template Save<type, 1>(ptr, stride, val1, bias, params, 0xFFFF);
+            DepthwiseTerm16b<term>::template Save<type, 2>(ptr, stride, val2, bias, params, 0xFFFF);
+            DepthwiseTerm16b<term>::template Save<type, 3>(ptr, stride, val3, bias, params, 0xFFFF);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
         SIMD_INLINE void ConvertA(const float* src, uint16_t* dst, __mmask16 srcMask0 = __mmask16(-1), __mmask16 srcMask1 = __mmask16(-1), __mmask32 dstMask = __mmask32(-1))
         {
             __m512 s0 = _mm512_maskz_loadu_ps(srcMask0, src + 0 * 16);

@@ -4,7 +4,8 @@
 *
 * Copyright (c) 2011-2024 Yermalayeu Ihar,
 *               2014-2019 Antonenka Mikhail,
-*               2019-2019 Facundo Galan.
+*               2019-2019 Facundo Galan,
+*               2024-2024 Sergey Chezhin.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -90,6 +91,16 @@ typedef unsigned __int64  uint64_t;
 #if __cplusplus >= 201703L
 #define SIMD_CPP_2017_ENABLE
 #endif
+
+#if __cplusplus >= 202002L
+#define SIMD_CPP_2020_ENABLE
+#endif
+#endif
+
+#if defined(SIMD_CPP_2020_ENABLE)
+#define SIMD_CONSTEXPR constexpr
+#else
+#define SIMD_CONSTEXPR
 #endif
 
 #if defined(SIMD_CPP_2014_ENABLE)
@@ -259,7 +270,7 @@ typedef enum
     SimdCpuInfoAvx2, /*!< Availability of AVX, FMA, AVX2 (x86). */
     SimdCpuInfoAvx512bw, /*!< Availability of AVX-512F, AVX-512BW (x86). */
     SimdCpuInfoAvx512vnni, /*!< Availability of AVX-512VNNI (x86). */
-    SimdCpuInfoAmxBf16, /*!< Availability of AMX-BF16, AMX-INT8 (x86). */
+    SimdCpuInfoAmxBf16, /*!< Availability of AVX-512VBMI, AVX-512FP16, AMX-BF16, AMX-INT8 (x86). */
     SimdCpuInfoNeon, /*!< Availability of NEON (ARM). */
     SimdCpuInfoCurrentFrequency, /*!< Gets CPU current frequency (for current CPU core). */
 } SimdCpuInfoType;
@@ -448,6 +459,9 @@ typedef enum
     SimdResizeChannelShort,
     /*! 32-bit float channel type.  */
     SimdResizeChannelFloat,
+    /*! 16-bit BFloat16 (Brain Floating Point) channel type.  */
+    SimdResizeChannelBf16,
+
 } SimdResizeChannelType;
 
 /*! @ingroup resizing
@@ -728,7 +742,7 @@ typedef struct SimdConvolutionParameters
 #ifdef __cplusplus
 extern "C"
 {
-#endif//__cplusplus
+#endif
 
     /*! @ingroup info
 
@@ -6077,18 +6091,17 @@ extern "C"
 
     /*! @ingroup synet_convolution_fp32
 
-        \fn void * SimdSynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+        \fn void * SimdSynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv);
 
         \short Initilizes FP32 convolution algorithm.
 
         \param [in] batch - a batch size.
         \param [in] conv - a pointer to convolution parameters.
-        \param [in] compatibility - a flags of calculation compatibility.
         \return a pointer to FP32 convolution context. On error it returns NULL. It must be released with using of function ::SimdRelease.
             This pointer is used in functions ::SimdSynetConvolution32fExternalBufferSize, ::SimdSynetConvolution32fInternalBufferSize, 
             ::SimdSynetConvolution32fInfo, ::SimdSynetConvolution32fSetParams and ::SimdSynetConvolution32fForward.
     */
-    SIMD_API void * SimdSynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+    SIMD_API void * SimdSynetConvolution32fInit(size_t batch, const SimdConvolutionParameters * conv);
 
     /*! @ingroup synet_convolution_fp32
 
@@ -6373,6 +6386,80 @@ extern "C"
         \param [out] dst - a pointer to output tensor.
     */
     SIMD_API void SimdSynetDeconvolution32fForward(void * context, const float * src, float * buf, float * dst);
+
+    /*! @ingroup synet_deconvolution_bf16
+
+    \fn void * SimdSynetDeconvolution16bInit(size_t batch, const SimdConvolutionParameters * conv, SimdSynetCompatibilityType compatibility);
+
+    \short Initilizes BF16 deconvolution algorithm.
+
+    \param [in] batch - a batch size.
+    \param [in] conv - a pointer to deconvolution parameters.
+    \param [in] compatibility - a flags of calculation compatibility.
+    \return a pointer to BF16 convolution context. On error it returns NULL. It must be released with using of function ::SimdRelease.
+        This pointer is used in functions ::SimdSynetDeconvolution16bExternalBufferSize, ::SimdSynetDeconvolution16bInternalBufferSize,
+        ::SimdSynetDeconvolution16bInfo, ::SimdSynetDeconvolution16bSetParams and ::SimdSynetDeconvolution16bForward.
+*/
+    SIMD_API void* SimdSynetDeconvolution16bInit(size_t batch, const SimdConvolutionParameters* conv, SimdSynetCompatibilityType compatibility);
+
+    /*! @ingroup synet_deconvolution_bf16
+
+        \fn size_t SimdSynetDeconvolution16bExternalBufferSize(const void * context);
+
+        \short Gets size in bytes of external temporary buffer required for BF16 deconvolution algorithm.
+
+        \param [in] context - a pointer to BF16 deconvolution context. It must be created by function ::SimdSynetDeconvolution16bInit and released by function ::SimdRelease.
+        \return size of external temporary buffer required for BF16 convolution algorithm.
+    */
+    SIMD_API size_t SimdSynetDeconvolution16bExternalBufferSize(const void* context);
+
+    /*! @ingroup synet_deconvolution_bf16
+
+        \fn size_t SimdSynetDeconvolution16bInternalBufferSize(const void * context);
+
+        \short Gets size (in bytes) of internal buffer used inside BF16 deconvolution algorithm.
+
+        \param [in] context - a pointer to BF16 deconvolution context. It must be created by function ::SimdSynetDeconvolution16bInit and released by function ::SimdRelease.
+        \return size of internal buffer used inside BF16 convolution algorithm.
+    */
+    SIMD_API size_t SimdSynetDeconvolution16bInternalBufferSize(const void* context);
+
+    /*! @ingroup synet_deconvolution_bf16
+
+        \fn const char* SimdSynetDeconvolution16bInfo(const void* context);
+
+        \short Gets description of internal implementation of BF16 deconvolution algorithm.
+
+        \param [in] context - a pointer to BF16 deconvolution context. It must be created by function ::SimdSynetDeconvolution16bInit and released by function ::SimdRelease.
+        \return string with description of internal implementation of BF16 convolution algorithm.
+    */
+    SIMD_API const char* SimdSynetDeconvolution16bInfo(const void* context);
+
+    /*! @ingroup synet_deconvolution_bf16
+
+        \fn void SimdSynetDeconvolution16bSetParams(void * context, const float * weight, const float * bias, const float * params, const float * const * stats);
+
+        \short Sets weights, biases, parameters of activation function, input/output tensor statistics required for BF16 deconvolution algorithm.
+
+        \param [in, out] context - a pointer to BF16 deconvolution context. It must be created by function ::SimdSynetDeconvolution16bInit and released by function ::SimdRelease.
+        \param [in] weight - a pointer to original (32-bit float point) convolution weights.
+        \param [in] bias - a pointer to original (32-bit float point) bias. Can be NULL.
+        \param [in] params - a pointer to original (32-bit float point) parameters of activation functions (see ::SimdDeconvolutionActivationType). Can be NULL.
+    */
+    SIMD_API void SimdSynetDeconvolution16bSetParams(void* context, const float* weight, const float* bias, const float* params);
+
+    /*! @ingroup synet_deconvolution_bf16
+
+        \fn void SimdSynetDeconvolution16bForward(void * context, const uint8_t * src, uint8_t * buf, uint8_t * dst);
+
+        \short Performs forward propagation of BF16 deconvolution algorithm.
+
+        \param [in] context - a pointer to BF16 deconvolution context. It must be created by function ::SimdSynetDeconvolution16bInit and released by function ::SimdRelease.
+        \param [in] src - a pointer to input tensor.
+        \param [out] buf - a pointer to external temporary buffer. The size of the external temporary buffer is determined by function ::SimdSynetDeconvolution16bExternalBufferSize. Can be NULL (it causes usage of internal buffer).
+        \param [out] dst - a pointer to output tensor.
+    */
+    SIMD_API void SimdSynetDeconvolution16bForward(void* context, const uint8_t* src, uint8_t* buf, uint8_t* dst);
 
     /*! @ingroup synet_other
 
@@ -6802,21 +6889,19 @@ extern "C"
 
     /*! @ingroup synet_merged_convolution_fp32
 
-        \fn void * SimdSynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+        \fn void * SimdSynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add);
 
         \short Initilizes FP32 merged convolution algorithm.
 
         \param [in] batch - a batch size.
         \param [in] convs - an array with convolutions parameters.
         \param [in] count - a number of merged convolutions.
-        \param [in] add - a flag that signilizes if we need to add output to source value.
-        \param [in] compatibility - a flags of calculation compatibility.
+        \param [in] add - a flag that signilizes if we need to add source to output value.
         \return a pointer to FP32 merged convolution context. On error it returns NULL. It must be released with using of function ::SimdRelease.
             This pointer is used in functions ::SimdSynetMergedConvolution32fExternalBufferSize, ::SimdSynetMergedConvolution32fInternalBufferSize, 
             ::SimdSynetMergedConvolution32fInfo, ::SimdSynetMergedConvolution32fSetParams and ::SimdSynetMergedConvolution32fForward.
     */
-    SIMD_API void * SimdSynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, 
-        size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+    SIMD_API void * SimdSynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add);
 
     /*! @ingroup synet_merged_convolution_fp32
 
@@ -6880,19 +6965,19 @@ extern "C"
 
     /*! @ingroup synet_merged_convolution_bf16
 
-        \fn void * SimdSynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
+        \fn void * SimdSynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
 
         \short Initilizes BF16 merged convolution algorithm.
 
         \param [in] batch - a batch size.
         \param [in] convs - an array with convolutions parameters.
         \param [in] count - a number of merged convolutions.
-        \param [in] compatibility - a flags of calculation compatibility.
+        \param [in] add - a flag that signilizes if we need to add source to output value.
         \return a pointer to BF16 merged convolution context. On error it returns NULL. It must be released with using of function ::SimdRelease.
             This pointer is used in functions ::SimdSynetMergedConvolution16bExternalBufferSize, ::SimdSynetMergedConvolution16bInternalBufferSize, 
             ::SimdSynetMergedConvolution16bInfo, ::SimdSynetMergedConvolution16bSetParams and ::SimdSynetMergedConvolution16bForward.
     */
-    SIMD_API void* SimdSynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdSynetCompatibilityType compatibility);
+    SIMD_API void* SimdSynetMergedConvolution16bInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
 
     /*! @ingroup synet_merged_convolution_bf16
 
@@ -6929,17 +7014,16 @@ extern "C"
 
     /*! @ingroup synet_merged_convolution_bf16
 
-        \fn void SimdSynetMergedConvolution16bSetParams(void* context, const float* const* weight, SimdBool* internal, const float* const* bias, const float* const* params, const float* const* stats);
+        \fn void SimdSynetMergedConvolution16bSetParams(void* context, const float* const* weight, const float* const* bias, const float* const* params);
 
         \short Sets weights, beases and parameters of activation function required for BF16 merged convolution algorithm.
 
         \param [in, out] context - a pointer to BF16 merged convolution context. It must be created by function ::SimdSynetMergedConvolution16bInit and released by function ::SimdRelease.
         \param [in] weight - a pointer to the array with pointers to convolution weights. The array size is determined by number of merged convolutions.
-        \param [out] internal - a ponter to the array of flags signalized that weights are stored in the internal buffer. The array size is determined by number of merged convolutions. Can be NULL.
         \param [in] bias - a pointer to the array with pointers to bias. The array size is determined by number of merged convolutions. Can be NULL.
         \param [in] params - a pointer to the array with pointers to parameters of the activation functions (see ::SimdConvolutionActivationType). The array size is determined by number of merged convolutions. Can be NULL.
     */
-    SIMD_API void SimdSynetMergedConvolution16bSetParams(void* context, const float* const* weight, SimdBool* internal, const float* const* bias, const float* const* params);
+    SIMD_API void SimdSynetMergedConvolution16bSetParams(void* context, const float* const* weight, const float* const* bias, const float* const* params);
 
     /*! @ingroup synet_merged_convolution_bf16
 
@@ -7297,7 +7381,7 @@ extern "C"
         \param [in] kernelC - a channel size of the pooling kernel in 3D case. In 2D case it must be equal to 1.
         \param [in] kernelY - a height of the pooling kernel.
         \param [in] kernelX - a width of the pooling kernel.
-        \param [in] strideC - a ñ-stride of the pooling in 3D case. In 2D case it must be equal to 1.
+        \param [in] strideC - a �-stride of the pooling in 3D case. In 2D case it must be equal to 1.
         \param [in] strideY - a y-stride of the pooling.
         \param [in] strideX - a x-stride of the pooling.
         \param [in] padC - a channel pad to the begin of the input image.
@@ -7529,8 +7613,11 @@ extern "C"
         upper[c] = (1 - mean[c]) / std[c];
         lower[c] = - mean[c] / std[c];
         \endverbatim
-
-        \note This function has a C++ wrappers: Simd::SynetSetInput(const View<A> & src, const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType format).
+        Also this algorithm assumes that channel order of output tensor is BGR. 
+        In case of RGB channel order you need to change parameter srcFormat: ::SimdPixelFormatBgr24 <-> ::SimdPixelFormatRgb24, ::SimdPixelFormatBgra32 <-> ::SimdPixelFormatRgba32. 
+        Note that real format of pixel data of input image is not need to change.
+        
+        \note This function has a C++ wrappers: Simd::SynetSetInput(const View<A> & src, const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType format, bool isRgb = false).
 
         \param [in] src - a pointer to pixels data of input image.
         \param [in] width - a width of input image and output image tensor.
@@ -7669,6 +7756,33 @@ extern "C"
         \param [out] dst - a pointer to output 32-bit float array.
     */
     SIMD_API void SimdSynetTanh32f(const float* src, size_t size, const float* slope, float* dst);
+
+    /*! @ingroup synet_other
+
+        \fn void SimdSynetTiledScale2D32f(const float* src, size_t channels, size_t height, size_t width, SimdTensorFormatType format, const float* ver, const float* hor, float* dst);
+
+        \short This function is used for forward propagation of TiledScale2DLayer for FP32 tensor type.
+
+        Algorithm's details (example for NCHW tensor format):
+        \verbatim
+        for(c = 0; c < channels; ++c)
+            for(h = 0; h < height; ++h)
+                for(w = 0; w < width; ++w)
+                    dst[(c*height + h)*width + w] = src[(c*height + h)*width + w] * hor[c*height + h] * ver[c*width + w];
+        \endverbatim
+
+        \note This function is used in <a href="http://github.com/ermig1979/Synet">Synet Framework</a>.
+
+        \param [in] src - a pointer to the 32-bit float array with input image tensor. The size of the array is equal to channels * height * width.
+        \param [in] channels - a number of channels in the (input/output) image tensor.
+        \param [in] height - a height of (input/output) image tensor.
+        \param [in] width - a width of (input/output) image tensor.
+        \param [in] format - a format of (input/output) image tensor.
+        \param [in] ver - a pointer to the 32-bit float array with vertical scale coefficients. The size of the array is equal to channels * width.
+        \param [in] hor - a pointer to the 32-bit float array with horisontal scale coefficients. The size of the array is equal to channels. * height.
+        \param [out] dst - a pointer to the 32-bit float array with output image tensor. The size of the array is equal to channels * height * width. Input and output image tensors can be the same.
+    */
+    SIMD_API void SimdSynetTiledScale2D32f(const float* src, size_t channels, size_t height, size_t width, SimdTensorFormatType format, const float* ver, const float* hor, float* dst);
 
     /*! @ingroup synet_other
 
@@ -8750,6 +8864,32 @@ extern "C"
 
     /*! @ingroup yuv_conversion
 
+        \fn void void SimdYuv444pToRgbaV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride, size_t width, size_t height, uint8_t* rgba, size_t rgbaStride, uint8_t alpha, SimdYuvType yuvType);
+
+        \short Converts YUV444P image to 32-bit RGBA image.
+
+        The input Y, U, V and output RGBA images must have the same width and height.
+
+        \note This function has a C++ wrappers: Simd::Yuv444pToRgba(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgba, uint8_t alpha, SimdYuvType yuvType = SimdYuvBt601);
+
+        \param [in] y - a pointer to pixels data of input 8-bit image with Y color plane.
+        \param [in] yStride - a row size of the y image.
+        \param [in] u - a pointer to pixels data of input 8-bit image with U color plane.
+        \param [in] uStride - a row size of the u image.
+        \param [in] v - a pointer to pixels data of input 8-bit image with V color plane.
+        \param [in] vStride - a row size of the v image.
+        \param [in] width - an image width.
+        \param [in] height - an image height.
+        \param [out] rgba - a pointer to pixels data of output 32-bit RGBA image.
+        \param [in] rgbaStride - a row size of the rgba image.
+        \param [in] alpha - a value of alpha channel.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType).
+    */
+    SIMD_API void SimdYuv444pToRgbaV2(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride,
+        size_t width, size_t height, uint8_t* rgba, size_t rgbaStride, uint8_t alpha, SimdYuvType yuvType);
+
+    /*! @ingroup yuv_conversion
+
         \fn void SimdYuv420pToUyvy422(const uint8_t* y, size_t yStride, const uint8_t* u, size_t uStride, const uint8_t* v, size_t vStride, size_t width, size_t height, uint8_t* uyvy, size_t uyvyStride);
 
         \short Converts YUV420P to 16-bit UYVY422 image.
@@ -8774,6 +8914,6 @@ extern "C"
         size_t width, size_t height, uint8_t* uyvy, size_t uyvyStride);
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif
 
-#endif//__SimdLib_h__
+#endif

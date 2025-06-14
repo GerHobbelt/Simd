@@ -180,19 +180,25 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add);
     }
 
 #ifdef SIMD_SSE41_ENABLE    
     namespace Sse41
     {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        void SetDepthwise(const ConvParam& p, bool last, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        //-------------------------------------------------------------------------------------------------
+
         class SynetMergedConvolution32fCdc : public Base::SynetMergedConvolution32fCdc
         {
         public:
             SynetMergedConvolution32fCdc(const MergConvParam& p);
             virtual String Ext() const { return "Sse41"; }
-
-            static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         class SynetMergedConvolution32fCd : public Base::SynetMergedConvolution32fCd
@@ -200,8 +206,6 @@ namespace Simd
         public:
             SynetMergedConvolution32fCd(const MergConvParam& p);
             virtual String Ext() const { return "Sse41"; }
-
-            static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         class SynetMergedConvolution32fDc : public Base::SynetMergedConvolution32fDc
@@ -209,26 +213,30 @@ namespace Simd
         public:
             SynetMergedConvolution32fDc(const MergConvParam& p);
             virtual String Ext() const { return "Sse41"; }
-
-            static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         //-------------------------------------------------------------------------------------------------
 
-        void* SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+        void* SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
     }
 #endif
 
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
     {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        void SetDepthwise(const ConvParam& p, bool last, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        //-------------------------------------------------------------------------------------------------
+
         class SynetMergedConvolution32fCdc : public Sse41::SynetMergedConvolution32fCdc
         {
         public:
             SynetMergedConvolution32fCdc(const MergConvParam& p);
             virtual String Ext() const { return "Avx2"; }
-
-            static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         class SynetMergedConvolution32fCd : public Sse41::SynetMergedConvolution32fCd
@@ -236,8 +244,6 @@ namespace Simd
         public:
             SynetMergedConvolution32fCd(const MergConvParam& p);
             virtual String Ext() const { return "Avx2"; }
-
-            static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         class SynetMergedConvolution32fDc : public Sse41::SynetMergedConvolution32fDc
@@ -245,19 +251,25 @@ namespace Simd
         public:
             SynetMergedConvolution32fDc(const MergConvParam& p);
             virtual String Ext() const { return "Avx2"; }
-
-            static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
         //-------------------------------------------------------------------------------------------------
 
-        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add);
     }
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE    
     namespace Avx512bw
     {
+        void SetInput(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        void SetDepthwise(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        void SetOutput(const ConvParam& p, Base::SynetMergedConvolution32f::ConvolutionPtr* convolution);
+
+        //-------------------------------------------------------------------------------------------------
+
         class SynetMergedConvolution32fCdc : public Avx2::SynetMergedConvolution32fCdc
         {
         public:
@@ -287,7 +299,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        void* SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+        void* SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
     }
 #endif
 
@@ -321,7 +333,7 @@ namespace Simd
             static void Set(const MergConvParam& p, size_t t, size_t i, SynetMergedConvolution32f::ConvolutionPtr* c);
         };
 
-        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility);
+        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add);
     }
 #endif
 }

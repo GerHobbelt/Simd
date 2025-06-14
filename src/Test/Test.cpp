@@ -349,6 +349,7 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetEltwiseLayerForward);
     TEST_ADD_GROUP_A0(SynetLrnLayerCrossChannels);
     TEST_ADD_GROUP_A0(SynetShuffleLayerForward);
+    TEST_ADD_GROUP_A0(SynetTiledScale2D32f);
 
     TEST_ADD_GROUP_A0(SynetElu32f);
     TEST_ADD_GROUP_A0(SynetGelu32f);
@@ -375,6 +376,8 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetConvolution32fForward);
 
     TEST_ADD_GROUP_A0(SynetDeconvolution32fForward);
+
+    TEST_ADD_GROUP_A0(SynetDeconvolution16bForward);
 
     TEST_ADD_GROUP_A0(SynetGridSample2d);
 
@@ -473,6 +476,7 @@ namespace Test
     TEST_ADD_GROUP_A0(Yuv444pToBgraV2);
     TEST_ADD_GROUP_A0(Yuv422pToBgraV2);
     TEST_ADD_GROUP_A0(Yuv420pToBgraV2);
+    TEST_ADD_GROUP_A0(Yuv444pToRgbaV2);
 
     //-------------------------------------------------------------------------------------------------
 

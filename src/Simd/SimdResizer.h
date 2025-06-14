@@ -71,6 +71,12 @@ namespace Simd
                 (method == SimdResizeMethodBilinear || method == SimdResizeMethodBilinearCaffe || method == SimdResizeMethodBilinearPytorch);
         }
 
+        bool IsBf16Bilinear() const
+        {
+            return type == SimdResizeChannelBf16 &&
+                (method == SimdResizeMethodBilinear || method == SimdResizeMethodBilinearCaffe || method == SimdResizeMethodBilinearPytorch);
+        }
+
         bool IsByteBicubic() const
         {
             return type == SimdResizeChannelByte && method == SimdResizeMethodBicubic;
@@ -90,7 +96,7 @@ namespace Simd
 
         size_t ChannelSize() const
         {
-            static const size_t sizes[3] = { 1, 2, 4 };
+            static const size_t sizes[4] = { 1, 2, 4, 2 };
             return sizes[(int)type];
         }
 
@@ -180,14 +186,29 @@ namespace Simd
             Array32i _ix, _iy;
             Array32f _ax, _ay, _bx[2];
 
-            void EstimateIndexAlpha(size_t srcSize, size_t dstSize, size_t channels, int32_t * indices, float * alphas);
-
             virtual void Run(const float * src, size_t srcStride, float * dst, size_t dstStride);
 
         public:
             ResizerFloatBilinear(const ResParam & param);
 
             virtual void Run(const uint8_t * src, size_t srcStride, uint8_t * dst, size_t dstStride);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerBf16Bilinear : public Resizer
+        {
+        protected:
+            bool _rowBuf;
+            Array32i _ix, _iy;
+            Array32f _ax, _ay, _bx[2];
+
+            virtual void Run(const uint16_t* src, size_t srcStride, uint16_t* dst, size_t dstStride);
+
+        public:
+            ResizerBf16Bilinear(const ResParam& param);
+
+            virtual void Run(const uint8_t* src, size_t srcStride, uint8_t* dst, size_t dstStride);
         };
 
         //-------------------------------------------------------------------------------------------------
@@ -329,6 +350,15 @@ namespace Simd
             virtual void Run(const float* src, size_t srcStride, float* dst, size_t dstStride);
         public:
             ResizerFloatBilinear(const ResParam& param);
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class ResizerBf16Bilinear : public Base::ResizerBf16Bilinear
+        {
+            virtual void Run(const uint16_t* src, size_t srcStride, uint16_t* dst, size_t dstStride);
+        public:
+            ResizerBf16Bilinear(const ResParam& param);
         };
         
         //-------------------------------------------------------------------------------------------------

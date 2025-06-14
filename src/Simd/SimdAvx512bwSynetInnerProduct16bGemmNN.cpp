@@ -67,7 +67,7 @@ namespace Simd
 
         //-----------------------------------------------------------------------------------------
 
-        static void InnerProduct16bGemmNN_ReorderA(const uint8_t* src8, const InnerProductParam16b& p, const AlgParam& a, size_t M, size_t K, uint16_t* dst)
+        void InnerProduct16bGemmNN_ReorderA(const uint8_t* src8, const InnerProductParam16b& p, const AlgParam& a, size_t M, size_t K, uint16_t* dst)
         {
             const uint16_t* src = (uint16_t*)src8;
             size_t KDF = Simd::AlignLo(p.K, DF);
@@ -558,10 +558,8 @@ namespace Simd
                     {
                         a0 = _mm512_and_ps(_mm512_set1_ps(*(float*)(A3 + k0 - 1)), m);
                         c30 = _mm512_fmadd_ps(a0, b00, c30);
-                        c31 = _mm512_fmadd_ps(a0, b10, c31);
                         a0 = _mm512_and_ps(_mm512_set1_ps(*(float*)(A3 + k0 - 0)), m);
                         c30 = _mm512_fmadd_ps(a0, b01, c30);
-                        c31 = _mm512_fmadd_ps(a0, b11, c31);
                     }
                     if (M > 0x4)
                     {

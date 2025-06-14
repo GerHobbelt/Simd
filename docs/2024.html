@@ -35,7 +35,111 @@
 
 <a href="#HOME">Home</a>
 <hr/>
-<h3 id="R140">August 1, 2024 (version X.X.140)</h3>
+<h3 id="R144">December 2, 2024 (version 6.1.144)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>SSE4.1, AVX2 optimizations of function Yuv444pToRgbaV2.</li>
+ <li>SSE4.1 optimizations of class ImageJpegLoader.</li>
+ <li>isRgb parameter of function Simd::SynetSetInput.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetConvolution16bNhwcGemm.</li>
+</ul>
+
+<h4>Python wrapper</h4>
+<h5>New features</h5>
+<ul>
+ <li>isRgb parameter of function Simd.SynetSetInput.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R143">November 4, 2024 (version 6.1.143)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of class SynetConvolution16bNhwcDepthwise.</li>
+ <li>AVX-512BW kernel Convolution32fNhwcDepthwise_k7p3d1s1w4 for class SynetConvolution32fNhwcDepthwise.</li>
+ <li>AMX-BF16 kernel DepthwiseConvolution_k7p3d1s1w4 for class SynetMergedConvolution16b.</li>
+ <li>AVX-512BW kernel Convolution32fNhwcDepthwise_k7p3d1s1w6 for class SynetConvolution32fNhwcDepthwise.</li>
+ <li>AVX-512BW kernel Convolution32fNhwcDepthwise_k7p3d1s1w8 for class SynetConvolution32fNhwcDepthwise.</li>
+ <li>AMX-BF16 kernel DepthwiseConvolution_k7p3d1s1w6 for class SynetMergedConvolution16b.</li>
+ <li>AMX-BF16 kernel DepthwiseConvolution_k7p3d1s1w8 for class SynetMergedConvolution16b.</li>
+ <li>AVX-512BW kernel Convolution32fNhwcDepthwise_k7p3d1s1w4 for framework SynetMergedConvolution32f.</li>
+ <li>AVX-512BW kernel Convolution32fNhwcDepthwise_k7p3d1s1w6 for framework SynetMergedConvolution32f.</li>
+ <li>AVX-512BW kernel Convolution32fNhwcDepthwise_k7p3d1s1w8 for framework SynetMergedConvolution32f.</li>
+ <li>AMX-BF16 kernel DepthwiseConvolution_k5p2d1s1w8 for class SynetMergedConvolution16b.</li>
+ <li>Base implementation of function Yuv444pToRgbaV2.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>AVX-512BW optimizations of function Convolution32fNhwcDepthwiseDefault.</li>
+ <li>AMX-BF16 optimizations of function DepthwiseConvolutionLargePad.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in Base implementation of class SynetDeconvolution16bNhwcGemm.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of function SimdYuv444pToRgbaV2.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R142">October 1, 2024 (version 6.1.142)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation of class SynetDeconvolution16bGemm.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetDeconvolution16bNhwcGemm.</li>
+ <li>AMX-BF16 (AVX-512VBMI) optimizations of function DeinterleaveUv.</li>
+ <li>AMX-BF16 (AVX-512VBMI) optimizations of function DeinterleaveBgr.</li>
+ <li>AMX-BF16 (AVX-512VBMI) optimizations of function DeinterleaveBgra.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>AVX-512BW optimizations of function ConvolutionDirectNhwcConvolutionBiasActivationDepthwise.</li>
+</ul>
+<h5>Removing</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetConvolution32fBf16NhwcGemm.</li>
+ <li>Base implementation of class SynetConvolution32fBf16Gemm.</li>
+ <li>Parameter 'compatibility' from function SynetConvolution32fInit.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetMergedConvolution32fBf16Cdc.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetMergedConvolution32fBf16Cd.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetMergedConvolution32fBf16Dc.</li>
+ <li>Base implementation of class SynetMergedConvolution32fBf16.</li>
+ <li>Parameter 'compatibility' from function SynetMergedConvolution32fInit.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of SynetDeconvolution16b framework.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R141">September 2, 2024 (version 6.1.141)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Support of BFloat16 in Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of class ResizerNearest.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Compiler warning in function Simd::LitterCpuCache.</li>
+ <li>Error in AVX-512BW optimizations of class SynetInnerProduct16bGemmNN.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<hr/>
+<h3 id="R140">August 19, 2024 (version 6.1.140)</h3>
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>

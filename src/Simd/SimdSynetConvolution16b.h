@@ -140,7 +140,7 @@ namespace Simd
                 size_t batch, K, M;
                 size_t F, microD, microM, microK;
                 size_t macroD, macroH, macroK;
-                size_t bufD, bufM, bufK, elem;
+                size_t bufD, bufM, bufK, elem, dB;
                 int reorderType, sumBuf;
             };
 
@@ -196,6 +196,29 @@ namespace Simd
             PreprocessPtr _preprocess;
             ConvolutionPtr _convolution;
             PostprocessPtr _postprocess;
+        };
+
+        //-------------------------------------------------------------------------------------------------
+
+        class SynetConvolution16bNhwcDepthwise : public SynetConvolution16b
+        {
+        public:
+            SynetConvolution16bNhwcDepthwise(const ConvParam& p);
+            virtual String Ext() const { return "Base"; }
+            virtual String Desc() const;
+            virtual size_t InternalBufferSize() const;
+            virtual void SetParams(const float* weight, const float* bias, const float* params);
+
+            virtual void Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst);
+
+            static bool Preferable(const ConvParam& p);
+
+            typedef void(*ConvolutionPtr)(const uint8_t* src, const ConvParam& p, const float* weight, const float* bias, const float* params, uint8_t* dst);
+
+        protected:
+            size_t _sizeS, _sizeD;
+            Array32f _weight;
+            ConvolutionPtr _convolution;
         };
 
         //-------------------------------------------------------------------------------------------------
@@ -260,6 +283,14 @@ namespace Simd
             virtual String Ext() const { return "Sse41"; }
         };
 
+        class SynetConvolution16bNhwcDepthwise : public Base::SynetConvolution16bNhwcDepthwise
+        {
+        public:
+            SynetConvolution16bNhwcDepthwise(const ConvParam& p);
+
+            virtual String Ext() const { return "Sse41"; }
+        };
+
         class SynetConvolution16bNchwGemm : public Base::SynetConvolution16bNchwGemm
         {
         public:
@@ -293,6 +324,14 @@ namespace Simd
             virtual String Ext() const { return "Avx2"; }
         };
 
+        class SynetConvolution16bNhwcDepthwise : public Sse41::SynetConvolution16bNhwcDepthwise
+        {
+        public:
+            SynetConvolution16bNhwcDepthwise(const ConvParam& p);
+
+            virtual String Ext() const { return "Avx2"; }
+        };
+
         class SynetConvolution16bNchwGemm : public Sse41::SynetConvolution16bNchwGemm
         {
         public:
@@ -322,6 +361,15 @@ namespace Simd
         {
         public:
             SynetConvolution16bNhwcDirect(const ConvParam& p);
+
+            virtual String Ext() const { return "Avx512bw"; }
+        };
+
+
+        class SynetConvolution16bNhwcDepthwise : public Avx2::SynetConvolution16bNhwcDepthwise
+        {
+        public:
+            SynetConvolution16bNhwcDepthwise(const ConvParam& p);
 
             virtual String Ext() const { return "Avx512bw"; }
         };

@@ -58,7 +58,7 @@ namespace Simd
         os << ", L3: " << SimdCpuInfo(SimdCpuInfoCacheL3) / 1024 << " KB";
         os << ", RAM: " << SimdCpuInfo(SimdCpuInfoRam) / 1024 / 1024 << " MB";
         os << "; Available SIMD:";
-        os << (SimdCpuInfo(SimdCpuInfoAmxBf16) ? " AMX-BF16 AMX-INT8 AVX-512BF16" : "");
+        os << (SimdCpuInfo(SimdCpuInfoAmxBf16) ? " AMX-BF16 AMX-INT8 AVX-512VBMI AVX-512FP16" : "");
         os << (SimdCpuInfo(SimdCpuInfoAvx512vnni) ? " AVX-512VNNI" : "");
         os << (SimdCpuInfo(SimdCpuInfoAvx512bw) ? " AVX-512BW AVX-512F" : "");
         os << (SimdCpuInfo(SimdCpuInfoAvx2) ? " AVX2 FMA AVX" : "");
@@ -2517,7 +2517,7 @@ namespace Simd
     */
     SIMD_INLINE void LitterCpuCache(size_t k = 2)
     {
-        size_t size = SimdCpuInfo(SimdCpuInfoCacheL3)*k;
+        size_t size = (size_t)SimdCpuInfo(SimdCpuInfoCacheL3) * k;
         uint8_t * buffer = (uint8_t*)SimdAllocate(size, SimdAlignment());
         SimdFillBgra(buffer, size, size / 4, 1, 0, 1, 2, 3);
         SimdFree(buffer);
@@ -3903,7 +3903,7 @@ namespace Simd
 
     /*! @ingroup synet_conversion
 
-        \fn void SynetSetInput(const View<A> & src, const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType format)
+        \fn void SynetSetInput(const View<A> & src, const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType format, bool isRgb = false)
 
         \short Sets image to the input of neural network of <a href="http://github.com/ermig1979/Synet">Synet Framework</a>.
 
@@ -3923,19 +3923,29 @@ namespace Simd
 
         \note This function is a C++ wrapper for function ::SimdSynetSetInput.
 
-        \param [in] src - an input image.There are supported following image formats: View<A>::Gray8, View<A>::Bgr24, View<A>::Bgra32, View<A>::Rgb24.
+        \param [in] src - an input image.There are supported following image formats: View<A>::Gray8, View<A>::Bgr24, View<A>::Bgra32, View<A>::Rgb24, View<A>::Rgba32.
         \param [in] lower - a pointer to the array with lower bound of values of the output tensor. The size of the array have to correspond number of channels in the output image tensor.
         \param [in] upper - a pointer to the array with upper bound of values of the output tensor. The size of the array have to correspond number of channels in the output image tensor.
         \param [out] dst - a pointer to the output 32-bit float image tensor.
         \param [in] channels - a number of channels in the output image tensor. It can be 1 or 3.
         \param [in] format - a format of output image tensor. There are supported following tensor formats: ::SimdTensorFormatNchw, ::SimdTensorFormatNhwc.
+        \param [in] isRgb - is channel order of output tensor is RGB or BGR. Its default value is false.
     */
-    template<template<class> class A> SIMD_INLINE void SynetSetInput(const View<A> & src, const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType format)
+    template<template<class> class A> SIMD_INLINE void SynetSetInput(const View<A> & src, const float * lower, const float * upper, float * dst, size_t channels, SimdTensorFormatType format, bool isRgb = false)
     {
-        assert(src.format == View<A>::Gray8 || src.format == View<A>::Bgr24 || src.format == View<A>::Bgra32 || src.format == View<A>::Rgb24);
         assert(format == SimdTensorFormatNchw || format == SimdTensorFormatNhwc);
-
-        SimdSynetSetInput(src.data, src.width, src.height, src.stride, (SimdPixelFormatType)src.format, lower, upper, dst, channels, format);
+        SimdPixelFormatType srcFormat;
+        switch (src.format)
+        {
+        case View<A>::Gray8: srcFormat = SimdPixelFormatGray8; break;
+        case View<A>::Bgr24: srcFormat = isRgb ? SimdPixelFormatRgb24 : SimdPixelFormatBgr24; break;
+        case View<A>::Bgra32: srcFormat = isRgb ? SimdPixelFormatRgba32 : SimdPixelFormatBgra32; break;
+        case View<A>::Rgb24: srcFormat = isRgb ? SimdPixelFormatBgr24 : SimdPixelFormatRgb24; break;
+        case View<A>::Rgba32: srcFormat = isRgb ? SimdPixelFormatBgra32 : SimdPixelFormatRgba32; break;
+        deafult :
+            assert(0);
+        }
+        SimdSynetSetInput(src.data, src.width, src.height, src.stride, srcFormat, lower, upper, dst, channels, format);
     }
 
     /*! @ingroup texture_estimation
@@ -4628,6 +4638,30 @@ namespace Simd
         assert(Compatible(y, u, v) && EqualSize(y, rgb) && y.format == View<A>::Gray8 && rgb.format == View<A>::Rgb24);
 
         SimdYuv444pToRgbV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgb.data, rgb.stride, yuvType);
+    }
+
+    /*! @ingroup yuv_conversion
+
+        \fn void Yuv444pToRgba(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgba, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
+
+        \short Converts YUV444P image to 32-bit RGBA image.
+
+        The input Y, U, V and output RGBA images must have the same width and height.
+
+        \note This function is a C++ wrapper for function ::SimdYuv444pToRgbaV2.
+
+        \param [in] y - an input 8-bit image with Y color plane.
+        \param [in] u - an input 8-bit image with U color plane.
+        \param [in] v - an input 8-bit image with V color plane.
+        \param [out] rgba - an output 32-bit RGBA image.
+        \param [in] alpha - a value of alpha channel. It is equal to 255 by default.
+        \param [in] yuvType - a type of input YUV image (see descriprion of ::SimdYuvType). By default it is equal to ::SimdYuvBt601.
+    */
+    template<template<class> class A> SIMD_INLINE void Yuv444pToRgba(const View<A>& y, const View<A>& u, const View<A>& v, View<A>& rgba, uint8_t alpha = 0xFF, SimdYuvType yuvType = SimdYuvBt601)
+    {
+        assert(Compatible(y, u, v) && EqualSize(y, rgba) && y.format == View<A>::Gray8 && rgba.format == View<A>::Rgba32);
+
+        SimdYuv444pToRgbaV2(y.data, y.stride, u.data, u.stride, v.data, v.stride, y.width, y.height, rgba.data, rgba.stride, alpha, yuvType);
     }
 
     /*! @ingroup yuv_conversion

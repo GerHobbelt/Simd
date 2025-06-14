@@ -21,7 +21,7 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetMergedConvolution32fBf16.h"
+#include "Simd/SimdSynetMergedConvolution32f.h"
 #include "Simd/SimdSynetConvolution32f.h"
 #include "Simd/SimdSynetConvolution32fCommon.h"
 #include "Simd/SimdUpdate.h"
@@ -438,6 +438,7 @@ namespace Simd
                     break;
             }
             _sizeB[1] = 0;
+            _bufH[1] = 0;
             for (size_t i = 0; i < 2; ++i)
             {
                 size_t dstC = AlignHiAny(p.conv[i].dstC, i == 1 ? _miC : 2 * _miC);
@@ -551,6 +552,7 @@ namespace Simd
                     break;
             }
             _bufH[1] = _bufH[0];
+            _bufH[0] = 0;
             _sizeB[1] = 0;
             for (size_t i = 0; i < 2; ++i)
             {
@@ -647,17 +649,12 @@ namespace Simd
 
         //---------------------------------------------------------------------
 
-        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add, SimdSynetCompatibilityType compatibility)
+        void * SynetMergedConvolution32fInit(size_t batch, const SimdConvolutionParameters * convs, size_t count, SimdBool add)
         {
-            MergConvParam param(batch, convs, count, add, compatibility);
+            MergConvParam param(batch, convs, count, add, SimdSynetCompatibilityDefault);
             if (!param.Valid(SimdTensorData32f))
                 return NULL;
-            if (Base::Bf16Soft(compatibility))
-            {
-                return new Base::SynetMergedConvolution32fBf16(param);
-            }
-            else
-                return new Base::SynetMergedConvolution32f(param);
+            return new Base::SynetMergedConvolution32f(param);
         }
     }
 #endif
