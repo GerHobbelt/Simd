@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -80,6 +80,7 @@ namespace Test
             switch (level)
             {
             case Log::Error: ss << Console::Stylized("Error: ", Console::FormatDefault, Console::ForegroundLightRed); break;
+            case Log::Warning: ss << Console::Stylized("Warning: ", Console::FormatDefault, Console::ForegroundYellow); break;
             case Log::Info: ss << Console::Stylized("Info: ", Console::FormatDefault, Console::ForegroundGreen); break;
             default:
                 assert(0);

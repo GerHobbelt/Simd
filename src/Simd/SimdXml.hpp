@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2018 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -1738,7 +1738,7 @@ namespace Simd
             NodeIterator operator++(int)
             {
                 NodeIterator tmp = *this;
-                ++this;
+                ++(*this);
                 return tmp;
             }
 
@@ -1752,7 +1752,7 @@ namespace Simd
             NodeIterator operator--(int)
             {
                 NodeIterator tmp = *this;
-                ++this;
+                --(*this);
                 return tmp;
             }
 
@@ -1813,7 +1813,7 @@ namespace Simd
             AttributeIterator operator++(int)
             {
                 AttributeIterator tmp = *this;
-                ++this;
+                ++(*this);
                 return tmp;
             }
 
@@ -1827,7 +1827,7 @@ namespace Simd
             AttributeIterator operator--(int)
             {
                 AttributeIterator tmp = *this;
-                ++this;
+                --(*this);
                 return tmp;
             }
 

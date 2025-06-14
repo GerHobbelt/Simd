@@ -49,6 +49,7 @@
 #include <stdexcept>
 #include <thread>
 #include <mutex>
+#include <cstring>
 
 #define SIMD_STATIC
 #include "Simd/SimdConfig.h"
@@ -98,7 +99,7 @@ namespace Test
     const int O = 9;
 
     extern double MINIMAL_TEST_EXECUTION_TIME;
-    extern double WARM_UP_TIME;
+    //extern double WARM_UP_TIME;
 
     const int DW = 48;
     const int DH = 64;
@@ -112,12 +113,9 @@ namespace Test
     extern uint32_t DISABLED_EXTENSIONS;
 
     extern String ROOT_PATH;
-    extern String SOURCE;
-    extern String OUTPUT;
     extern String REAL_IMAGE;
 
     extern int LITTER_CPU_CACHE;
-    extern int TEST_THREADS;
 
     enum DifferenceType
     {

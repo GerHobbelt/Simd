@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2022 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePgmBinSaver::ImagePgmBinSaver(const ImageSaverParam& param)
             : Base::ImagePgmBinSaver(param)
@@ -64,7 +64,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePpmTxtSaver::ImagePpmTxtSaver(const ImageSaverParam& param)
             : Base::ImagePpmTxtSaver(param)
@@ -81,7 +81,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePpmBinSaver::ImagePpmBinSaver(const ImageSaverParam& param)
             : Base::ImagePpmBinSaver(param)
@@ -98,7 +98,21 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
+
+        ImageBmpSaver::ImageBmpSaver(const ImageSaverParam& param)
+            : Base::ImageBmpSaver(param)
+        {
+            switch (_param.format)
+            {
+            case SimdPixelFormatGray8: _convert = Neon::GrayToBgr; break;
+            case SimdPixelFormatRgb24: _convert = Neon::BgrToRgb; break;
+            case SimdPixelFormatRgba32: _convert = Neon::BgraToRgba; break;
+            default: break;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
 
         ImageSaver* CreateImageSaver(const ImageSaverParam& param)
         {
@@ -110,6 +124,7 @@ namespace Simd
             case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
             case SimdImageFilePng: return new ImagePngSaver(param);
             case SimdImageFileJpeg: return new ImageJpegSaver(param);
+            case SimdImageFileBmp: return new ImageBmpSaver(param);
             default:
                 return NULL;
             }
@@ -130,5 +145,5 @@ namespace Simd
             return NULL;
         }
     }
-#endif// SIMD_NEON_ENABLE
+#endif
 }

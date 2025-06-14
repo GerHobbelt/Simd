@@ -28,6 +28,7 @@
 #include "Test/TestLog.h"
 #include "Test/TestString.h"
 #include "Test/TestTensor.h"
+#include "Test/TestOptions.h"
 
 #if defined(_MSC_VER)
 #ifndef NOMINMAX
@@ -43,7 +44,7 @@
 namespace Test
 {
     typedef bool(*AutoTestPtr)();
-    typedef bool(*SpecialTestPtr)();
+    typedef bool(*SpecialTestPtr)(const Options& options);
 
     struct Group
     {
@@ -63,7 +64,7 @@ namespace Test
     Groups g_groups;
 
 #define TEST_ADD_GROUP_0S(name) \
-    bool name##SpecialTest(); \
+    bool name##SpecialTest(const Options & options); \
     bool name##AddToList(){ g_groups.push_back(Group(#name, NULL, name##SpecialTest)); return true; } \
     bool name##AtList = name##AddToList();
 
@@ -74,7 +75,7 @@ namespace Test
 
 #define TEST_ADD_GROUP_AS(name) \
     bool name##AutoTest(); \
-    bool name##SpecialTest(); \
+    bool name##SpecialTest(const Options & options); \
     bool name##AddToList(){ g_groups.push_back(Group(#name, name##AutoTest, name##SpecialTest)); return true; } \
     bool name##AtList = name##AddToList();
 
@@ -351,6 +352,7 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetAdd8i);
     TEST_ADD_GROUP_A0(SynetAdd16b);
 
+    TEST_ADD_GROUP_A0(SynetChannelSum16b);
     TEST_ADD_GROUP_A0(SynetEltwiseLayerForward);
     TEST_ADD_GROUP_A0(SynetLrnLayerCrossChannels);
     TEST_ADD_GROUP_A0(SynetShuffleLayerForward);
@@ -411,6 +413,7 @@ namespace Test
 
     TEST_ADD_GROUP_A0(SynetScaleLayerForward);
     TEST_ADD_GROUP_A0(SynetScale8iForward);
+    TEST_ADD_GROUP_A0(SynetScale16b);
 
     TEST_ADD_GROUP_A0(SynetSoftmaxLayerForward);
 
@@ -485,7 +488,7 @@ namespace Test
 
     //-------------------------------------------------------------------------------------------------
 
-    void WarmUpCpu()
+    void WarmUpCpu(double warmUpTime)
     {
 #if defined(__linux__)
         TEST_LOG_SS(Info, "CPU warm upping is started. Initial frequency: " << SimdCpuInfo(SimdCpuInfoCurrentFrequency) / 1000 / 1000 << " MHz.");
@@ -493,7 +496,7 @@ namespace Test
         TEST_LOG_SS(Info, "CPU warm upping is started.");
 #endif
         double time = 0;
-        while (time < WARM_UP_TIME)
+        while (time < warmUpTime)
         {
             double start = GetTime();
             const size_t n = 1024;
@@ -509,17 +512,36 @@ namespace Test
 #endif
     }
 
+    static bool PinThread(size_t core)
+    {
+#if defined(__linux__)
+        pthread_t this_thread = pthread_self();
+        cpu_set_t cpuset;
+        CPU_ZERO(&cpuset);
+        CPU_SET(core, &cpuset);
+        if (pthread_setaffinity_np(this_thread, sizeof(cpu_set_t), &cpuset))
+        {
+            TEST_LOG_SS(Warning, "Can't set affinity " << core << " to " << this_thread << " thread : " << std::strerror(errno) << " !");
+            return false;
+        }
+#endif
+        return true;
+    }
+
     class Task
     {
+        const Options& _options;
         Group * _groups;
-        size_t _size;
+        size_t _id, _size;
         std::thread _thread;
         volatile double _progress;
     public:
         static volatile bool s_stopped;
 
-        Task(Group * groups, size_t size, bool start)
-            : _groups(groups)
+        Task(const Options& options, size_t id, Group * groups, size_t size, bool start)
+            : _options(options)
+            , _id(id)
+            , _groups(groups)
             , _size(size)
             , _progress(0)
         {
@@ -542,8 +564,10 @@ namespace Test
 
         void Run()
         {
-            if (WARM_UP_TIME > 0)
-                WarmUpCpu();
+            if (_options.pinThreads)
+                PinThread(_id);
+            if (_options.warmUpTime > 0)
+                WarmUpCpu(_options.warmUpTime);
             for (size_t i = 0; i < _size && !s_stopped; ++i)
             {
                 _progress = double(i) / double(_size);
@@ -613,173 +637,32 @@ namespace Test
         std::this_thread::sleep_for(std::chrono::milliseconds(miliseconds));
     }
 
-    struct Options
+    bool Required(const Options & options, const Group& group)
     {
-        enum Mode
-        {
-            Auto,
-            Special,
-        } mode;
-
-        bool help;
-
-        Strings include, exclude;
-
-        String text, html;
-
-        size_t workThreads, testRepeats, testStatistics;
-
-        bool printAlign, printInternal, checkCpp;
-
-        Options(int argc, char* argv[])
-            : mode(Auto)
-            , help(false)
-            , testRepeats(1)
-            , workThreads(1)
-            , testStatistics(0)
-            , printAlign(false)
-            , printInternal(true)
-            , checkCpp(false)
-        {
-            for (int i = 1; i < argc; ++i)
-            {
-                String arg = argv[i];
-                if (arg.substr(0, 5) == "-help" || arg.substr(0, 2) == "-?")
-                {
-                    help = true;
-                    break;
-                }
-                else if (arg.find("-m=") == 0)
-                {
-                    switch (arg[3])
-                    {
-                    case 'a': mode = Auto; break;
-                    case 's': mode = Special; break;
-                    default:
-                        TEST_LOG_SS(Error, "Unknown command line options: '" << arg << "'!" << std::endl);
-                        exit(1);
-                    }
-                }
-                else if (arg.find("-tt=") == 0)
-                {
-                    TEST_THREADS = Simd::Min<int>(FromString<int>(arg.substr(4, arg.size() - 4)), (size_t)std::thread::hardware_concurrency());
-                }
-                else if (arg.find("-tr=") == 0)
-                {
-                    testRepeats = FromString<size_t>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-ts=") == 0)
-                {
-                    testStatistics = FromString<int>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-fi=") == 0)
-                {
-                    include.push_back(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-fe=") == 0)
-                {
-                    exclude.push_back(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-ot=") == 0)
-                {
-                    text = arg.substr(4, arg.size() - 4);
-                }
-                else if (arg.find("-oh=") == 0)
-                {
-                    html = arg.substr(4, arg.size() - 4);
-                }
-                else if (arg.find("-r=") == 0)
-                {
-                    ROOT_PATH = arg.substr(3, arg.size() - 3);
-                }
-                else if (arg.find("-s=") == 0)
-                {
-                    SOURCE = arg.substr(3, arg.size() - 3);
-                }
-                else if (arg.find("-o=") == 0)
-                {
-                    OUTPUT = arg.substr(3, arg.size() - 3);
-                }
-                else if (arg.find("-c=") == 0)
-                {
-                    C = FromString<int>(arg.substr(3, arg.size() - 3));
-                }
-                else if (arg.find("-h=") == 0)
-                {
-                    H = FromString<int>(arg.substr(3, arg.size() - 3));
-                }                
-                else if (arg.find("-w=") == 0)
-                {
-                    W = FromString<int>(arg.substr(3, arg.size() - 3));
-                }
-                else if (arg.find("-pa=") == 0)
-                {
-                    printAlign = FromString<bool>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-pi=") == 0)
-                {
-                    printInternal = FromString<bool>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-wt=") == 0)
-                {
-                    workThreads = FromString<size_t>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-mt=") == 0)
-                {
-                    MINIMAL_TEST_EXECUTION_TIME = FromString<int>(arg.substr(4, arg.size() - 4))*0.001;
-                }
-                else if (arg.find("-lc=") == 0)
-                {
-                    LITTER_CPU_CACHE = FromString<int>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-ri=") == 0)
-                {
-                    REAL_IMAGE = arg.substr(4, arg.size() - 4);
-                }
-                else if (arg.find("-cc=") == 0)
-                {
-                    checkCpp = FromString<bool>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-de=") == 0)
-                {
-                    DISABLED_EXTENSIONS = FromString<uint32_t>(arg.substr(4, arg.size() - 4));
-                }
-                else if (arg.find("-wu=") == 0)
-                {
-                    WARM_UP_TIME = FromString<int>(arg.substr(4, arg.size() - 4)) * 0.001;
-                }
-                else
-                {
-                    TEST_LOG_SS(Error, "Unknown command line options: '" << arg << "'!" << std::endl);
-                    exit(1);
-                }
-            }
-        }
-
-        bool Required(const Group & group) const
-        {
-            if (mode == Auto && group.autoTest == NULL)
-                return false;
-            if (mode == Special && group.specialTest == NULL)
-                return false;
-            bool required = include.empty();
-            for (size_t i = 0; i < include.size() && !required; ++i)
-                if (group.name.find(include[i]) != std::string::npos)
-                    required = true;
-            for (size_t i = 0; i < exclude.size() && required; ++i)
-                if (group.name.find(exclude[i]) != std::string::npos)
-                    required = false;
-            return required;
-        }
-    };
+        if (options.mode == Options::Auto && group.autoTest == NULL)
+            return false;
+        if (options.mode == Options::Special && group.specialTest == NULL)
+            return false;
+        bool required = options.include.empty();
+        for (size_t i = 0; i < options.include.size() && !required; ++i)
+            if (group.name.find(options.include[i]) != std::string::npos)
+                required = true;
+        for (size_t i = 0; i < options.exclude.size() && required; ++i)
+            if (group.name.find(options.exclude[i]) != std::string::npos)
+                required = false;
+        return required;
+    }
 
     int MakeAutoTests(Groups & groups, const Options & options)
     {
-        if (TEST_THREADS > 0)
+        if (options.testThreads > 0)
         {
+            if (options.pinThreads)
+                PinThread(SimdCpuInfo(SimdCpuInfoThreads) - 1);
+
             Test::Log::s_log.SetLevel(Test::Log::Error);
 
-            size_t testThreads = Simd::Min<size_t>(TEST_THREADS, groups.size());
+            size_t testThreads = Simd::Min<size_t>(options.testThreads, groups.size());
             size_t total = groups.size();
             size_t block = Simd::DivHi(total, testThreads);
             testThreads = Simd::Min(testThreads, Simd::DivHi(total, block));
@@ -790,7 +673,7 @@ namespace Test
             {
                 size_t beg = i * block;
                 size_t end = std::min(total, beg + block);
-                tasks.push_back(Test::TaskPtr(new Test::Task(groups.data() + beg, end - beg, true)));
+                tasks.push_back(Test::TaskPtr(new Test::Task(options, i, groups.data() + beg, end - beg, true)));
             }
 
             std::cout << std::endl;
@@ -815,7 +698,7 @@ namespace Test
         }
         else
         {
-            Test::Task task(groups.data(), groups.size(), false);
+            Test::Task task(options, 0, groups.data(), groups.size(), false);
             task.Run();
         }
 
@@ -852,7 +735,7 @@ namespace Test
         {
             TEST_LOG_SS(Info, group.name << "SpecialTest is started :");
             group.time = GetTime();
-            bool result = group.specialTest();
+            bool result = group.specialTest(options);
             group.time = GetTime() - group.time;
             TEST_LOG_SS(Info, group.name << "SpecialTest is finished " << (result ? "successfully." : "with errors!") << std::endl);
             if (!result)
@@ -889,7 +772,7 @@ namespace Test
         std::cout << "-ot=log.txt  - a file name with test report (in TEXT format)." << std::endl;
         std::cout << "               The test's report also will be output to console." << std::endl << std::endl;
         std::cout << "Also you can use parameters: " << std::endl << std::endl;
-        std::cout << "    -help or -?   to print this help message." << std::endl << std::endl;
+        std::cout << "    --help or -?   to print this help message." << std::endl << std::endl;
         std::cout << "    -r=../..      to set project root directory." << std::endl << std::endl;
         std::cout << "    -pa=1         to print alignment statistics." << std::endl << std::endl;
         std::cout << "    -pi=1         to print internal statistics (Cmake parameter SIMD_PERF must be ON)." << std::endl << std::endl;
@@ -911,6 +794,7 @@ namespace Test
         std::cout << "    -de=2         a flags of SIMD extensions which testing are disabled." << std::endl;
         std::cout << "                  Base - 1, 2 - SSE4.1/NEON, 4 - AVX2, 8 - AVX-512BW, 16 - AVX-512VNNI, 32 - AMX-BF16." << std::endl << std::endl;
         std::cout << "    -wu=100       a time to warm up CPU before testing (in milliseconds)." << std::endl << std::endl;
+        std::cout << "    -pt=1         a boolean flag to pin threads to cpu cores." << std::endl << std::endl;
         return 0;
     }
 
@@ -919,8 +803,6 @@ namespace Test
 #else
     String ROOT_PATH = "..";
 #endif
-    String SOURCE = "";
-    String OUTPUT = "";
     String REAL_IMAGE = "";
 
 #ifdef TEST_PERFORMANCE_TEST_ENABLE
@@ -933,9 +815,8 @@ namespace Test
     int W = 128;
 #endif
     double MINIMAL_TEST_EXECUTION_TIME = 0.1;
-    double WARM_UP_TIME = 0.0;
+    //double WARM_UP_TIME = 0.0;
     int LITTER_CPU_CACHE = 0;
-    int TEST_THREADS = 0;
     uint32_t DISABLED_EXTENSIONS = 0;
 
     void CheckCpp();
@@ -956,7 +837,7 @@ int main(int argc, char* argv[])
     Test::Groups groups;
     for (const Test::Group& group : Test::g_groups)
     {
-        if (options.Required(group))
+        if (Test::Required(options, group))
         {
             for(size_t r = 0; r < options.testRepeats; ++r)
                 groups.push_back(group);

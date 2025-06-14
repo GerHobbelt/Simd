@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePgmBinLoader::ImagePgmBinLoader(const ImageLoaderParam& param)
             : Base::ImagePgmBinLoader(param)
@@ -74,7 +74,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePpmTxtLoader::ImagePpmTxtLoader(const ImageLoaderParam& param)
             : Base::ImagePpmTxtLoader(param)
@@ -96,7 +96,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePpmBinLoader::ImagePpmBinLoader(const ImageLoaderParam& param)
             : Base::ImagePpmBinLoader(param)
@@ -118,7 +118,32 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
+
+        ImageBmpLoader::ImageBmpLoader(const ImageLoaderParam& param)
+            : Base::ImageBmpLoader(param)
+        {
+        }
+
+        void ImageBmpLoader::SetConverters()
+        {
+            switch (_param.format)
+            {
+            case SimdPixelFormatGray8: _toAny = (_bpp == 32 ? Neon::BgraToGray : Neon::BgrToGray); break;
+            case SimdPixelFormatBgr24: _toAny = (_bpp == 32 ? (ToAnyPtr)Neon::BgraToBgr : NULL); break;
+            case SimdPixelFormatRgb24: _toAny = (_bpp == 32 ? Neon::BgraToRgb : Neon::BgrToRgb); break;
+            case SimdPixelFormatBgra32: _toBgra = (_bpp == 32 ? NULL : (ToBgraPtr)Neon::BgrToBgra); break;
+            case SimdPixelFormatRgba32:
+                if (_bpp == 32)
+                    _toAny = Neon::BgraToRgba;
+                else
+                    _toBgra = (ToBgraPtr)Neon::RgbToBgra;
+                break;
+            default: break;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
 
         ImageLoader* CreateImageLoader(const ImageLoaderParam& param)
         {
@@ -130,6 +155,7 @@ namespace Simd
             case SimdImageFilePpmBin: return new ImagePpmBinLoader(param);
             case SimdImageFilePng: return new Base::ImagePngLoader(param);
             case SimdImageFileJpeg: return new Base::ImageJpegLoader(param);
+            case SimdImageFileBmp: return new ImageBmpLoader(param);
             default:
                 return NULL;
             }
@@ -150,5 +176,5 @@ namespace Simd
             return NULL;
         }
     }
-#endif// SIMD_NEON_ENABLE
+#endif
 }

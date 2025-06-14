@@ -2,7 +2,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar,
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
 *               2014-2019 Antonenka Mikhail,
 *               2019-2019 Facundo Galan,
 *               2024-2024 Sergey Chezhin.
@@ -338,6 +338,8 @@ typedef enum
     SimdImageFilePng,
     /*! A JPEG (Joint Photographic Experts Group) image file format. */
     SimdImageFileJpeg,
+    /*! A BMP (BitMap Picture) image file format. */
+    SimdImageFileBmp,
 } SimdImageFileType;
 
 /*! @ingroup c_types
@@ -6068,6 +6070,30 @@ extern "C"
     SIMD_API void SimdSynetAdd8i(const uint8_t * aData, const float * aScale, const float* aShift, const uint8_t* bData, const float* bScale, const float* bShift,
         uint8_t* cData, const float* cScale, const float* cShift, size_t batch, size_t channels, size_t spatial, SimdTensorFormatType format, SimdSynetCompatibilityType compatibility);
 
+    /*! @ingroup synet_other
+
+        \fn void SimdSynetChannelSum16b(const uint16_t* src, size_t channels, size_t spatial, SimdTensorFormatType format, float* sum);
+
+        \short Calculates channels sums in FP32 format for input tensor in BF16 format.
+
+        Algorithm's details (example for NCHW tensor format) :
+        \verbatim
+        for(c = 0; c < channels; ++c)
+            sum[c] = 0;
+            for(s = 0; s < spatial; ++s)
+                sum[c] += src[c, s];
+        \endverbatim
+
+        \note This function is used in <a href="http://github.com/ermig1979/Synet">Synet Framework</a>.
+
+        \param [in] src - a pointer to the input 16-bit brain-float tensor.
+        \param [in] channels - a number of channels in input and output arrays.
+        \param [in] spatial - a spatial (width * height) size of input tensor.
+        \param [in] format - a format of input tensor.
+        \param [out] sum - a pointer to output 32-bit float array with channels sums.
+    */
+    SIMD_API void SimdSynetChannelSum16b(const uint16_t* src, size_t channels, size_t spatial, SimdTensorFormatType format, float* sum);
+
     /*! @ingroup synet_conversion
 
         \fn void SimdSynetConvert32fTo8u(const float * src, size_t batch, size_t channels, size_t height, size_t width, SimdTensorFormatType format, const float* scale, const float * shift, uint8_t * dst, SimdSynetCompatibilityType compatibility);
@@ -7532,6 +7558,38 @@ extern "C"
         \param [out] dst - a pointer to the output 32-bit float array.
     */
     SIMD_API void SimdSynetRestrictRange32f(const float * src, size_t size, const float * lower, const float * upper, float * dst);
+
+    /*! @ingroup synet_scale
+
+        \fn void* SimdSynetScale16bInit(size_t channels, size_t spatial, SimdTensorDataType srcType, SimdTensorDataType dstType, SimdTensorFormatType format, SimdBool norm, SimdBool bias);
+
+        \short Initilizes BF16 scale algorithm.
+
+        \param [in] channels - a number of channels in the (input/output) image tensor.
+        \param [in] spatial - a spaial size (height*width) of (input/output) image tensor.
+        \param [in] srcType - a type of input tensor. Can be FP32 of BF16.
+        \param [in] dstType - a type of output tensor. Can be FP32 of BF16.
+        \param [in] format - a format of input/output tensors.
+        \param [in] norm - a flag of presence scale operation.
+        \param [in] bias - a flag of presence shift operation.
+        \return a pointer to scale context. On error it returns NULL. It must be released with using of function ::SimdRelease.
+            This pointer is used in function ::SimdSynetScale16bForward.
+    */
+    SIMD_API void* SimdSynetScale16bInit(size_t channels, size_t spatial, SimdTensorDataType srcType, SimdTensorDataType dstType, SimdTensorFormatType format, SimdBool norm, SimdBool bias);
+
+    /*! @ingroup synet_scale
+
+        \fn void SimdSynetScale16bForward(void* context, const uint8_t* src, const float *norm, const float * bias, uint8_t* dst);
+
+        \short Performs forward propagation of BF16 scale algorithm.
+
+        \param [in] context - a pointer to scale context. It must be created by function ::SimdSynetScale16bInit and released by function ::SimdRelease.
+        \param [in] src - a pointer to input tensor.
+        \param [in] norm - a pointer to FP32 array with scale coefficients. Can be NULL.
+        \param [in] bias - a pointer to FP32 array with shift coefficients. Can be NULL.
+        \param [out] dst - a pointer to output tensor.
+    */
+    SIMD_API void SimdSynetScale16bForward(void* context, const uint8_t* src, const float *norm, const float * bias, uint8_t* dst);
 
     /*! @ingroup synet_scale
 

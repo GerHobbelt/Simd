@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2021 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePgmBinSaver::ImagePgmBinSaver(const ImageSaverParam& param)
             : Sse41::ImagePgmBinSaver(param)
@@ -66,7 +66,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePpmTxtSaver::ImagePpmTxtSaver(const ImageSaverParam& param)
             : Sse41::ImagePpmTxtSaver(param)
@@ -84,7 +84,7 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
 
         ImagePpmBinSaver::ImagePpmBinSaver(const ImageSaverParam& param)
             : Sse41::ImagePpmBinSaver(param)
@@ -102,7 +102,21 @@ namespace Simd
             }
         }
 
-        //---------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------
+
+        ImageBmpSaver::ImageBmpSaver(const ImageSaverParam& param)
+            : Sse41::ImageBmpSaver(param)
+        {
+            switch (_param.format)
+            {
+            case SimdPixelFormatGray8: _convert = Avx2::GrayToBgr; break;
+            case SimdPixelFormatRgb24: _convert = Avx2::BgrToRgb; break;
+            case SimdPixelFormatRgba32: _convert = Avx2::BgraToRgba; break;
+            default: break;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
 
         ImageSaver* CreateImageSaver(const ImageSaverParam& param)
         {
@@ -114,6 +128,7 @@ namespace Simd
             case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
             case SimdImageFilePng: return new ImagePngSaver(param);
             case SimdImageFileJpeg: return new ImageJpegSaver(param);
+            case SimdImageFileBmp: return new ImageBmpSaver(param);
             default:
                 return NULL;
             }
@@ -134,5 +149,5 @@ namespace Simd
             return NULL;
         }
     }
-#endif// SIMD_AVX2_ENABLE
+#endif
 }

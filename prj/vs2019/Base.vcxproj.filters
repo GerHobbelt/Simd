@@ -334,9 +334,6 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcGemm.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcDirect.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetMergedConvolution16b.cpp">
       <Filter>Base</Filter>
     </ClCompile>
@@ -377,6 +374,27 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Simd\SimdBaseBgrToLab.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageSaveBmp.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageSavePpm.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageLoadBmp.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageLoadPpm.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseSynetScale16b.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcSpecV0.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcSpecV1.cpp">
       <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
@@ -646,6 +664,9 @@
       <Filter>Inc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Simd\SimdBgrToLab.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Simd\SimdSynetScale16b.h">
       <Filter>Inc</Filter>
     </ClInclude>
   </ItemGroup>

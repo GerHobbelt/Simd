@@ -96,8 +96,9 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16b.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16bNchwGemm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16bNhwcDeptwise.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16bNhwcDirect.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16bNhwcGemm.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16bNhwcSpecV0.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution16bNhwcSpecV1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution32f.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution32fDirectNchw.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetConvolution32fGemm.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetPermute.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetPooling.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetScale.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdSse41SynetScale16b.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetSoftmax.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41SynetUnaryOperation.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdSse41Texture.cpp" />

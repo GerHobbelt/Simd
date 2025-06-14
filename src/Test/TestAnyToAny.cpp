@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar,
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
 *               2014-2016 Antonenka Mikhail.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,6 +27,7 @@
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
 #include "Test/TestFile.h"
+#include "Test/TestOptions.h"
 
 #ifdef SIMD_OPENCV_ENABLE
 #include <opencv2/core/core.hpp>
@@ -541,7 +542,7 @@ namespace Test
         return result;
     }
 
-    bool ConvertImageSpecialTest()
+    bool ConvertImageSpecialTest(const Options & options)
     {
         bool result = true;
 
@@ -555,7 +556,7 @@ namespace Test
 
     //-----------------------------------------------------------------------------------------------------
 
-    bool BgrToLabSpecialTest()
+    bool BgrToLabSpecialTest(const Options & options)
     {
         bool result = true;
 #ifdef SIMD_OPENCV_ENABLE

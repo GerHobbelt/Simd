@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -741,8 +741,13 @@ namespace Simd
             a.dw[0] = AlignHi(c0.srcC, a.miK);
             a.dw[1] = c1.kernelY * c1.kernelX;
             a.dw[2] = AlignHi(c2.dstC, a.miC);
-            _sizeB[3] = _dst16b && (count > 1 || p.add || a.miK == 32) ? _sizeD : 0;
-            
+            if (a.miK == 32)
+            {
+                bool aligned = Aligned(c2.dstC, a.miC) && Aligned(c2.dstH * c2.dstW, a.miC) && Aligned((c2.dstH % a.yStep[2]) * c2.dstW, a.miC);
+                _sizeB[3] = _dst16b || !aligned ? AlignHi(c2.dstC, a.miC) * AlignHi(c2.dstH * c2.dstW + a.miC, a.miC) : 0;
+            }
+            else
+                _sizeB[3] = _dst16b && (count > 1 || p.add) ? _sizeD : 0;
             ((ConvParam&)c1).dstT = SimdTensorData16b;
             ((ConvParam&)c2).srcT = SimdTensorData16b;
         }
@@ -936,7 +941,13 @@ namespace Simd
             a.bufH[1] = 0;
             _sizeB[0] = 0;
             _sizeB[1] = 0;
-            _sizeB[3] = _dst16b && (count > 1 || a.miK == 32) ? _sizeD : 0;
+            if (a.miK == 32)
+            {
+                bool aligned = Aligned(c1.dstC, a.miC) && Aligned(c1.dstH * c1.dstW, a.miC) && Aligned((c1.dstH % a.yStep[2]) * c1.dstW, a.miC);
+                _sizeB[3] = _dst16b || !aligned ? AlignHi(c1.dstC, a.miC) * AlignHi(c1.dstH * c1.dstW + a.miC, a.miC) : 0;
+            }
+            else
+                _sizeB[3] = _dst16b && count > 1 ? _sizeD : 0;
             a.dp[0] = c0.activation == ::SimdConvolutionActivationPrelu ? 1 : 0;
             a.dp[1] = c1.activation == ::SimdConvolutionActivationPrelu ? 1 : 0;
             a.dw[0] = c0.kernelY * c0.kernelX;

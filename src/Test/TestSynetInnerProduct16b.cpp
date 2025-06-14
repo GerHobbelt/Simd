@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -166,29 +166,59 @@ namespace Test
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 129, 131, f32, f32, f32, f, t, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 129, 131, f32, f32, b16, f, f, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 129, 131, b16, b16, f32, f, t, f), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 129, 131, f32, f32, f32, t, t, f), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(128, 129, 127, f32, f32, f32, t, t, f), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 129, 131, f32, f32, b16, t, f, t), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 129, 131, b16, b16, f32, t, t, f), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 8192, b16, b16, b16, f, t, t), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 8192, b16, b16, b16, f, f, t), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 8192, b16, b16, b16, t, f, t), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 512, b16, b16, b16, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 127, 127, b16, b16, f32, t, t, f), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(128, 128, 128, b16, b16, f32, t, t, f), f1, f2);
+        //result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 8192, b16, b16, b16, f, t, t), f1, f2);
+        //result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 8192, b16, b16, b16, f, f, t), f1, f2);
+        //result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 8192, b16, b16, b16, t, f, t), f1, f2);
+        //result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 512, b16, b16, b16, f, t, t), f1, f2);
 
 #endif
 #if 0
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(9, 128, 9, f32, f32, f32, f, f, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(9, 128, 9, f32, f32, f32, f, t, t), f1, f2);
 #endif
-#if 1
+#if 0
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(10, 64, 256, b16, f32, f32, f, t, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(10, 60, 256, b16, f32, f32, f, t, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(10, 64, 240, f32, f32, f32, f, t, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(10, 64, 240, b16, f32, f32, f, t, t), f1, f2);
         result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(10, 60, 240, b16, f32, f32, f, t, t), f1, f2);
 #endif
+#if 0
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(15, 128, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(31, 128, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(128, 15, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(128, 31, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(111, 128, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(127, 128, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(128, 111, 128, b16, b16, f32, f, f, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(128, 127, 128, b16, b16, f32, f, f, t), f1, f2);
+#endif
+#if 0
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(64, 512, 512, f32, f32, f32, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(64, 608, 608, f32, f32, f32, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1824, 64, 608, f32, f32, f32, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(64, 1824, 608, f32, f32, f32, f, t, t), f1, f2);
+#endif
+#if 0
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(3333, 3333, 3333, b16, b16, f32, f, f, t), f1, f2);
+#endif
+#if 0
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 100352, f32, b16, b16, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 100352, b16, b16, f32, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 2048, 25088, b16, b16, f32, f, t, t), f1, f2);
+#endif
+#if 1
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(9, 128, 32, f32, f32, f32, f, f, f), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(32, 128, 9, f32, f32, f32, f, t, f), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(32, 128, 9, f32, f32, f32, f, f, f), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(9, 128, 9, f32, f32, f32, f, f, f), f1, f2);
+#endif
 #else
-        //result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 512, 4096, b16, b16, b16, t, f, t), f1, f2);
-        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(1, 1000, 1280, f32, f32, f32, f, t, t), f1, f2);
+        result = result && SynetInnerProduct16bForwardAutoTest(eps, Param(64, 512, 512, f32, f32, f32, f, t, t), f1, f2);
 #endif
 
         return result;

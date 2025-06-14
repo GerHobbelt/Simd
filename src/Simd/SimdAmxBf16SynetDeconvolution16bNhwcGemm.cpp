@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -87,32 +87,15 @@ namespace Simd
 
         //-----------------------------------------------------------------------------------------
 
-        static void Deconvolution16bNhwcGemm_32x32(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
+        template<int cfg> void Deconvolution16bNhwcGemm_32x32(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
             size_t dstS, size_t dstC, size_t srcC, int zero, const uint16_t* weight0, float* dst)
         {
             int dD = (int)a.bufN, dS = (int)a.bufK, strideD = dD * 4, strideW = 64, strideS = dS * 2;
             const uint16_t* src1 = src0 + 16 * dS;
             const uint16_t* weight1 = weight0 + a.bufK * F;
 
-            TileConf conf;
-            conf.rows[0] = 16;
-            conf.rows[1] = 16;
-            conf.rows[2] = uint8_t(dstS - 16);
-            conf.rows[3] = uint8_t(dstS - 16);
-            conf.rows[4] = 16;
-            conf.rows[5] = uint8_t(dstS - 16);
-            conf.rows[6] = 16;
-            conf.rows[7] = 16;
-            conf.colsb[0] = 64;
-            conf.colsb[1] = uint16_t((dstC - 16) * 4);
-            conf.colsb[2] = 64;
-            conf.colsb[3] = uint16_t((dstC - 16) * 4);
-            conf.colsb[4] = 64;
-            conf.colsb[5] = 64;
-            conf.colsb[6] = 64;
-            conf.colsb[7] = uint16_t((dstC - 16) * 4);
-            _tile_loadconfig(&conf);
-
+            if(cfg)
+                SetTileConf2x2(dstS, dstC);
             if (zero)
             {
                 _tile_zero(0);
@@ -127,17 +110,29 @@ namespace Simd
                 _tile_stream_loadd(2, dst + 16 * dD + 0, strideD);
                 _tile_stream_loadd(3, dst + 16 * dD + F, strideD);
             }
-            for (size_t sc = 0; sc < srcC; sc += 32, src0 += 32, src1 += 32)
+
+            int srcC32 = (int)srcC - 32, sc = 0;
+            _tile_stream_loadd(4, src0, strideS);
+            _tile_loadd(6, weight0 + sc * 16, strideW);
+            for (; sc < srcC32;)
             {
-                _tile_stream_loadd(4, src0, strideS);
-                _tile_loadd(6, weight0 + sc * 16, strideW);
-                _tile_dpbf16ps(0, 4, 6);
                 _tile_loadd(7, weight1 + sc * 16, strideW);
+                _tile_stream_loadd(5, src1 + sc, strideS);
+                _tile_dpbf16ps(0, 4, 6);
                 _tile_dpbf16ps(1, 4, 7);
-                _tile_stream_loadd(5, src1, strideS);
+                sc += 32;               
+                _tile_stream_loadd(4, src0 + sc, strideS);
                 _tile_dpbf16ps(2, 5, 6);
+                _tile_loadd(6, weight0 + sc * 16, strideW);
                 _tile_dpbf16ps(3, 5, 7);
             }
+            _tile_loadd(7, weight1 + sc * 16, strideW);
+            _tile_stream_loadd(5, src1 + sc, strideS);
+            _tile_dpbf16ps(0, 4, 6);
+            _tile_dpbf16ps(1, 4, 7);
+            _tile_dpbf16ps(2, 5, 6);
+            _tile_dpbf16ps(3, 5, 7);
+
             _tile_stored(0, dst + 0, strideD);
             _tile_stored(1, dst + F, strideD);
             _tile_stored(2, dst + 16 * dD + 0, strideD);
@@ -148,25 +143,14 @@ namespace Simd
             TileMoveToMemory(dst + 16 * dD + F, dD);
         }
 
-		static void Deconvolution16bNhwcGemm_32x16(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
+        template<int cfg> void Deconvolution16bNhwcGemm_32x16(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
             size_t dstS, size_t dstC, size_t srcC, int zero, const uint16_t* weight0, float* dst)
 		{
 			int dD = (int)a.bufN, dS = (int)a.bufK, strideD = dD * 4, strideW = 64, strideS = dS * 2;
 			const uint16_t* src1 = src0 + 16 * dS;
 
-			TileConf conf;
-			conf.rows[0] = 16;
-			conf.rows[2] = uint8_t(dstS - 16);
-			conf.rows[4] = 16;
-			conf.rows[5] = uint8_t(dstS - 16);
-			conf.rows[6] = 16;
-			conf.colsb[0] = uint16_t(dstC * 4);
-			conf.colsb[2] = uint16_t(dstC * 4);
-			conf.colsb[4] = 64;
-			conf.colsb[5] = 64;
-			conf.colsb[6] = uint16_t(dstC * 4);
-			_tile_loadconfig(&conf);
-
+            if (cfg)
+                SetTileConf2x1(dstS, dstC);
 			if (zero)
 			{
 				_tile_zero(0);
@@ -177,39 +161,37 @@ namespace Simd
 				_tile_stream_loadd(0, dst + 0, strideD);
 				_tile_stream_loadd(2, dst + 16 * dD + 0, strideD);
 			}
-			for (size_t sc = 0; sc < srcC; sc += 32, src0 += 32, src1 += 32)
-			{
-				_tile_stream_loadd(4, src0, strideS);
-				_tile_loadd(6, weight0 + sc * 16, strideW);
-				_tile_dpbf16ps(0, 4, 6);
-				_tile_stream_loadd(5, src1, strideS);
-				_tile_dpbf16ps(2, 5, 6);
-			}
+
+            int srcC32 = (int)srcC - 32, sc = 0;
+            _tile_stream_loadd(4, src0, strideS);
+            for (; sc < srcC32;)
+            {
+                _tile_loadd(6, weight0 + sc * 16, strideW);
+                _tile_stream_loadd(5, src1 + sc, strideS);
+                _tile_dpbf16ps(0, 4, 6);
+                sc += 32;
+                _tile_stream_loadd(4, src0 + sc, strideS);
+                _tile_dpbf16ps(2, 5, 6);
+            }
+            _tile_loadd(6, weight0 + sc * 16, strideW);
+            _tile_stream_loadd(5, src1 + sc, strideS);
+            _tile_dpbf16ps(0, 4, 6);
+            _tile_dpbf16ps(2, 5, 6);
+
 			_tile_stored(0, dst + 0, strideD);
 			_tile_stored(2, dst + 16 * dD + 0, strideD);
 			TileMoveToMemory(dst + 0, dD);
 			TileMoveToMemory(dst + 16 * dD + 0, dD);
 		}
 
-        static void Deconvolution16bNhwcGemm_16x32(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
+        template<int cfg> void Deconvolution16bNhwcGemm_16x32(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
             size_t dstS, size_t dstC, size_t srcC, int zero, const uint16_t* weight0, float* dst)
         {
             int dD = (int)a.bufN, dS = (int)a.bufK, strideD = dD * 4, strideW = 64, strideS = dS * 2;
             const uint16_t* weight1 = weight0 + a.bufK * F;
 
-            TileConf conf;
-            conf.rows[0] = uint8_t(dstS);
-            conf.rows[1] = uint8_t(dstS);
-            conf.rows[4] = uint8_t(dstS);
-            conf.rows[6] = 16;
-            conf.rows[7] = 16;
-            conf.colsb[0] = 64;
-            conf.colsb[1] = uint16_t(dstC - 16) * 4;
-            conf.colsb[4] = 64;
-            conf.colsb[6] = 64;
-            conf.colsb[7] = uint16_t(dstC - 16) * 4;
-            _tile_loadconfig(&conf);
-
+            if (cfg)
+                SetTileConf1x2(dstS, dstC);
             if (zero)
             {
                 _tile_zero(0);
@@ -220,34 +202,36 @@ namespace Simd
                 _tile_stream_loadd(0, dst + 0, strideD);
                 _tile_stream_loadd(1, dst + F, strideD);
             }
-            for (size_t sc = 0; sc < srcC; sc += 32, src0 += 32)
+
+            int srcC32 = (int)srcC - 32, sc = 0;
+            _tile_loadd(6, weight0 + sc * 16, strideW);
+            for (; sc < srcC32;)
             {
-                _tile_stream_loadd(4, src0, strideS);
-                _tile_loadd(6, weight0 + sc * 16, strideW);
-                _tile_dpbf16ps(0, 4, 6);
+                _tile_stream_loadd(4, src0 + sc, strideS);
                 _tile_loadd(7, weight1 + sc * 16, strideW);
+                _tile_dpbf16ps(0, 4, 6);
+                sc += 32;
+                _tile_loadd(6, weight0 + sc * 16, strideW);
                 _tile_dpbf16ps(1, 4, 7);
             }
+            _tile_stream_loadd(4, src0 + sc, strideS);
+            _tile_loadd(7, weight1 + sc * 16, strideW);
+            _tile_dpbf16ps(0, 4, 6);
+            _tile_dpbf16ps(1, 4, 7);
+
             _tile_stored(0, dst + 0, strideD);
             _tile_stored(1, dst + F, strideD);
             TileMoveToMemory(dst + 0, dD);
             TileMoveToMemory(dst + F, dD);
         }
 
-        static void Deconvolution16bNhwcGemm_16x16(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
+        template<int cfg> void Deconvolution16bNhwcGemm_16x16(const uint16_t* src0, const DeconvParam& p, const AlgParam& a,
             size_t dstS, size_t dstC, size_t srcC, int zero, const uint16_t* weight0, float* dst)
         {
             int dD = (int)a.bufN, dS = (int)a.bufK, strideD = dD * 4, strideW = 64, strideS = dS * 2;
 
-            TileConf conf;
-            conf.rows[0] = uint8_t(dstS);
-            conf.rows[4] = uint8_t(dstS);
-            conf.rows[6] = 16;
-            conf.colsb[0] = uint16_t(dstC * 4);
-            conf.colsb[4] = 64;
-            conf.colsb[6] = uint16_t(dstC * 4);
-            _tile_loadconfig(&conf);
-
+            if (cfg)
+                SetTileConf1x1(dstS, dstC);
             if (zero)
             {
                 _tile_zero(0);
@@ -256,12 +240,14 @@ namespace Simd
             {
                 _tile_stream_loadd(0, dst + 0, strideD);
             }
-            for (size_t sc = 0; sc < srcC; sc += 32, src0 += 32)
+
+            for (size_t sc = 0; sc < srcC; sc += 32)
             {
-                _tile_stream_loadd(4, src0, strideS);
+                _tile_stream_loadd(4, src0 + sc, strideS);
                 _tile_loadd(6, weight0 + sc * 16, strideW);
                 _tile_dpbf16ps(0, 4, 6);
             }
+
             _tile_stored(0, dst + 0, strideD);
             TileMoveToMemory(dst + 0, dD);
         }
@@ -271,33 +257,57 @@ namespace Simd
 
         void Deconvolution16bNhwcGemm_2(const uint16_t* src, const DeconvParam& p, const AlgParam& a, size_t M, size_t N, size_t K, int zero, const uint16_t* wgt, float* dst)
         {
-            //SIMD_PERF_FUNC();
             size_t m = 32, mm = AlignLoAny(M, m), t = M - mm;
             size_t dS = a.bufK, dW = a.bufK * DF, dD = a.bufN;
-            Deconvolution16bNhwcGemmPtr body_2 = Deconvolution16bNhwcGemm_32x32;
-            Deconvolution16bNhwcGemmPtr tail_2 = t > 16 ? Deconvolution16bNhwcGemm_32x32 : Deconvolution16bNhwcGemm_16x32;
-            Deconvolution16bNhwcGemmPtr body_1 = Deconvolution16bNhwcGemm_32x16;
-            Deconvolution16bNhwcGemmPtr tail_1 = t > 16 ? Deconvolution16bNhwcGemm_32x16 : Deconvolution16bNhwcGemm_16x16;
 
-            for (size_t j = 0; j < N; j += DF)
+            if (mm)
             {
-                size_t dN = Simd::Min(DF, N - j), i = 0;
-                if (dN > F)
+                Deconvolution16bNhwcGemmPtr body_2 = Deconvolution16bNhwcGemm_32x32<0>;
+                Deconvolution16bNhwcGemmPtr tail_2 = t > 16 ? Deconvolution16bNhwcGemm_32x32<1> : Deconvolution16bNhwcGemm_16x32<1>;
+                Deconvolution16bNhwcGemmPtr body_1 = Deconvolution16bNhwcGemm_32x16<1>;
+                Deconvolution16bNhwcGemmPtr tail_1 = t > 16 ? Deconvolution16bNhwcGemm_32x16<1> : Deconvolution16bNhwcGemm_16x16<1>;
+                SetTileConfFull();
+                for (size_t j = 0; j < N; j += DF)
                 {
-                    for (; i < mm; i += m)
-                        body_2(src + i * dS, p, a, m, dN, K, zero, wgt, dst + i * dD);
-                    if (t)
-                        tail_2(src + i * dS, p, a, t, dN, K, zero, wgt, dst + i * dD);
+                    size_t dN = Simd::Min(DF, N - j), i = 0;
+                    if (dN > F)
+                    {
+                        if(t)
+                            SetTileConfFull();
+                        for (; i < mm; i += m)
+                            body_2(src + i * dS, p, a, m, dN, K, zero, wgt, dst + i * dD);
+                        if (t)
+                            tail_2(src + i * dS, p, a, t, dN, K, zero, wgt, dst + i * dD);
+                    }
+                    else
+                    {
+                        for (; i < mm; i += m)
+                            body_1(src + i * dS, p, a, m, dN, K, zero, wgt, dst + i * dD);
+                        if (t)
+                            tail_1(src + i * dS, p, a, t, dN, K, zero, wgt, dst + i * dD);
+                    }
+                    wgt += dW;
+                    dst += DF;
                 }
+            }
+            else
+            {
+                Deconvolution16bNhwcGemmPtr tail_2 = t > 16 ? Deconvolution16bNhwcGemm_32x32<0> : Deconvolution16bNhwcGemm_16x32<0>;
+                Deconvolution16bNhwcGemmPtr tail_1 = t > 16 ? Deconvolution16bNhwcGemm_32x16<0> : Deconvolution16bNhwcGemm_16x16<0>;
+                if (t > 16)
+                    SetTileConf2x2(t, 32);
                 else
+                    SetTileConf1x2(t, 32);
+                for (size_t j = 0; j < N; j += DF)
                 {
-                    for (; i < mm; i += m)
-                        body_1(src + i * dS, p, a, m, dN, K, zero, wgt, dst + i * dD);
-                    if (t)
+                    size_t dN = Simd::Min(DF, N - j), i = 0;
+                    if (dN > F)
+                        tail_2(src + i * dS, p, a, t, dN, K, zero, wgt, dst + i * dD);
+                    else
                         tail_1(src + i * dS, p, a, t, dN, K, zero, wgt, dst + i * dD);
+                    wgt += dW;
+                    dst += DF;
                 }
-                wgt += dW;
-                dst += DF;
             }
         }
 
@@ -307,10 +317,12 @@ namespace Simd
         {
             size_t dstCF = AlignLo(p.dstC, F);
             __mmask16 tail = TailMask16(p.dstC - dstCF);
-            for (size_t dy = 0; dy < p.dstH; ++dy)
-                for (size_t dx = 0; dx < p.dstW; ++dx)
-                    memset(dst + (dy * p.dstW + dx) * p.dstC, 0, p.dstC * sizeof(float));
-            for (size_t sy = 0; sy < p.srcH; ++sy)
+            size_t rowSize = p.dstW * p.dstC, gap = a.bufN - a.N;
+            size_t dyBeg = yBeg ? yBeg * p.strideY + a.preH : 0;
+            size_t dyEnd = Simd::Min(yEnd * p.strideY + a.preH, p.dstH);
+            for (size_t dy = dyBeg; dy < dyEnd; ++dy)
+                memset(dst + dy * rowSize, 0, rowSize * sizeof(float));
+            for (size_t sy = yBeg; sy < yEnd; ++sy)
             {
                 for (size_t sx = 0; sx < p.srcW; ++sx)
                 {
@@ -337,6 +349,7 @@ namespace Simd
                         else
                             src += p.kernelX * p.dstC;
                     }
+                    src += gap;
                 }
             }
         }
@@ -347,6 +360,8 @@ namespace Simd
         {
             size_t body = AlignLo(p.dstC, F);
             __mmask16 tail = TailMask16(p.dstC - body);
+            src += yBeg * p.dstW * p.dstC;
+            dst += yBeg * p.dstW * p.dstC * a.elem;
             for (size_t dy = yBeg; dy < yEnd; ++dy)
             {
                 for (size_t dx = 0; dx < p.dstW; ++dx)

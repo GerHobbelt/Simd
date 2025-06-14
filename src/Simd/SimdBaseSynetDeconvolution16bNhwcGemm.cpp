@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -76,8 +76,11 @@ namespace Simd
             a.macroM = a.macroH * p.srcW;
             a.macroN = Simd::RestrictRange(AlignLoAny(L3 / a.macroK / 2, a.microN), a.microN, a.bufN);
             a.elem = _elemD;
+            a.preH = (p.kernelY - 1) * p.dilationY - p.padY;
             _stepS = p.srcH * p.srcW * p.srcC * _elemS;
             _stepD = p.dstH * p.dstW * p.dstC * _elemD;
+            if (a.bufN != a.N)
+                _is1x1 = false;
         }
 
         void SynetDeconvolution16bNhwcGemm::SetParams(const float* weight, const float* bias, const float* params)
@@ -118,7 +121,10 @@ namespace Simd
             float* bufD = _dst16b ? Allocate<float>(buf, p.dstH * p.dstW * p.dstC) : NULL;
             for (size_t b = 0; b < p.batch; ++b)
             {
-                ForwardCommon(src, bufS, bufB, bufD, dst);
+                if(a.macroK == a.bufK && a.macroN == a.bufN)
+                    ForwardSmallNK(src, bufS, bufB, bufD, dst);
+                else
+                    ForwardCommon(src, bufS, bufB, bufD, dst);
                 src += _stepS;
                 dst += _stepD;
             }
@@ -157,6 +163,30 @@ namespace Simd
                     wgt += macroK * a.F;
                 }
                 dst += macroN;
+            }
+        }
+
+        void SynetDeconvolution16bNhwcGemm::ForwardSmallNK(const uint8_t* src, uint16_t* bufS, float* bufB, float* bufD, uint8_t* dst)
+        {
+            const DeconvParam& p = _param;
+            const AlgParam& a = _alg;
+            const uint16_t* src16b = (_src16b && a.bufK == a.K) ? (uint16_t*)src : bufS;
+            float* dst32f = _dst16b ? bufD : (float*)dst;
+            float* buf32f = _is1x1 ? dst32f : bufB;
+            for (size_t syBeg = 0, syEnd = 0; syBeg < p.srcH; syBeg = syEnd)
+            {
+                syEnd = Min(syBeg + a.macroH, p.srcH);
+                if (!_src16b || a.bufK != a.K)
+                    _convert(src, p, a, syBeg, syEnd, bufS);
+                else
+                    src16b = (uint16_t*)src + syBeg * p.srcW * p.srcC;
+                size_t mBeg = syBeg * p.srcW, mEnd = syEnd * p.srcW;
+                _gemm(src16b, _param, a, mEnd - mBeg, a.N, a.bufK, 1, _weight.data, buf32f);
+                if (!_is1x1)
+                    _toImg(buf32f, p, a, p.dstC, syBeg, syEnd, dst32f);
+                size_t dyBeg = Max(int(syBeg * p.strideY - p.padY), 0);
+                size_t dyEnd = syEnd == p.srcH ? p.dstH : syEnd * p.strideY - p.padY;
+                _biasAct(dst32f, p, a, p.dstC, dyBeg, dyEnd, _bias.data, _params.data, dst);
             }
         }
 

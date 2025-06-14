@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "Test/TestString.h"
 #include "Test/TestFile.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdGaussianBlur.h"
 #include "Simd/SimdRecursiveBilateralFilter.h"
@@ -961,7 +962,7 @@ namespace Test
         std::cout << std::endl;
     }
 
-    bool GaussianBlurSpecialTest()
+    bool GaussianBlurSpecialTest(const Options & options)
     {
         const size_t rows = 8, cols = 12;
         uint8_t src[rows * cols], dst[rows * cols];

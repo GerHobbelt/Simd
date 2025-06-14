@@ -35,22 +35,101 @@
 </center>
 
 <a href="#HOME">Home</a>
+
+<h3 id="R149">May X, 2025 (version 6.1.149)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AMX-BF16 optimizations of class SynetConvolution16bNhwcSpecV1.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in function Simd::SynetSetInput.</li>
+</ul>
+<h5>Renaming</h5>
+<ul>
+ <li>Class SynetConvolution16bNhwcDirect to SynetConvolution16bNhwcSpecV0.</li>
+</ul> 
+
+<h4>Infrastructure</h4>
+<h5>Bug fixing</h5>
+<ul>
+ <li>CMake warning (required minimal version of CMake must be greater or equal to 3.10).</li>
+</ul>
+
+<h3 id="R148">April 1, 2025 (version 6.1.148)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>ForwardSmallNK algorithm in Base implementation of class SynetDeconvolution16bNhwcGemm.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetChannelSum16b.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of class SynetScale16b.</li>
+</ul>
+<h5>Improving</h5>
+<ul>
+ <li>AMX-BF16 optimizations of class SynetDeconvolution16bNhwcGemm.</li>
+ <li>AMX-BF16 optimizations of class SynetMergedConvolution16bCdc.</li>
+ <li>AMX-BF16 optimizations of class SynetMergedConvolution16bCd.</li>
+ <li>AMX-BF16 optimizations of class SynetMergedConvolution16bDc.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of class SynetDeconvolution16bNhwcGemm.</li>
+ <li>Error in Base implementation, AVX-512BW, AMX-BF16 optimizations of class SynetInnerProduct16bGemmNN.</li>
+ <li>Error in class Xml::NodeIterator.</li>
+ <li>Error in class Xml::AttributeIterator.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of function SynetChannelSum16b.</li>
+ <li>Tests for verifying functionality of class SynetScale16b.</li>
+ <li>Pinning of test threads (-pt=1 command line argument).</li>
+</ul>
+
+<h4>Infrastructure</h4>
+<h5>New features</h5>
+<ul>
+ <li>Clang version parameter in Github actions script for CMake.</li>
+ <li>Check Clang-19 in Github actions script for CMake.</li>
+</ul>
+
 <hr/>
-<h3 id="R147">March X, 2025 (version 6.1.147)</h3> 
+<h3 id="R147">March 3, 2025 (version 6.1.147)</h3> 
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function BgrToLab.</li>
  <li>LAB pixel format in Simd::View.</li>
  <li>LAB pixel format in Simd::Frame.</li>
+ <li>Supporting of BMP file format in function SimdImageSaveToMemory.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of class ImageBmpSaver.</li>
+ <li>Supporting of BMP file format in function SimdImageLoadFromMemory.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, NEON optimizations of class ImageBmpLoader.</li>
 </ul>
+<h5>Improving</h5>
 <ul>
  <li>AMX-BF16 optimizations of class SynetConvolution16bNhwcGemm.</li>
+ <li>AMX-BF16 optimizations of class SynetConvolution16bNhwcDirect.</li>
+ <li>AMX-BF16 optimizations of class SynetInnerProduct16bGemmNN.</li>
 </ul>
 <h5>Bug fixing</h5>
 <ul>
  <li>Error in AVX-512BW optimizations of class SynetConvolution32fNhwcDepthwise.</li>
  <li>Error in AMX-BF16 optimizations of class SynetConvolution16bNchwGemm.</li>
+ <li>Error in AMX-BF16 optimizations of class SynetMergedConvolution16bCdc (micro kernel DepthwiseConvolution3x3xH).</li>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of class SynetInnerProduct16bGemmNN.</li>
+</ul>
+
+<h4>Python wrapper</h4>
+<h5>New features</h5>
+<ul>
+ <li>Lab24 in Simd.PixelFormat enumeration.</li>
+ <li>Lab24 in Simd.FrameFormat enumeration.</li>
+ <li>Bmp in Simd.ImageFile enumeration.</li>
+ <li>Wrapper for function SimdBgrToLab.</li>
+ <li>Function Simd.BgrToLab.</li>
 </ul>
 
 <h4>Test framework</h4>

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -337,10 +337,12 @@ namespace Simd
         static void RowToImgCommon(const float* src, const DeconvParam& p, const AlgParam& a, size_t dstC, size_t yBeg, size_t yEnd, float* dst)
         {
             size_t dstCF = AlignLo(p.dstC, F);
-            for (size_t dy = 0; dy < p.dstH; ++dy)
-                for (size_t dx = 0; dx < p.dstW; ++dx)
-                    memset(dst + (dy * p.dstW + dx) * p.dstC, 0, p.dstC * sizeof(float));
-            for (size_t sy = 0; sy < p.srcH; ++sy)
+            size_t rowSize = p.dstW * p.dstC, gap = a.bufN - a.N;
+            size_t dyBeg = yBeg ? yBeg * p.strideY + a.preH : 0;
+            size_t dyEnd = Simd::Min(yEnd * p.strideY + a.preH, p.dstH);
+            for (size_t dy = dyBeg; dy < dyEnd; ++dy)
+                memset(dst + dy * rowSize, 0, rowSize * sizeof(float));
+            for (size_t sy = yBeg; sy < yEnd; ++sy)
             {
                 for (size_t sx = 0; sx < p.srcW; ++sx)
                 {
@@ -367,6 +369,7 @@ namespace Simd
                         else
                             src += p.kernelX * p.dstC;
                     }
+                    src += gap;
                 }
             }
         }
@@ -376,6 +379,8 @@ namespace Simd
         template <Term16bType term, SimdConvolutionActivationType type> void BiasActivationCommon(const float* src, const DeconvParam& p, const AlgParam& a, size_t dstC, size_t yBeg, size_t yEnd, const float* bias, const float* params, uint8_t* dst)
         {
             size_t body = AlignLo(p.dstC, F), tail = p.dstC - body;
+            src += yBeg * p.dstW * p.dstC;
+            dst += yBeg * p.dstW * p.dstC * a.elem;
             for (size_t dy = yBeg; dy < yEnd; ++dy)
             {
                 for (size_t dx = 0; dx < p.dstW; ++dx)

@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -169,7 +169,7 @@ namespace Simd
                         size_t yEnd = Simd::Min(yBeg + a.macroH, dstH);
                         size_t bufOffs = (a.macroK < a.bufK || _convert == NULL) ? 
                             yBeg * (_convert ? AlignHi(p.dstW, a.F) : p.dstW) * a.bufK + (a.reorderType ? mak * a.F : mak) : 0;
-                        size_t sumOffs = a.macroK < a.bufK ? yBeg * AlignHi(p.dstW, a.F) * a.dB : 0;
+                        size_t sumOffs = a.macroK < a.bufK ? yBeg * (a.microK > 2 ? AlignHi(p.dstW, a.F) : p.dstW)* a.dB : 0;
                         size_t dstOffs = yBeg * p.dstW * p.dstC * _elemD;
                         if (dc == 0 && mak == 0 && _convert)
                         {

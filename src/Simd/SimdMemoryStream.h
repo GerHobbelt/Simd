@@ -210,7 +210,7 @@ namespace Simd
 
         SIMD_INLINE bool Skip(size_t size)
         {
-            if (_pos + size < _size)
+            if (_pos + size <= _size)
             {
                 _pos += size;
                 return true;
@@ -461,6 +461,15 @@ namespace Simd
             memset(_data + _pos, value, count);
             _pos += count;
             _size = Max(_size, _pos);
+        }
+
+        SIMD_INLINE void WriteBe16u(const uint16_t& value)
+        {
+#if defined(SIMD_BIG_ENDIAN)
+            Write<uint16_t>(value);
+#else
+            Write<uint16_t>((value & 0x00FF) << 8 | (value & 0xFF00) >> 8);
+#endif
         }
 
         SIMD_INLINE void WriteBe32u(const uint32_t & value)

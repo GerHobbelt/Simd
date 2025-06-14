@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -52,6 +52,24 @@ namespace Simd
             float _a = Convert16b<A, float>(a);
             float _b = Convert16b<B, float>(b);
             dst = Convert16b<float, D>(_a + _b);
+        }
+
+        template <typename S, typename D> void NormBias16b(const S& src, float norm, float bias, D& dst)
+        {
+            float _src = Convert16b<S, float>(src);
+            dst = Convert16b<float, D>(_src * norm + bias);
+        }
+
+        template <typename S, typename D> void Norm16b(const S& src, float norm, D& dst)
+        {
+            float _src = Convert16b<S, float>(src);
+            dst = Convert16b<float, D>(_src * norm);
+        }
+
+        template <typename S, typename D> void Bias16b(const S& src, float bias, D& dst)
+        {
+            float _src = Convert16b<S, float>(src);
+            dst = Convert16b<float, D>(_src + bias);
         }
     }
 }

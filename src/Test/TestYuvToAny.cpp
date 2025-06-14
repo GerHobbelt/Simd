@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include "Test/TestCompare.h"
 #include "Test/TestPerformance.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdFrame.hpp"
 
@@ -453,7 +454,7 @@ namespace Test
 
     //-------------------------------------------------------------------------------------------------
 
-    bool Yuv420pToRgbV2SpecialTest()
+    bool Yuv420pToRgbV2SpecialTest(const Options & options)
     {
         bool result = true;
 

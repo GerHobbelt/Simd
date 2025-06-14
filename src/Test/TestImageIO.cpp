@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdImageLoad.h"
 #include "Simd/SimdImageSave.h"
@@ -35,7 +36,7 @@
 
 namespace Test
 {
-    const int DebugImageSave = 0;
+    const int DebugImageSave = 1;
 
     SIMD_INLINE int GetMaxJpegError(int quality)
     {
@@ -63,7 +64,7 @@ namespace Test
         {
             TEST_LOG_SS(Info, "Test " << desc1 << " & " << desc2 << " [" << width << ", " << height << "].");
             image.Recreate(width, height, format, NULL, TEST_ALIGN(width));
-#if 1
+#if 0
             ::srand(0);
             View buffer(image.Size(), image.format);
             FillRandom(buffer);
@@ -106,6 +107,8 @@ namespace Test
             ss << suffix << ".ppm";
         else if (file == SimdImageFilePng)
             ss << suffix << ".png";
+        else if (file == SimdImageFileBmp)
+            ss << suffix << ".bmp";
         if (file == SimdImageFileJpeg)
             ss << "_" << ToString(quality) << suffix << ".jpg";
         const String dir = "_out";
@@ -113,7 +116,7 @@ namespace Test
         return CreatePathIfNotExist(dir, false) && image.Save(path, file, quality);
     }
 
-    //-------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     namespace
     {
@@ -213,7 +216,7 @@ namespace Test
         std::vector<View::Format> formats({ View::Gray8, View::Bgr24, View::Bgra32, View::Rgb24, View::Rgba32});
         for (int format = 0; format < (int)formats.size(); format++)
         {
-            for (int file = (int)SimdImageFileJpeg; file <= (int)SimdImageFileJpeg; file++)
+            for (int file = (int)SimdImageFileBmp; file <= (int)SimdImageFileBmp; file++)
             {
                 if (file == SimdImageFileJpeg)
                 {
@@ -259,7 +262,7 @@ namespace Test
         return result;
     }
 
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     namespace
     {
@@ -412,7 +415,7 @@ namespace Test
         return result;
     }
 
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     namespace
     {
@@ -558,7 +561,7 @@ namespace Test
         return result;
     }
 
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     namespace
     {
@@ -595,6 +598,8 @@ namespace Test
             return format == View::Gray8;
         if (file == SimdImageFilePpmTxt || file == SimdImageFilePpmBin)
             return format != View::Bgra32 && format != View::Rgba32;
+        if (file == SimdImageFileBmp)
+            return true;
         return false;
     }
 
@@ -668,7 +673,7 @@ namespace Test
         std::vector<View::Format> formats = { View::Gray8, View::Bgr24, View::Bgra32, View::Rgb24, View::Rgba32 };
         for (size_t format = 0; format < formats.size(); format++)
         {
-            for (int file = (int)SimdImageFileJpeg; file <= (int)SimdImageFileJpeg; file++)
+            for (int file = (int)SimdImageFileBmp; file <= (int)SimdImageFileBmp; file++)
             {
                 if (file == SimdImageFileJpeg)
                 {
@@ -713,7 +718,7 @@ namespace Test
         return result;
     }
 
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
 
     bool ImageLoadFromMemorySpecialTest(const String & name, View::Format format, const FuncLM& f1, const FuncLM& f2)
     {
@@ -894,7 +899,7 @@ namespace Test
         return result;
     }
 
-    bool ImageLoadFromMemorySpecialTest()
+    bool ImageLoadFromMemorySpecialTest(const Options & options)
     {
         bool result = true;
 

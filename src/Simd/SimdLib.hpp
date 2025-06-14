@@ -2,7 +2,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar,
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
 *               2014-2019 Antonenka Mikhail,
 *               2019-2019 Facundo Galan,
 *               2022-2022 Souriya Trinh.
@@ -3962,7 +3962,7 @@ namespace Simd
         case View<A>::Bgra32: srcFormat = isRgb ? SimdPixelFormatRgba32 : SimdPixelFormatBgra32; break;
         case View<A>::Rgb24: srcFormat = isRgb ? SimdPixelFormatBgr24 : SimdPixelFormatRgb24; break;
         case View<A>::Rgba32: srcFormat = isRgb ? SimdPixelFormatBgra32 : SimdPixelFormatRgba32; break;
-        deafult :
+        default :
             assert(0);
         }
         SimdSynetSetInput(src.data, src.width, src.height, src.stride, srcFormat, lower, upper, dst, channels, format);

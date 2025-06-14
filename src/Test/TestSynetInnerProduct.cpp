@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -175,6 +175,10 @@ namespace Test
         result = result && SynetInnerProduct32fForwardAutoTest(eps, 100, 4096, 1024, t, a, f1, f2);
         result = result && SynetInnerProduct32fForwardAutoTest(eps, 100, 1024, 4096, f, a, f1, f2);
         result = result && SynetInnerProduct32fForwardAutoTest(eps, 100, 4096, 1024, f, a, f1, f2);
+#endif
+#if 0
+        result = result && SynetInnerProduct32fForwardAutoTest(eps, 1, 100352, 512, f, a, f1, f2);
+        result = result && SynetInnerProduct32fForwardAutoTest(eps, 1, 25088, 2048, f, a, f1, f2);
 #endif
 #else
         result = result && SynetInnerProduct32fForwardAutoTest(eps, 49, 49, 32, f, a, f1, f2);

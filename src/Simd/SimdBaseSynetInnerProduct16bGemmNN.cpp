@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -129,16 +129,17 @@ namespace Simd
             a.aM = AlignHi(p.M, a.microM);
             a.macroK = Simd::RestrictRange(AlignLo(L1 / a.microN / 2, a.microK), a.microK, a.aK);
             a.macroN = Simd::RestrictRange(AlignLo(L3 / a.macroK / 2, a.microN), a.microN, a.aN);
-            a.macroM = Simd::RestrictRange(L2 / a.macroK / 2, a.microM, a.aM);
+            a.macroM = Simd::RestrictRange(AlignLo(L2 / a.macroK / 2, a.microM), a.microM, a.aM);
             a.eA = p.typeA == SimdTensorData32f ? 4 : 2;
             a.eB = p.typeB == SimdTensorData32f ? 4 : 2;
             a.eC = p.typeC == SimdTensorData32f ? 4 : 2;
-            a.bK = p.constB ? a.aK : a.macroK;
-            a.cN = p.typeC == SimdTensorData32f || a.macroK < a.aK ? p.N : a.macroN;
 
-            _sizeA = (p.typeA == SimdTensorData32f || p.K != a.aK) ? (a.macroN == a.aN ? a.macroM : a.aM) * a.aK : 0;
+            _sizeA = (p.typeA == SimdTensorData32f || p.K != a.aK) ? a.aM * a.aK : 0;
             _sizeB = p.constB ? 0 : a.macroK * a.macroN;
-            _sizeC = p.typeC == SimdTensorData16b ? a.macroM * a.cN : 0;
+            _sizeC = (p.typeC == SimdTensorData16b || a.aM != p.M || a.aN != p.N) ? a.macroN * a.aM : 0;
+
+            a.bK = p.constB ? a.aK : a.macroK;
+            a.cN = _sizeC ? a.macroN : p.N;
 
             _bias.Resize(a.aN, true);
         }
@@ -174,9 +175,9 @@ namespace Simd
                     for (size_t i = 0; i < p.M; i += a.macroM)
                     {
                         size_t macroM = Simd::Min(p.M, i + a.macroM) - i;
-                        size_t offsA = (a.macroN == a.aN && _prepA) ? 0 : i * a.aK;
+                        size_t offsA = (a.macroN == a.aN && a.macroK == a.aK && _prepA) ? 0 : i * a.aK;
                         size_t offsB = p.constB ? j * a.bK + k * a.F : 0;
-                        size_t offsC = _sizeC ? 0 : i * a.cN + j;
+                        size_t offsC = _sizeC ? (a.macroK < a.aK ? i * a.cN : 0) : i * a.cN + j;
                         if (j == 0 && k == 0 && _prepA)
                             _prepA(A + i * p.K * a.eA, p, a, macroM, p.K, bufA + offsA);
                         if (i == 0 && _prepB && !p.constB)

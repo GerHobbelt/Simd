@@ -31,12 +31,121 @@
 #include "Simd/SimdExp.h"
 #include "Simd/SimdGather.h"
 #include "Simd/SimdPow.h"
+#include "Simd/SimdBFloat16.h"
 
 namespace Simd
 {
 #if defined(SIMD_SSE41_ENABLE) && defined(SIMD_SYNET_ENABLE)   
     namespace Sse41
     {
+        void SynetChannelSum16b(const uint16_t* src, size_t channels, size_t spatial, SimdTensorFormatType format, float* sum)
+        {
+            if (format == SimdTensorFormatNhwc)
+            {
+                size_t channels4 = AlignLo(channels, 4), channels8 = AlignLo(channels, 8);
+                size_t spatial4 = AlignLo(spatial, 4);
+                size_t c = 0;
+                for (; c < channels4; c += 4)
+                    _mm_storeu_ps(sum + c, _mm_setzero_ps());
+                for (; c < channels; ++c)
+                    sum[c] = 0.0f;
+
+                size_t s = 0;
+                for (; s < spatial4; s += 4)
+                {
+                    const uint16_t* src0 = src + 0 * channels;
+                    const uint16_t* src1 = src + 1 * channels;
+                    const uint16_t* src2 = src + 2 * channels;
+                    const uint16_t* src3 = src + 3 * channels;
+                    size_t c = 0;
+                    for (; c < channels8; c += 8)
+                    {
+                        __m128 sum0 = _mm_loadu_ps(sum + c + 0);
+                        __m128 sum1 = _mm_loadu_ps(sum + c + 4);
+                        __m128i _src = _mm_loadu_si128((__m128i*)(src0 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        sum1 = _mm_add_ps(sum1, BFloat16ToFloat32<1>(_src));
+                        _src = _mm_loadu_si128((__m128i*)(src1 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        sum1 = _mm_add_ps(sum1, BFloat16ToFloat32<1>(_src));
+                        _src = _mm_loadu_si128((__m128i*)(src2 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        sum1 = _mm_add_ps(sum1, BFloat16ToFloat32<1>(_src));
+                        _src = _mm_loadu_si128((__m128i*)(src3 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        sum1 = _mm_add_ps(sum1, BFloat16ToFloat32<1>(_src));
+                        _mm_storeu_ps(sum + c + 0, sum0);
+                        _mm_storeu_ps(sum + c + 4, sum1);
+                    }
+                    for (; c < channels4; c += 4)
+                    {
+                        __m128 sum0 = _mm_loadu_ps(sum + c + 0);
+                        __m128i _src = _mm_loadl_epi64((__m128i*)(src0 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        _src = _mm_loadl_epi64((__m128i*)(src1 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        _src = _mm_loadl_epi64((__m128i*)(src2 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        _src = _mm_loadl_epi64((__m128i*)(src3 + c));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src));
+                        _mm_storeu_ps(sum + c + 0, sum0);
+                    }
+                    for (; c < channels; ++c)
+                    {
+                        sum[c] += Base::BFloat16ToFloat32(src0[c]);
+                        sum[c] += Base::BFloat16ToFloat32(src1[c]);
+                        sum[c] += Base::BFloat16ToFloat32(src2[c]);
+                        sum[c] += Base::BFloat16ToFloat32(src3[c]);
+                    }
+                    src += channels * 4;
+                }
+                for (; s < spatial; ++s)
+                {
+                    c = 0;
+                    for (; c < channels8; c += 8)
+                    {
+                        __m128i _src = _mm_loadu_si128((__m128i*)(src + c));
+                        __m128 sum0 = _mm_loadu_ps(sum + c + 0);
+                        __m128 sum1 = _mm_loadu_ps(sum + c + 4);
+                        _mm_storeu_ps(sum + c + 0, _mm_add_ps(sum0, BFloat16ToFloat32<0>(_src)));
+                        _mm_storeu_ps(sum + c + 4, _mm_add_ps(sum1, BFloat16ToFloat32<1>(_src)));
+                    }
+                    for (; c < channels4; c += 4)
+                    {
+                        __m128 _sum = _mm_loadu_ps(sum + c);
+                        __m128i _src = _mm_loadl_epi64((__m128i*)(src + c));
+                        _mm_storeu_ps(sum + c, _mm_add_ps(_sum, BFloat16ToFloat32<0>(_src)));
+                    }
+                    for (; c < channels; ++c)
+                        sum[c] += Base::BFloat16ToFloat32(src[c]);
+                    src += channels;
+                }
+            }
+            else if (format == SimdTensorFormatNchw)
+            {
+                size_t spatial8 = AlignLo(spatial, 8);
+                for (size_t c = 0; c < channels; ++c)
+                {
+                    __m128 sum0 = _mm_setzero_ps(), sum1 = _mm_setzero_ps();
+                    size_t s = 0;
+                    for (; s < spatial8; s += 8)
+                    {
+                        __m128i _src = _mm_loadu_si128((__m128i*)(src + s));
+                        sum0 = _mm_add_ps(sum0, BFloat16ToFloat32Even(_src));
+                        sum1 = _mm_add_ps(sum1, BFloat16ToFloat32Odd(_src));
+                    }
+                    sum[c] = ExtractSum(_mm_add_ps(sum0, sum1));
+                    for (; s < spatial; ++s)
+                        sum[c] += Base::BFloat16ToFloat32(src[s]);
+                    src += spatial;
+                }
+            }
+            else
+                assert(0);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
         template <SimdSynetEltwiseOperationType type> __m128 SynetEltwiseLayerForward(__m128 src0, __m128 src1);
 
         template <> SIMD_INLINE __m128 SynetEltwiseLayerForward<SimdSynetEltwiseOperationProduct>(__m128 src0, __m128 src1)

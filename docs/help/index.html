@@ -139,7 +139,7 @@ Test Framework</h1>
 <li><code>-ot=log.txt</code> - a file name with test report (in TEXT file format). The test's report also will be output to console.</li>
 </ul>
 <p >Also you can use parameters:</p><ul>
-<li><code>-help</code> or <code>-?</code> in order to print help message.</li>
+<li><code>--help</code> or <code>-?</code> in order to print help message.</li>
 <li><code>-r=../..</code> to set project root directory.</li>
 <li><code>-pa=1</code> to print alignment statistics.</li>
 <li><code>-pi=1</code> to print internal statistics (Cmake parameter SIMD_PERF must be ON).</li>
@@ -158,7 +158,8 @@ Test Framework</h1>
 <li><code>-ts=1</code> to print statistics of time of tests execution.</li>
 <li><code>-cc=1</code> to check c++ API.</li>
 <li><code>-de=2</code> a flags of SIMD extensions which testing are disabled. Base - 1, 2 - SSE4.1/NEON, 4 - AVX2, 8 - AVX-512BW, 16 - AVX-512VNNI, 32 - AMX-BF16.</li>
-<li><code>-wu=100</code> a time to warm up CPU before testing (in milliseconds). </li>
+<li><code>-wu=100</code> a time to warm up CPU before testing (in milliseconds).</li>
+<li><code>-pt=1</code> a boolean flag to pin threads to cpu cores. </li>
 </ul>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->

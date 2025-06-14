@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -127,7 +127,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = Base::Float32ToBFloat16(ps[i * p.N + f]);
                             else
                                 *(dst++) = 0;
@@ -145,7 +145,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = Base::Float32ToBFloat16(ps[i * p.N + f]);
                             else
                                 *(dst++) = 0;
@@ -184,7 +184,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = Base::Float32ToBFloat16(ps[f * p.K + i]);
                             else
                                 *(dst++) = 0;
@@ -202,7 +202,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = Base::Float32ToBFloat16(ps[f * p.K + i]);
                             else
                                 *(dst++) = 0;
@@ -242,7 +242,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = ps[i * p.N + f];
                             else
                                 *(dst++) = 0;
@@ -260,7 +260,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = ps[i * p.N + f];
                             else
                                 *(dst++) = 0;
@@ -304,7 +304,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = ps[f * p.K + i];
                             else
                                 *(dst++) = 0;
@@ -322,7 +322,7 @@ namespace Simd
                     {
                         for (size_t i = 0; i < 2; ++i)
                         {
-                            if (j + f < p.N && k + i < p.K)
+                            if (j + f < N && k + i < K)
                                 *(dst++) = ps[f * p.K + i];
                             else
                                 *(dst++) = 0;

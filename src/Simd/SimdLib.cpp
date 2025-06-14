@@ -1,7 +1,7 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar,
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
 *               2014-2018 Antonenka Mikhail,
 *               2018-2018 Radchenko Andrey,
 *               2019-2019 Facundo Galan.
@@ -83,6 +83,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID lpReserved)
 #include "Simd/SimdSynetMergedConvolution8i.h"
 #include "Simd/SimdSynetPermute.h"
 #include "Simd/SimdSynetScale8i.h"
+#include "Simd/SimdSynetScale16b.h"
 #include "Simd/SimdWarpAffine.h"
 
 #include "Simd/SimdBase.h"
@@ -4861,6 +4862,19 @@ SIMD_API void SimdSynetAdd8i(const uint8_t* aData, const float* aScale, const fl
 #endif
 }
 
+SIMD_API void SimdSynetChannelSum16b(const uint16_t* src, size_t channels, size_t spatial, SimdTensorFormatType format, float* sum)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void(*SimdSynetChannelSum16bPtr) (const uint16_t* src, size_t channels, size_t spatial, SimdTensorFormatType format, float* sum);
+    const static SimdSynetChannelSum16bPtr simdSynetChannelSum16b = SIMD_FUNC3(SynetChannelSum16b, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    simdSynetChannelSum16b(src, channels, spatial, format, sum);
+#else
+    assert(0);
+#endif
+}
+
 SIMD_API void SimdSynetConvert32fTo8u(const float* src, size_t batch, size_t channels, size_t height, size_t width, SimdTensorFormatType format, const float* scale, const float* shift, uint8_t* dst, SimdSynetCompatibilityType compatibility)
 {
     SIMD_EMPTY();
@@ -5956,6 +5970,31 @@ SIMD_API void SimdSynetScale8iForward(void* context, const uint8_t* src, uint8_t
     SIMD_EMPTY();
 #if defined(SIMD_SYNET_ENABLE)
     ((Base::SynetScale8i*)context)->Forward(src, dst);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void* SimdSynetScale16bInit(size_t channels, size_t spatial, SimdTensorDataType srcType, SimdTensorDataType dstType, SimdTensorFormatType format, SimdBool norm, SimdBool bias)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void* (*SimdSynetScale16bInitPtr) (size_t channels, size_t spatial, SimdTensorDataType srcType, SimdTensorDataType dstType, SimdTensorFormatType format, SimdBool norm, SimdBool bias);
+    const static SimdSynetScale16bInitPtr simdSynetScale16bInit = SIMD_FUNC3(SynetScale16bInit, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    return simdSynetScale16bInit(channels, spatial, srcType, dstType, format, norm, bias);
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API void SimdSynetScale16bForward(void* context, const uint8_t* src, const float* norm, const float* bias, uint8_t* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    SynetScale16b* c = (SynetScale16b*)context;
+    c->Forward(src, norm, bias, dst);
 #else
     assert(0);
 #endif

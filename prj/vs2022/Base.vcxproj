@@ -98,6 +98,7 @@
     <ClInclude Include="..\..\src\Simd\SimdSynetMergedConvolution32f.h" />
     <ClInclude Include="..\..\src\Simd\SimdSynetMergedConvolution8i.h" />
     <ClInclude Include="..\..\src\Simd\SimdSynetPermute.h" />
+    <ClInclude Include="..\..\src\Simd\SimdSynetScale16b.h" />
     <ClInclude Include="..\..\src\Simd\SimdSynetScale8i.h" />
     <ClInclude Include="..\..\src\Simd\SimdTime.h" />
     <ClInclude Include="..\..\src\Simd\SimdTransform.h" />
@@ -153,11 +154,15 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseHistogram.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseHog.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseImageLoad.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageLoadBmp.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseImageLoadJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseImageLoadPng.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageLoadPpm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseImageSave.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageSaveBmp.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseImageSaveJpeg.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseImageSavePng.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseImageSavePpm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseInt16ToGray.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseIntegral.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseInterleave.cpp" />
@@ -195,8 +200,9 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16b.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNchwGemm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcDepthwise.cpp" />
-    <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcDirect.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcGemm.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcSpecV0.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution16bNhwcSpecV1.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution32f.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution32fDirectNchw.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetConvolution32fGemm.cpp" />
@@ -220,6 +226,7 @@
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetPermute.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetPooling.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetScale.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdBaseSynetScale16b.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetSoftmax.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseSynetUnaryOperation.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdBaseTexture.cpp" />

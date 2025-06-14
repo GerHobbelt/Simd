@@ -1,7 +1,7 @@
 /*
 * Tests for Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2024 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -103,6 +103,7 @@ namespace Test
         case SimdImageFilePpmBin:       return "PpmB";
         case SimdImageFilePng:          return "Png";
         case SimdImageFileJpeg:         return "Jpeg";
+        case SimdImageFileBmp:          return "Bmp";
         default: assert(0);  return "";
         }
     }
@@ -169,9 +170,10 @@ namespace Test
         case SimdImageFilePpmBin: return "ppm";
         case SimdImageFilePng:    return "png";
         case SimdImageFileJpeg:   return "jpg";
+        case SimdImageFileBmp:    return "bmp";
         default: assert(0);  return "";
         }
     }
 }
 
-#endif//__TestString_h__
+#endif

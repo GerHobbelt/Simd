@@ -1,7 +1,7 @@
 ###################################################################################################
 # Simd Library (http://ermig1979.github.io/Simd).
 #
-# Copyright (c) 2011-2024 Yermalayeu Ihar.
+# Copyright (c) 2011-2025 Yermalayeu Ihar.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
 # associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -74,13 +74,16 @@ def ImagePaintTest(args) :
 ###################################################################################################
 
 def ImageFrameTest(args) :
-	formats = [Simd.FrameFormat.Nv12, Simd.FrameFormat.Yuv420p, Simd.FrameFormat.Bgra32, Simd.FrameFormat.Bgr24, Simd.FrameFormat.Gray8, Simd.FrameFormat.Rgb24, Simd.FrameFormat.Rgba32]
+	formats = [Simd.FrameFormat.Nv12, Simd.FrameFormat.Yuv420p, Simd.FrameFormat.Bgra32, Simd.FrameFormat.Bgr24, Simd.FrameFormat.Gray8, Simd.FrameFormat.Rgb24, Simd.FrameFormat.Rgba32, Simd.FrameFormat.Lab24]
 	image = LoadTestImage(args)
 	frame = Simd.ImageFrame(Simd.FrameFormat.Rgb24, image.Width(), image.Height())
 	frame.Planes()[0] = image.Copy()
 	for i in range(len(formats)) :
+		if formats[i] == Simd.FrameFormat.Lab24 :
+			continue
 		frameI = frame.Converted(formats[i])
 		for j in range(len(formats)) :
+			#print(" Convert {0} to {1}.".format(formats[i], formats[j]))
 			frameJ = frameI.Converted(formats[j])
 			#frameJ.Save("converted_image_{0}_to_{1}.jpg".format(formats[i], formats[j]), Simd.ImageFile.Jpeg, 85)
 	
