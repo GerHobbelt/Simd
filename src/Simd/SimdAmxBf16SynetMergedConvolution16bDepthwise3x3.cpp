@@ -1,7 +1,8 @@
 /*
 * Simd Library (http://ermig1979.github.io/Simd).
 *
-* Copyright (c) 2011-2025 Yermalayeu Ihar.
+* Copyright (c) 2011-2025 Yermalayeu Ihar,
+*               2025-2025 Ger Hobbelt.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -388,10 +389,17 @@ namespace Simd
                 LoadSrc<T, H, 1>(src0, src1, src2, src3, src4, src5, 0, mask0, tailS, mask2, s);
                 for (size_t dx = 0, offs = sX; dx < dstW; dx += 1, offs += sX)
                 {
+#if defined(SIMD_CPP_2017_ENABLE)
                     if constexpr (H > 0) d[0] = _mm512_setzero_ps();
                     if constexpr (H > 1) d[1] = _mm512_setzero_ps();
                     if constexpr (H > 2) d[2] = _mm512_setzero_ps();
                     if constexpr (H > 3) d[3] = _mm512_setzero_ps();
+#else
+                    if (H > 0) d[0] = _mm512_setzero_ps();
+                    if (H > 1) d[1] = _mm512_setzero_ps();
+                    if (H > 2) d[2] = _mm512_setzero_ps();
+                    if (H > 3) d[3] = _mm512_setzero_ps();
+#endif
                     switch (dx % 3)
                     {
                     case 0:

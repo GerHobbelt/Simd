@@ -454,6 +454,8 @@ namespace Simd
 
         void SynetChannelSum16b(const uint16_t* src, size_t channels, size_t spatial, SimdTensorFormatType format, float* sum);
 
+        void SynetDequantizeLinear(const uint8_t* src, size_t size, int32_t bias, const float* norm, float* dst);
+
         void SynetEltwiseLayerForward(float const* const* src, const float* weight, size_t count, size_t size, SimdSynetEltwiseOperationType type, float* dst);
 
         void SynetInnerProductLayerForward(const float* src, const float* weight, const float* bias, size_t count, size_t size, float* dst);
@@ -477,6 +479,8 @@ namespace Simd
         void SynetMish32f(const float* src, size_t size, const float* threshold, float* dst);
 
         void SynetPreluLayerForward(const float* src, const float* slope, size_t channels, size_t spatial, float* dst, SimdTensorFormatType format);
+
+        void SynetQuantizeLinear(const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst);
 
         void SynetRelu32f(const float* src, size_t size, const float* slope, float* dst);
 

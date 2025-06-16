@@ -21,29 +21,32 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetQuantizedConvolution.h"
-#include "Simd/SimdSynetQuantizeLinear.h"
-#include "Simd/SimdSynetConvolution8iCommon.h"
-#include "Simd/SimdSynet.h"
-#include "Simd/SimdMath.h"
 #include "Simd/SimdBase.h"
 #include "Simd/SimdCpu.h"
 #include "Simd/SimdLog.h"
+#include "Simd/SimdSynetQuantizeLinear.h"
 
 namespace Simd
 {
-#if defined(SIMD_AVX2_ENABLE) && defined(SIMD_SYNET_ENABLE)   
-    namespace Avx2
+#if defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_SYNET_ENABLE)   
+    namespace Avx512bw
     {
-        void* SynetQuantizedConvolutionInit(size_t batch, const SimdConvolutionParameters* conv)
+        SIMD_INLINE void DequantizeLinear16(const uint8_t* src, __m512i bias, __m512 norm, float* dst, __mmask16 tail = __mmask16(-1))
         {
-            ConvParam param(batch, conv);
-            if (!ValidQuantized(param))
-                return NULL;
-            else if(SynetQuantizedConvolutionNhwcGemm::Preferable(param))
-                return new SynetQuantizedConvolutionNhwcGemm(param);
-            else
-                return new Base::SynetQuantizedConvolutionGemm(param);
+            __m128i _src = _mm_maskz_loadu_epi8(tail, src);
+            _mm512_mask_storeu_ps(dst, tail, DequantizeLinear(_mm512_cvtepu8_epi32(_src), bias, norm));
+        }
+
+        void SynetDequantizeLinear(const uint8_t* src, size_t size, int32_t bias, const float* norm, float* dst)
+        {
+            __m512i _bias = _mm512_set1_epi32(bias);
+            __m512 _norm = _mm512_set1_ps(norm[0]);
+            size_t i = 0, size16 = AlignLo(size, 16);
+            __mmask16 tail16 = TailMask16(size - size16);
+            for (; i < size16; i += 16)
+                DequantizeLinear16(src + i, _bias, _norm, dst + i);
+            if (i < size)
+                DequantizeLinear16(src + i, _bias, _norm, dst + i, tail16);
         }
     }
 #endif

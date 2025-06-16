@@ -5256,6 +5256,19 @@ SIMD_API void SimdSynetDeconvolution16bForward(void* context, const uint8_t* src
 #endif
 }
 
+SIMD_API void SimdSynetDequantizeLinear(const uint8_t* src, size_t size, int32_t bias, const float* norm, float* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void(*SimdSynetDequantizeLinearPtr) (const uint8_t* src, size_t size, int32_t bias, const float* norm, float* dst);
+    const static SimdSynetDequantizeLinearPtr simdSynetDequantizeLinear = SIMD_FUNC3(SynetDequantizeLinear, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);// , SIMD_NEON_FUNC);
+
+    simdSynetDequantizeLinear(src, size, bias, norm, dst);
+#else
+    assert(0);
+#endif
+}
+
 SIMD_API void SimdSynetEltwiseLayerForward(float const * const * src, const float * weight, size_t count, size_t size, SimdSynetEltwiseOperationType type, float * dst)
 {
     SIMD_EMPTY();
@@ -5952,6 +5965,19 @@ SIMD_API void SimdSynetQuantizedConvolutionForward(void* context, const uint8_t*
     SynetQuantizedConvolution* c = (SynetQuantizedConvolution*)context;
     SIMD_PERF_EXT(c);
     c->Forward(src, buf, dst);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void SimdSynetQuantizeLinear(const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void(*SimdSynetQuantizeLinearPtr) (const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst);
+    const static SimdSynetQuantizeLinearPtr simdSynetQuantizeLinear = SIMD_FUNC2(SynetQuantizeLinear, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);// , SIMD_AVX512BW_FUNC);// , SIMD_NEON_FUNC);
+
+    simdSynetQuantizeLinear(src, size, scale, zero, dst);
 #else
     assert(0);
 #endif
