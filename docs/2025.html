@@ -34,8 +34,30 @@
  <a href="2013.html">2013</a>
 </center> 
 
- <a href="#HOME">Home</a>
-<h3 id="R151">July X, 2025 (version 6.2.151)</h3>
+<a href="#HOME">Home</a>
+<h3 id="R152">August X, 2025 (version 6.2.152)</h3>
+<h4>Algorithms</h4>
+<h5>New features</h5>
+<ul>
+ <li>AVX2, AVX-512BW optimizations of class SynetQuantizedAddUniform.</li>
+ <li>Base implementation of class SynetQuantizedInnerProductRef.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI, AMX-INT8 optimizations of class SynetQuantizedInnerProductGemmNN.</li>
+ <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI, AMX-INT8 optimizations of class SynetQuantizedConvolutionNhwcSpecV0.</li>
+</ul>
+<h5>Bug fixing</h5>
+<ul>
+ <li>Error in NEON optimization of function Float32ToBFloat16.</li>
+ <li>Error in Base implementation of class SynetQuantizedConvolutionNhwcGemm.</li>
+</ul>
+
+<h4>Test framework</h4>
+<h5>New features</h5>
+<ul>
+ <li>Tests for verifying functionality of SynetQuantizedInnerProduct framework.</li>
+</ul>
+
+<a href="#HOME">Home</a>
+<h3 id="R151">July 7, 2025 (version 6.2.151)</h3>
 <h4>Algorithms</h4>
 <h5>New features</h5>
 <ul>
@@ -45,6 +67,7 @@
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI, AMX-INT8 optimizations of class SynetQuantizedConvolutionNhwcGemm.</li>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetDequantizeLinear.</li>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function SynetQuantizeLinear.</li>
+ <li>Base implementation, SSE4.1 optimizations of class SynetQuantizedAddUniform.</li>
 </ul>
 <h5>Improve</h5>
 <ul>
@@ -58,9 +81,10 @@
 <h4>Test framework</h4>
 <h5>New features</h5>
 <ul>
- <li>Tests for verifying functionality of class SynetQuantizedConvolution framework.</li>
+ <li>Tests for verifying functionality of SynetQuantizedConvolution framework.</li>
  <li>Tests for verifying functionality of function SynetDequantizeLinear.</li>
  <li>Tests for verifying functionality of function SynetQuantizeLinear.</li>
+ <li>Tests for verifying functionality of SynetQuantizedAdd framework.</li>
 </ul>
 
 <h4>Python wrapper</h4>

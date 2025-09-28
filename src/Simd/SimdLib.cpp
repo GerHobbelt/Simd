@@ -83,7 +83,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID lpReserved)
 #include "Simd/SimdSynetMergedConvolution16b.h"
 #include "Simd/SimdSynetMergedConvolution8i.h"
 #include "Simd/SimdSynetPermute.h"
+#include "Simd/SimdSynetQuantizedAdd.h"
 #include "Simd/SimdSynetQuantizedConvolution.h"
+#include "Simd/SimdSynetQuantizedInnerProduct.h"
 #include "Simd/SimdSynetScale8i.h"
 #include "Simd/SimdSynetScale16b.h"
 #include "Simd/SimdWarpAffine.h"
@@ -5901,6 +5903,35 @@ SIMD_API void SimdSynetPreluLayerForward(const float * src, const float * slope,
 #endif
 }
 
+SIMD_API void* SimdSynetQuantizedAddInit(const size_t* aShape, size_t aCount, SimdTensorDataType aType, int32_t aBias, const float* aNorm,
+    const size_t* bShape, size_t bCount, SimdTensorDataType bType, int32_t bBias, const float* bNorm,
+    SimdConvolutionActivationType actType, const float* actParams, SimdTensorDataType dstType, const float* dstNorm, int32_t dstZero)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void* (*SimdSynetQuantizedAddInitPtr) (const size_t* aShape, size_t aCount, SimdTensorDataType aType, int32_t aBias, const float* aNorm,
+        const size_t* bShape, size_t bCount, SimdTensorDataType bType, int32_t bBias, const float* bNorm,
+        SimdConvolutionActivationType actType, const float* actParams, SimdTensorDataType dstType, const float* dstNorm, int32_t dstZero);
+    const static SimdSynetQuantizedAddInitPtr simdSynetQuantizedAddInit = SIMD_FUNC3(SynetQuantizedAddInit, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    return simdSynetQuantizedAddInit(aShape, aCount, aType, aBias, aNorm, bShape, bCount, bType, bBias, bNorm, actType, actParams, dstType, dstNorm, dstZero);
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API void SimdSynetQuantizedAddForward(void* context, const uint8_t* a, const uint8_t* b, uint8_t* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    SynetQuantizedAdd* c = (SynetQuantizedAdd*)context;
+    c->Forward(a, b, dst);
+#else
+    assert(0);
+#endif
+}
+
 SIMD_API void* SimdSynetQuantizedConvolutionInit(size_t batch, const SimdConvolutionParameters* conv)
 {
     SIMD_EMPTY();
@@ -5970,14 +6001,83 @@ SIMD_API void SimdSynetQuantizedConvolutionForward(void* context, const uint8_t*
 #endif
 }
 
-SIMD_API void SimdSynetQuantizeLinear(const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst)
+SIMD_API void* SimdSynetQuantizedInnerProductInit(size_t M, size_t N, size_t K, SimdTensorDataType typeA, SimdTensorDataType typeB, SimdTensorDataType typeC, SimdBool transB, SimdBool constB, SimdBool bias)
 {
     SIMD_EMPTY();
 #if defined(SIMD_SYNET_ENABLE)
-    typedef void(*SimdSynetQuantizeLinearPtr) (const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst);
+    typedef void* (*SimdSynetQuantizedInnerProductInitPtr) (size_t M, size_t N, size_t K, SimdTensorDataType typeA, SimdTensorDataType typeB, SimdTensorDataType typeC, SimdBool transB, SimdBool constB, SimdBool bias);
+    const static SimdSynetQuantizedInnerProductInitPtr simdSynetQuantizedInnerProductInit = SIMD_FUNC5(SynetQuantizedInnerProductInit, SIMD_AMXBF16_FUNC, SIMD_AVX512VNNI_FUNC, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    return simdSynetQuantizedInnerProductInit(M, N, K, typeA, typeB, typeC, transB, constB, bias);
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API size_t SimdSynetQuantizedInnerProductInternalBufferSize(const void* context)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    return ((SynetQuantizedInnerProduct*)context)->InternalBufferSize();
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API size_t SimdSynetQuantizedInnerProductExternalBufferSize(const void* context)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    return ((SynetQuantizedInnerProduct*)context)->ExternalBufferSize();
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API const char* SimdSynetQuantizedInnerProductInfo(const void* context)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    return ((SynetQuantizedInnerProduct*)context)->Info();
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API void SimdSynetQuantizedInnerProductSetParams(void* context, const float* aScale, const uint8_t* aZero, const int8_t* b, const float* bScale, const int32_t* bias, const float* cScale, const uint8_t* cZero)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    ((SynetQuantizedInnerProduct*)context)->SetParams(aScale, aZero, b, bScale, bias, cScale, cZero);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void SimdSynetQuantizedInnerProductForward(void* context, const uint8_t* A, const uint8_t* B, uint8_t* buf, uint8_t* C)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    SynetQuantizedInnerProduct* ip = (SynetQuantizedInnerProduct*)context;
+    SIMD_PERF_EXT(ip);
+    ip->Forward(A, B, buf, C);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void SimdSynetQuantizeLinear(const float* src, size_t size, const float* norm, int32_t zero, uint8_t* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void(*SimdSynetQuantizeLinearPtr) (const float* src, size_t size, const float* norm, int32_t zero, uint8_t* dst);
     const static SimdSynetQuantizeLinearPtr simdSynetQuantizeLinear = SIMD_FUNC3(SynetQuantizeLinear, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);// , SIMD_NEON_FUNC);
 
-    simdSynetQuantizeLinear(src, size, scale, zero, dst);
+    simdSynetQuantizeLinear(src, size, norm, zero, dst);
 #else
     assert(0);
 #endif

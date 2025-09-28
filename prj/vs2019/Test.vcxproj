@@ -123,7 +123,9 @@
     <ClCompile Include="..\..\src\Test\TestSynetNormalize.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetPermute.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetPooling.cpp" />
+    <ClCompile Include="..\..\src\Test\TestSynetQuantizedAdd.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetQuantizedConvolution.cpp" />
+    <ClCompile Include="..\..\src\Test\TestSynetQuantizedInnerProduct.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetQuantizeLinear.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetScale.cpp" />
     <ClCompile Include="..\..\src\Test\TestSynetSoftmax.cpp" />

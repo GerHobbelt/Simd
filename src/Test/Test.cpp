@@ -414,7 +414,11 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetPoolingMax32f);
     TEST_ADD_GROUP_A0(SynetPoolingMax8u);
 
+    TEST_ADD_GROUP_A0(SynetQuantizedAddForward);
+
     TEST_ADD_GROUP_A0(SynetQuantizedConvolutionForward);
+
+    TEST_ADD_GROUP_A0(SynetQuantizedInnerProductForward);
 
     TEST_ADD_GROUP_A0(SynetDequantizeLinear);
     TEST_ADD_GROUP_A0(SynetQuantizeLinear);
@@ -832,8 +836,27 @@ namespace Test
 
 //-------------------------------------------------------------------------------------------------
 
+void TmpTest()
+{
+    //typedef Simd::View<Simd::Allocator> View;
+    //View srcView(256, 192, View::Format::Rgba32);
+    //srcView.Load("grass.jpg", View::Format::Rgba32);
+
+    //View dstView(1028, 1028, View::Format::Rgba32);
+
+    //Simd::Resize(srcView, dstView, SimdResizeMethodType::SimdResizeMethodBilinear);
+
+    //dstView.Save("resized_grass.jpg");
+
+    //exit(0);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 int main(int argc, char* argv[])
 {
+    TmpTest();
+
     Test::Options options(argc, argv);
 
     if (options.help)

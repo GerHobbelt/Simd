@@ -7501,7 +7501,6 @@ extern "C"
     SIMD_API void SimdSynetPoolingMax8u(const uint8_t* src, size_t srcC, size_t srcH, size_t srcW, size_t kernelY, size_t kernelX,
         size_t strideY, size_t strideX, size_t padY, size_t padX, uint8_t* dst, size_t dstH, size_t dstW, SimdTensorFormatType format);
 
-
     /*! @ingroup synet_activation
 
         \fn void SimdSynetPreluLayerForward(const float * src, const float * slope, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
@@ -7525,6 +7524,48 @@ extern "C"
         \param [in] format - a format of (input/output) image tensor.
     */
     SIMD_API void SimdSynetPreluLayerForward(const float * src, const float * slope, size_t channels, size_t spatial, float * dst, SimdTensorFormatType format);
+
+    /*! @ingroup synet_quantized_add
+
+        \fn void* SimdSynetQuantizedAddInit(const size_t* aShape, size_t aCount, SimdTensorDataType aType, int32_t aBias, const float* aNorm, const size_t* bShape, size_t bCount, SimdTensorDataType bType, int32_t bBias, const float* bNorm, SimdConvolutionActivationType actType, const float* actParams, SimdTensorDataType dstType, const float* dstNorm, int32_t dstZero);
+
+        \short Initilizes quantized addition algorithm.
+
+        \param [in] aShape - a pointer to shape of input A tensor.
+        \param [in] aCount - a count of dimensions of input A tensor.
+        \param [in] aType - a type of input A tensor. Can be FP32 of UINT8.
+        \param [in] aBias - a dequantization bias parameter of A tensor (-zero).
+        \param [in] aNorm - a dequantization norm parameter of A tensor (scale).
+        \param [in] bShape - a pointer to shape of input B tensor.
+        \param [in] bCount - a count of dimensions of input B tensor.
+        \param [in] bType - a type of input B tensor. Can be FP32 of UINT8.
+        \param [in] bBias - a dequantization bias parameter of B tensor (-zero).
+        \param [in] bNorm - a dequantization norm parameter of B tensor (scale).
+        \param [in] actType - an activation function type (if it merged to quantized addition).
+        \param [in] actParams - a pointer to activation function parameters. Can be NULL.
+        \param [in] dstType - a type of output tensor. Can be FP32 of UINT8.
+        \param [in] dstNorm - an output quantization norm (1/scale). 
+        \param [in] dstZero - an output quantization zero.
+        \return a pointer to quantized addition context. On error it returns NULL. It must be released with using of function ::SimdRelease.
+            This pointer is used in function ::SimdSynetQuantizedAddForward.
+    */
+    SIMD_API void* SimdSynetQuantizedAddInit(
+        const size_t* aShape, size_t aCount, SimdTensorDataType aType, int32_t aBias, const float* aNorm,
+        const size_t* bShape, size_t bCount, SimdTensorDataType bType, int32_t bBias, const float* bNorm, 
+        SimdConvolutionActivationType actType, const float* actParams, SimdTensorDataType dstType, const float* dstNorm, int32_t dstZero);
+
+    /*! @ingroup synet_quantized_add
+
+        \fn void SimdSynetQuantizedAddForward(void* context, const uint8_t* a, const uint8_t* b, uint8_t* dst);
+
+        \short Performs forward propagation of quantized addition algorithm.
+
+        \param [in] context - a pointer to quantized addition context. It must be created by function ::SimdSynetQuantizedAddInit and released by function ::SimdRelease.
+        \param [in] a - a pointer to input A tensor.
+        \param [in] b - a pointer to input B tensor.
+        \param [out] dst - a pointer to output tensor.
+    */
+    SIMD_API void SimdSynetQuantizedAddForward(void* context, const uint8_t* a, const uint8_t* b, uint8_t* dst);
 
     /*! @ingroup synet_quantized_convolution
 
@@ -7604,25 +7645,122 @@ extern "C"
     */
     SIMD_API void SimdSynetQuantizedConvolutionForward(void* context, const uint8_t* src, uint8_t* buf, uint8_t* dst);
 
+    /*! @ingroup synet_quantized_inner_product
+
+        \fn void* SimdSynetQuantizedInnerProductInit(size_t M, size_t N, size_t K, SimdTensorDataType typeA, SimdTensorDataType typeB, SimdTensorDataType typeC, SimdBool transB, SimdBool constB, SimdBool bias);
+
+        \short Initilizes quantized inner product (matrix mutiplication) algorithm.
+
+        Algorithm's details (transpA = false, bias = true):
+        \verbatim
+        for(i = 0; i < M; ++i)
+            for(j = 0; j < N; ++j)
+            {
+                C[i,j] = bias[j];
+                for(k = 0; k < K; ++k)
+                    C[i,j] += A[i,k] * B[k,j];
+            }
+        \endverbatim
+
+        \param [in] M - a height of A and height of C matrices.
+        \param [in] N - a width of B and width of C matrices.
+        \param [in] K - a width of A and height of B matrices.
+        \param [in] typeA - a type of A matrix. It can be FP32 or UINT8.
+        \param [in] typeB - a type of B matrix. It can be FP32 or INT8.
+        \param [in] typeC - a type of C matrix. It can be FP32 or UINT8.
+        \param [in] transB - a transpose matrix B before multiplication.
+        \param [in] constB - a matrix B is constant.
+        \param [in] bias - a flag to add bias to output matrix C.
+        \return a pointer to quantized inner product context. On error it returns NULL. It must be released with using of function ::SimdRelease.
+            This pointer is used in functions ::SimdSynetQuantizedInnerProductInternalBufferSize, ::SimdSynetQuantizedInnerProductExternalBufferSize,
+            ::SimdSynetQuantizedInnerProductInfo, ::SimdSynetQuantizedInnerProductSetParams and ::SimdSynetQuantizedInnerProductForward.
+    */
+    SIMD_API void* SimdSynetQuantizedInnerProductInit(size_t M, size_t N, size_t K, SimdTensorDataType typeA, SimdTensorDataType typeB, SimdTensorDataType typeC, SimdBool transB, SimdBool constB, SimdBool bias);
+
+    /*! @ingroup synet_quantized_inner_product
+
+        \fn size_t SimdSynetQuantizedInnerProductInternalBufferSize(const void * context);
+
+        \short Gets size in bytes of internal buffer used inside quantized inner product algorithm.
+
+        \param [in] context - a pointer to quantized inner product context. It must be created by function ::SimdSynetQuantizedInnerProductInit and released by function ::SimdRelease.
+        \return size in bytes of internal buffer used inside quantized inner product algorithm.
+    */
+    SIMD_API size_t SimdSynetQuantizedInnerProductInternalBufferSize(const void* context);
+
+    /*! @ingroup synet_quantized_inner_product
+
+        \fn size_t SimdSynetQuantizedInnerProductExternalBufferSize(const void * context);
+
+        \short Gets size in bytes of external buffer used in quantized inner product algorithm.
+
+        \param [in] context - a pointer to quantized inner product context. It must be created by function ::SimdSynetQuantizedInnerProductInit and released by function ::SimdRelease.
+        \return size in bytes of external buffer used in quantized inner product algorithm.
+    */
+    SIMD_API size_t SimdSynetQuantizedInnerProductExternalBufferSize(const void* context);
+
+    /*! @ingroup synet_quantized_inner_product
+
+        \fn const char* SimdSynetQuantizedInnerProductInfo(const void * context);
+
+        \short Gets string with description of internal implementation of quantized inner product algorithm.
+
+        \param [in] context - a pointer to quantized inner product context. It must be created by function ::SimdSynetQuantizedInnerProductInit and released by function ::SimdRelease.
+        \return string with description of internal implementation of quantized inner product algorithm.
+    */
+    SIMD_API const char* SimdSynetQuantizedInnerProductInfo(const void* context);
+
+    /*! @ingroup synet_quantized_inner_product
+
+        \fn void SimdSynetQuantizedInnerProductSetParams(void* context, const float* weight, SimdBool* internal, const float* bias);
+
+        \short Sets weights, biases, input/output parameters required for quantized inner product algorithm.
+
+        \param [in, out] context - a pointer to quantized inner product context. It must be created by function ::SimdSynetQuantizedInnerProductInit and released by function ::SimdRelease.
+        \param [in] aScale - a pointer to 32-bit float point input A tensor scale.
+        \param [in] aZero - a pointer to 8-bit unsigned integer input A tensor zero.
+        \param [in] b - a pointer to 8-bit integer input B tensor. Can be NULL.
+        \param [in] bScale - a pointer to 32-bit float point weight scale.
+        \param [in] bias - a pointer to 32-bit integer bias. Can be NULL.
+        \param [in] cScale - a pointer to 32-bit float point output C tensor scale.
+        \param [in] cZero - a pointer to 8-bit unsigned integer output C tensor zero.
+    */
+    SIMD_API void SimdSynetQuantizedInnerProductSetParams(void* context, const float* aScale, const uint8_t* aZero, const int8_t* b, const float* bScale, const int32_t* bias, const float* cScale, const uint8_t* cZero);
+
+    /*! @ingroup synet_quantized_inner_product
+
+        \fn void SimdSynetQuantizedInnerProductForward(void* context, const uint8_t* A, const uint8_t* B, uint8_t* buf, uint8_t* C);
+
+        \short Performs forward propagation of quantized inner product algorithm.
+
+        \param [in] context - a pointer to quantized inner product context. It must be created by function ::SimdSynetQuantizedInnerProductInit and released by function ::SimdRelease.
+        \param [in] A - a pointer to A matrix.
+        \param [in] B - a pointer to B matrix. Can be NULL if B is constant matrix. In that case you have to set B in function SimdSynetQuantizedInnerProductSetParams.
+        \param [out] buf - a pointer to external buffer. The size of the external temporary buffer is determined by function ::SimdSynetQuantizedInnerProductExternalBufferSize.
+            Can be NULL (it causes usage of internal buffer).
+        \param [out] C - a pointer to output matrix.
+    */
+    SIMD_API void SimdSynetQuantizedInnerProductForward(void* context, const uint8_t* A, const uint8_t* B, uint8_t* buf, uint8_t* C);
+
     /*! @ingroup synet_quantized_other
 
-        \fn void SimdSynetQuantizeLinear(const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst);
+        \fn void SimdSynetQuantizeLinear(const float* src, size_t size, const float* norm, int32_t zero, uint8_t* dst);
 
         \short Performs UINT8 linear quantization.
 
         Algorithm's details for ::SimdSynetQuantizeLinear:
         \verbatim
         for(i = 0; i < size; ++i)
-            dst[i] = Min(Max(std::nearbyint(src[i] * scale[0]) - zero), 0), 255);
+            dst[i] = Min(Max(std::nearbyint(src[i] * scale[0]) + zero), 0), 255);
         \endverbatim
 
         \param [in] src - a pointer to FP32 input tensor.
         \param [in] size - a size of the input and output tensors.
-        \param [in] scale - a quantization scale.
+        \param [in] norm - a quantization norm (1/scale).
         \param [in] zero - a quantization zero.
         \param [out] dst - a pointer to UINT8 output tensor.
     */
-    SIMD_API void SimdSynetQuantizeLinear(const float* src, size_t size, const float* scale, int32_t zero, uint8_t* dst);
+    SIMD_API void SimdSynetQuantizeLinear(const float* src, size_t size, const float* norm, int32_t zero, uint8_t* dst);
 
     /*! @ingroup synet_activation
 
