@@ -43,6 +43,47 @@ namespace Simd
 
         //-----------------------------------------------------------------------------------------
 
+        static void QuantizedConvolutionNhwcGemmReorderD(const uint8_t* src, uint8_t zero, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint8_t* dst)
+        {
+            size_t srcC64 = AlignLo(p.srcC, 64);
+            __mmask64 gapMask = TailMask64(a.bufK - a.K), tailMask = TailMask64(p.srcC - srcC64);
+            __m512i _zero = _mm512_set1_epi8(zero);
+            for (size_t dy = yBeg, dr = 0; dy < yEnd; ++dy)
+            {
+                for (size_t dx = 0; dx < p.dstW; ++dx, ++dr)
+                {
+                    uint8_t* row = dst + dr * a.bufK;
+                    for (size_t ky = 0, k = 0; ky < p.kernelY; ky++)
+                    {
+                        size_t sy = dy * p.strideY + ky * p.dilationY - p.padY;
+                        if (sy < p.srcH)
+                        {
+                            for (size_t kx = 0; kx < p.kernelX; kx++)
+                            {
+                                size_t sx = dx * p.strideX + kx * p.dilationX - p.padX;
+                                if (sx < p.srcW)
+                                {
+                                    Copy(src + (sy * p.srcW + sx) * p.srcC, srcC64, tailMask, row);
+                                    row += p.srcC;
+                                }
+                                else
+                                {
+                                    SetZeros(row, _zero, srcC64, tailMask);
+                                    row += p.srcC;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            SetZeros(row, _zero, p.kernelX * p.srcC);
+                            row += p.kernelX * p.srcC;
+                        }
+                    }
+                    SetZero(row, _mm512_setzero_si512(), gapMask);
+                }
+            }
+        }
+
         static void QuantizedConvolutionNhwcGemmReorderR(const uint8_t* src, uint8_t zero, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint8_t* dst)
         {
             assert(Aligned(p.srcC, 64));
@@ -82,6 +123,23 @@ namespace Simd
                         }
                     }
                 }
+            }
+        }
+
+        static void QuantizedConvolutionNhwcGemmReorder1x1D(const uint8_t* src, uint8_t zero, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint8_t* dst)
+        {
+            size_t srcC64 = AlignLo(p.srcC, 64), n = (yEnd - yBeg) * p.dstW;
+            __mmask64 srcMask = TailMask64(p.srcC - srcC64);
+            src += yBeg * p.srcW * p.srcC;
+            for (size_t i = 0; i < n; ++i)
+            {
+                size_t sc = 0;
+                for (; sc < srcC64; sc += 64)
+                    Avx512bw::Copy(src + sc, dst + sc);
+                if(srcMask)
+                    Avx512bw::Copy(src + sc, dst + sc, srcMask);
+                src += p.srcC;
+                dst += a.bufK;
             }
         }
 
@@ -444,10 +502,18 @@ namespace Simd
                     _convert = NULL;
                 else
                 {
-                    if (_is1x1 && a.batch == 1)
+                    if (_is1x1)
                     {
-                        _convert = QuantizedConvolutionNhwcGemmReorder1x1R;
-                        a.reorderType = 1;
+                        if (a.batch == 1)
+                        {
+                            _convert = QuantizedConvolutionNhwcGemmReorder1x1R;
+                            a.reorderType = 1;
+                        }
+                        else
+                        {
+                            _convert = QuantizedConvolutionNhwcGemmReorder1x1D;
+                            a.reorderType = 0;
+                        }
                     }
                     else
                     {
@@ -455,6 +521,11 @@ namespace Simd
                         {
                             _convert = QuantizedConvolutionNhwcGemmReorderR;
                             a.reorderType = 1;
+                        }
+                        else
+                        {
+                            _convert = QuantizedConvolutionNhwcGemmReorderD;
+                            a.reorderType = 0;
                         }
                     }
                 }
