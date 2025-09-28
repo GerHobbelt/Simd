@@ -130,12 +130,14 @@
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetPermute.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetPooling.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedAdd.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedConcat.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedConvolution.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedConvolutionNhwcDepthwise.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedConvolutionNhwcGemm.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedConvolutionNhwcSpecV0.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedInnerProduct.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedInnerProductGemmNN.cpp" />
+    <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizedShuffle.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetQuantizeLinear.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetScale.cpp" />
     <ClCompile Include="..\..\src\Simd\SimdAvx2SynetScale16b.cpp" />

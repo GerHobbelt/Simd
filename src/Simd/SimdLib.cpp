@@ -86,6 +86,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID lpReserved)
 #include "Simd/SimdSynetQuantizedAdd.h"
 #include "Simd/SimdSynetQuantizedConvolution.h"
 #include "Simd/SimdSynetQuantizedInnerProduct.h"
+#include "Simd/SimdSynetQuantizedMergedConvolution.h"
 #include "Simd/SimdSynetScale8i.h"
 #include "Simd/SimdSynetScale16b.h"
 #include "Simd/SimdWarpAffine.h"
@@ -5932,6 +5933,20 @@ SIMD_API void SimdSynetQuantizedAddForward(void* context, const uint8_t* a, cons
 #endif
 }
 
+SIMD_API void SimdSynetQuantizedConcatLayerForward(size_t count, const uint8_t** src, size_t num, const size_t* size, const int32_t* bias, const float* norm, const float* scale, int32_t zero, uint8_t* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void(*SimdSynetQuantizedConcatLayerForwardPtr) (size_t count, const uint8_t** src, size_t num, const size_t* size, const int32_t* bias, const float* norm, const float* scale, int32_t zero, uint8_t* dst);
+    const static SimdSynetQuantizedConcatLayerForwardPtr simdSynetQuantizedConcatLayerForward = SIMD_FUNC3(SynetQuantizedConcatLayerForward, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    simdSynetQuantizedConcatLayerForward(count, src, num, size, bias, norm, scale, zero, dst);
+#else
+    assert(0);
+#endif
+
+}
+
 SIMD_API void* SimdSynetQuantizedConvolutionInit(size_t batch, const SimdConvolutionParameters* conv)
 {
     SIMD_EMPTY();
@@ -6065,6 +6080,90 @@ SIMD_API void SimdSynetQuantizedInnerProductForward(void* context, const uint8_t
     SynetQuantizedInnerProduct* ip = (SynetQuantizedInnerProduct*)context;
     SIMD_PERF_EXT(ip);
     ip->Forward(A, B, buf, C);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void* SimdSynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void* (*SimdSynetQuantizedMergedConvolutionInitPtr) (size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+    const static SimdSynetQuantizedMergedConvolutionInitPtr simdSynetQuantizedMergedConvolutionInit = SIMD_FUNC0(SynetQuantizedMergedConvolutionInit);//, SIMD_AMXBF16_FUNC, SIMD_AVX512VNNI_FUNC, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    return simdSynetQuantizedMergedConvolutionInit(batch, convs, count, add);
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API size_t SimdSynetQuantizedMergedConvolutionExternalBufferSize(const void* context)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    return ((SynetQuantizedMergedConvolution*)context)->ExternalBufferSize();
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API size_t SimdSynetQuantizedMergedConvolutionInternalBufferSize(const void* context)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    return ((SynetQuantizedMergedConvolution*)context)->InternalBufferSize();
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API const char* SimdSynetQuantizedMergedConvolutionInfo(const void* context)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    return ((SynetQuantizedMergedConvolution*)context)->Info();
+#else
+    assert(0);
+    return 0;
+#endif
+}
+
+SIMD_API void SimdSynetQuantizedMergedConvolutionSetParams(void* context, const float* ioScale, const uint8_t* ioZero, const int8_t* const* weight, const float* const* weightScale, const int32_t* const* bias)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    ((SynetQuantizedMergedConvolution*)context)->SetParams(ioScale, ioZero, weight, weightScale, bias);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void SimdSynetQuantizedMergedConvolutionForward(void* context, const uint8_t* src, uint8_t* buf, uint8_t* dst)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    SynetQuantizedMergedConvolution* c = (SynetQuantizedMergedConvolution*)context;
+    SIMD_PERF_EXT(c);
+    c->Forward(src, buf, dst);
+#else
+    assert(0);
+#endif
+}
+
+SIMD_API void SimdSynetQuantizedShuffleLayerForward(const uint8_t* src0, int bias0, const float* norm0, size_t srcC0, const uint8_t* src1, int bias1, const float* norm1, size_t srcC1, 
+    size_t spatial, uint8_t* dst0, uint8_t* dst1, const float* scale, int zero, SimdTensorFormatType format, int type)
+{
+    SIMD_EMPTY();
+#if defined(SIMD_SYNET_ENABLE)
+    typedef void(*SimdSynetQuantizedShuffleLayerForwardPtr) (const uint8_t* src0, int bias0, const float* norm0, size_t srcC0, const uint8_t* src1, int bias1, const float* norm1, size_t srcC1,
+        size_t spatial, uint8_t* dst0, uint8_t* dst1, const float* scale, int zero, SimdTensorFormatType format, int type);
+    const static SimdSynetQuantizedShuffleLayerForwardPtr simdSynetQuantizedShuffleLayerForward = SIMD_FUNC3(SynetQuantizedShuffleLayerForward, SIMD_AVX512BW_FUNC, SIMD_AVX2_FUNC, SIMD_SSE41_FUNC);
+
+    simdSynetQuantizedShuffleLayerForward(src0, bias0, norm0, srcC0, src1, bias1, norm1, srcC1, spatial, dst0, dst1, scale, zero, format, type);
 #else
     assert(0);
 #endif

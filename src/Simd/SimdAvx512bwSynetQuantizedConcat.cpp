@@ -21,37 +21,35 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include "Simd/SimdSynetQuantizedConvolution.h"
 #include "Simd/SimdSynetQuantizeLinear.h"
-#include "Simd/SimdSynetConvolution8iCommon.h"
-#include "Simd/SimdSynet.h"
-#include "Simd/SimdMath.h"
-#include "Simd/SimdBase.h"
-#include "Simd/SimdCpu.h"
-#include "Simd/SimdLog.h"
 
 namespace Simd
 {
 #if defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_SYNET_ENABLE)   
     namespace Avx512bw
     {
-        void* SynetQuantizedConvolutionInit(size_t batch, const SimdConvolutionParameters* conv)
+        void SynetQuantizedConcatLayerForward(size_t count, const uint8_t** src, size_t num, const size_t* size, const int32_t* bias, const float* norm, const float* scale, int32_t zero, uint8_t* dst)
         {
-            ConvParam param(batch, conv);
-            if (!ValidQuantized(param))
-                return NULL;
-            else if (SynetQuantizedConvolutionNhwcDepthwiseV2::Preferable(param, 1))
-                return new SynetQuantizedConvolutionNhwcDepthwiseV2(param);
-            else if (SynetQuantizedConvolutionNhwcDepthwiseV1::Preferable(param, 1) && param.IsStride(1))
-                return new SynetQuantizedConvolutionNhwcDepthwiseV1(param);
-            else if (SynetQuantizedConvolutionNhwcDepthwiseV0::Preferable(param, 1))
-                return new SynetQuantizedConvolutionNhwcDepthwiseV0(param);
-            else if (SynetQuantizedConvolutionNhwcSpecV0::Preferable(param))
-                return new SynetQuantizedConvolutionNhwcSpecV0(param);
-            else if(SynetQuantizedConvolutionNhwcGemm::Preferable(param))
-                return new SynetQuantizedConvolutionNhwcGemm(param);
-            else
-                return Avx2::SynetQuantizedConvolutionInit(batch, conv);
+            __m512i _bias, _zero = _mm512_set1_epi32(zero);
+            __m512 _norm, _scale = _mm512_set1_ps(scale[0]);
+            for (size_t o = 0; o < num; ++o)
+            {
+                for (size_t s = 0; s < count; ++s)
+                {
+                    size_t size1 = size[s], size16 = size1 & (~16), size64 = size1 & (~63), i = 0;
+                    __mmask16 tail = __mmask16(-1) >> (size16 + 16 - size1);
+                    const uint8_t* ps = src[s] + o * size1;
+                    _bias = _mm512_set1_epi32(bias[s]);
+                    _norm = _mm512_set1_ps(norm[s]);
+                    for (; i < size64; i += 64)
+                        DequantizeQuantizeLinear64(ps + i, _bias, _norm, _scale, _zero, dst + i);
+                    for (; i < size16; i += 16)
+                        DequantizeQuantizeLinear16(ps + i, _bias, _norm, _scale, _zero, dst + i);
+                    if (tail)
+                        DequantizeQuantizeLinear16(ps + i, _bias, _norm, _scale, _zero, dst + i, tail);
+                    dst += size1;
+                }
+            }
         }
     }
 #endif
