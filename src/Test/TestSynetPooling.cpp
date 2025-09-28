@@ -25,6 +25,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestTensor.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -165,30 +166,30 @@ namespace Test
         return result;
     }
 
-    bool SynetPoolingAverageAutoTest()
+    bool SynetPoolingAverageAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Base::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Sse41::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Avx2::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Avx512bw::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SynetPoolingAverageAutoTest(FUNC_PA(Simd::Neon::SynetPoolingAverage), FUNC_PA(SimdSynetPoolingAverage));
 #endif 
 
@@ -294,30 +295,30 @@ namespace Test
         return result;
     }
 
-    bool SynetPoolingMax32fAutoTest()
+    bool SynetPoolingMax32fAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetPoolingMax32fAutoTest(FUNC_PM32F(Simd::Base::SynetPoolingMax32f), FUNC_PM32F(SimdSynetPoolingMax32f));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetPoolingMax32fAutoTest(FUNC_PM32F(Simd::Sse41::SynetPoolingMax32f), FUNC_PM32F(SimdSynetPoolingMax32f));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetPoolingMax32fAutoTest(FUNC_PM32F(Simd::Avx2::SynetPoolingMax32f), FUNC_PM32F(SimdSynetPoolingMax32f));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetPoolingMax32fAutoTest(FUNC_PM32F(Simd::Avx512bw::SynetPoolingMax32f), FUNC_PM32F(SimdSynetPoolingMax32f));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SynetPoolingMax32fAutoTest(FUNC_PM32F(Simd::Neon::SynetPoolingMax32f), FUNC_PM32F(SimdSynetPoolingMax32f));
 #endif 
 
@@ -408,30 +409,30 @@ namespace Test
         return result;
     }
 
-    bool SynetPoolingMax8uAutoTest()
+    bool SynetPoolingMax8uAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetPoolingMax8uAutoTest(FUNC_PM8U(Simd::Base::SynetPoolingMax8u), FUNC_PM8U(SimdSynetPoolingMax8u));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetPoolingMax8uAutoTest(FUNC_PM8U(Simd::Sse41::SynetPoolingMax8u), FUNC_PM8U(SimdSynetPoolingMax8u));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetPoolingMax8uAutoTest(FUNC_PM8U(Simd::Avx2::SynetPoolingMax8u), FUNC_PM8U(SimdSynetPoolingMax8u));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetPoolingMax8uAutoTest(FUNC_PM8U(Simd::Avx512bw::SynetPoolingMax8u), FUNC_PM8U(SimdSynetPoolingMax8u));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
            result = result && SynetPoolingMax8uAutoTest(FUNC_PM8U(Simd::Neon::SynetPoolingMax8u), FUNC_PM8U(SimdSynetPoolingMax8u));
 #endif 
 

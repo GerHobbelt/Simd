@@ -26,6 +26,7 @@
 #include "Test/TestTensor.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdSynet.h"
 #include "Simd/SimdSynetInnerProduct32f.h"
@@ -189,31 +190,31 @@ namespace Test
         return result;
     }
 
-    bool SynetInnerProduct32fForwardAutoTest()
+    bool SynetInnerProduct32fForwardAutoTest(const Options & options)
     {
         const float EPS = 0.001f;
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Base::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Sse41::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Avx2::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Avx512bw::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SynetInnerProduct32fForwardAutoTest(EPS, FUNC_IP32F(Simd::Neon::SynetInnerProduct32fInit), FUNC_IP32F(SimdSynetInnerProduct32fInit));
 #endif
 
@@ -286,30 +287,30 @@ namespace Test
         return result;
     }
 
-    bool SynetInnerProductLayerForwardAutoTest()
+    bool SynetInnerProductLayerForwardAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Base::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Sse41::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Avx2::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Avx512bw::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SynetInnerProductLayerForwardAutoTest(FUNC_IPLF(Simd::Neon::SynetInnerProductLayerForward), FUNC_IPLF(SimdSynetInnerProductLayerForward));
 #endif
 
@@ -402,24 +403,24 @@ namespace Test
         return result;
     }
 
-    bool SynetInnerProduct8iAutoTest()
+    bool SynetInnerProduct8iAutoTest(const Options & options)
     {
         bool result = true;
 
         result = result && SynetInnerProduct8iAutoTest(FUNC_IP8I(Simd::Base::SynetInnerProduct8i), FUNC_IP8I(SimdSynetInnerProduct8i));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetInnerProduct8iAutoTest(FUNC_IP8I(Simd::Sse41::SynetInnerProduct8i), FUNC_IP8I(SimdSynetInnerProduct8i));
 #endif
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetInnerProduct8iAutoTest(FUNC_IP8I(Simd::Avx2::SynetInnerProduct8i), FUNC_IP8I(SimdSynetInnerProduct8i));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetInnerProduct8iAutoTest(FUNC_IP8I(Simd::Avx512bw::SynetInnerProduct8i), FUNC_IP8I(SimdSynetInnerProduct8i));
 #endif
 

@@ -26,9 +26,9 @@
 #include "Simd/SimdSynetConvolution8iCommon.h"
 #include "Simd/SimdSynet.h"
 #include "Simd/SimdMath.h"
-#include "Simd/SimdBase.h"
 #include "Simd/SimdCpu.h"
 #include "Simd/SimdLog.h"
+#include "Simd/SimdTile.h"
 
 namespace Simd
 {
@@ -39,235 +39,276 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        template<Term8iType term, int M> void QuantizedMergedConvolutionOutput_2xM(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
-            size_t srcC, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf, uint8_t* dst)
+        template<Term8iType term, int cfg> void QuantizedMergedConvolutionOutput_2x2(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
+            size_t srcC, size_t dstS, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf0, uint8_t* dst)
         {
-            __m512i d00, d01, d10, d11, d20, d21, d30, d31, d40, d41, d50, d51, d60, d61, d70, d71, d80, d81, d90, d91, dA0, dA1, dB0, dB1, s0, w0, w1;
-            size_t dS = a.maC * p.strideX, dB = a.owStep, dD = p.dstC;
-            const int8_t* weight1 = weight0 + AlignHi(srcC, a.miK) * F;
-            const uint8_t* src1 = src0 + 1 * dS;
-            const uint8_t* src2 = src0 + 2 * dS;
-            const uint8_t* src3 = src0 + 3 * dS;
-            const uint8_t* src4 = src0 + 4 * dS;
-            const uint8_t* src5 = src0 + 5 * dS;
-            if (dstC > F)
+            int dS = (int)a.maC, dB = a.obStep ? (int)a.owStep : 32, dD = int(p.dstC);
+            int strideS = dS, strideW = 64, strideB = dB * 4, stepS = 64;
+            const uint8_t* src1 = src0 + dS * 16;
+            const int8_t * weight1 = weight0 + AlignHi(srcC, a.miK) * F;
+            int32_t* buf1 = buf0 + 16 * dB;
+
+            if (cfg)
+                SetTileConf2x2(dstS, dstC);
+            if (update)
             {
-                if (update)
-                {
-                    if (M > 0x0) d00 = _mm512_loadu_si512(buf + 0x0 * dB + 0), d01 = _mm512_loadu_si512(buf + 0x0 * dB + F);
-                    if (M > 0x1) d10 = _mm512_loadu_si512(buf + 0x1 * dB + 0), d11 = _mm512_loadu_si512(buf + 0x1 * dB + F);
-                    if (M > 0x2) d20 = _mm512_loadu_si512(buf + 0x2 * dB + 0), d21 = _mm512_loadu_si512(buf + 0x2 * dB + F);
-                    if (M > 0x3) d30 = _mm512_loadu_si512(buf + 0x3 * dB + 0), d31 = _mm512_loadu_si512(buf + 0x3 * dB + F);
-                    if (M > 0x4) d40 = _mm512_loadu_si512(buf + 0x4 * dB + 0), d41 = _mm512_loadu_si512(buf + 0x4 * dB + F);
-                    if (M > 0x5) d50 = _mm512_loadu_si512(buf + 0x5 * dB + 0), d51 = _mm512_loadu_si512(buf + 0x5 * dB + F);
-                    if (M > 0x6) d60 = _mm512_loadu_si512(buf + 0x6 * dB + 0), d61 = _mm512_loadu_si512(buf + 0x6 * dB + F);
-                    if (M > 0x7) d70 = _mm512_loadu_si512(buf + 0x7 * dB + 0), d71 = _mm512_loadu_si512(buf + 0x7 * dB + F);
-                    if (M > 0x8) d80 = _mm512_loadu_si512(buf + 0x8 * dB + 0), d81 = _mm512_loadu_si512(buf + 0x8 * dB + F);
-                    if (M > 0x9) d90 = _mm512_loadu_si512(buf + 0x9 * dB + 0), d91 = _mm512_loadu_si512(buf + 0x9 * dB + F);
-                    if (M > 0xA) dA0 = _mm512_loadu_si512(buf + 0xA * dB + 0), dA1 = _mm512_loadu_si512(buf + 0xA * dB + F);
-                    if (M > 0xB) dB0 = _mm512_loadu_si512(buf + 0xB * dB + 0), dB1 = _mm512_loadu_si512(buf + 0xB * dB + F);
-                }
-                else
-                {
-                    if (M > 0x0) d00 = _mm512_setzero_si512(), d01 = _mm512_setzero_si512();
-                    if (M > 0x1) d10 = _mm512_setzero_si512(), d11 = _mm512_setzero_si512();
-                    if (M > 0x2) d20 = _mm512_setzero_si512(), d21 = _mm512_setzero_si512();
-                    if (M > 0x3) d30 = _mm512_setzero_si512(), d31 = _mm512_setzero_si512();
-                    if (M > 0x4) d40 = _mm512_setzero_si512(), d41 = _mm512_setzero_si512();
-                    if (M > 0x5) d50 = _mm512_setzero_si512(), d51 = _mm512_setzero_si512();
-                    if (M > 0x6) d60 = _mm512_setzero_si512(), d61 = _mm512_setzero_si512();
-                    if (M > 0x7) d70 = _mm512_setzero_si512(), d71 = _mm512_setzero_si512();
-                    if (M > 0x8) d80 = _mm512_setzero_si512(), d81 = _mm512_setzero_si512();
-                    if (M > 0x9) d90 = _mm512_setzero_si512(), d91 = _mm512_setzero_si512();
-                    if (M > 0xA) dA0 = _mm512_setzero_si512(), dA1 = _mm512_setzero_si512();
-                    if (M > 0xB) dB0 = _mm512_setzero_si512(), dB1 = _mm512_setzero_si512();
-                }
-                for (size_t offs0 = 0, offs6 = offs0 + 6 * dS; offs0 < srcC; offs0 += 4, offs6 += 4)
-                {
-                    w0 = _mm512_loadu_si512((__m512i*)weight0);
-                    w1 = _mm512_loadu_si512((__m512i*)weight1);
-                    if (M > 0x0) s0 = Set4(src0 + offs0), Avx512vnni::Madd4<false>(d00, s0, w0), Avx512vnni::Madd4<false>(d01, s0, w1);
-                    if (M > 0x1) s0 = Set4(src1 + offs0), Avx512vnni::Madd4<false>(d10, s0, w0), Avx512vnni::Madd4<false>(d11, s0, w1);
-                    if (M > 0x2) s0 = Set4(src2 + offs0), Avx512vnni::Madd4<false>(d20, s0, w0), Avx512vnni::Madd4<false>(d21, s0, w1);
-                    if (M > 0x3) s0 = Set4(src3 + offs0), Avx512vnni::Madd4<false>(d30, s0, w0), Avx512vnni::Madd4<false>(d31, s0, w1);
-                    if (M > 0x4) s0 = Set4(src4 + offs0), Avx512vnni::Madd4<false>(d40, s0, w0), Avx512vnni::Madd4<false>(d41, s0, w1);
-                    if (M > 0x5) s0 = Set4(src5 + offs0), Avx512vnni::Madd4<false>(d50, s0, w0), Avx512vnni::Madd4<false>(d51, s0, w1);
-                    if (M > 0x6) s0 = Set4(src0 + offs6), Avx512vnni::Madd4<false>(d60, s0, w0), Avx512vnni::Madd4<false>(d61, s0, w1);
-                    if (M > 0x7) s0 = Set4(src1 + offs6), Avx512vnni::Madd4<false>(d70, s0, w0), Avx512vnni::Madd4<false>(d71, s0, w1);
-                    if (M > 0x8) s0 = Set4(src2 + offs6), Avx512vnni::Madd4<false>(d80, s0, w0), Avx512vnni::Madd4<false>(d81, s0, w1);
-                    if (M > 0x9) s0 = Set4(src3 + offs6), Avx512vnni::Madd4<false>(d90, s0, w0), Avx512vnni::Madd4<false>(d91, s0, w1);
-                    if (M > 0xA) s0 = Set4(src4 + offs6), Avx512vnni::Madd4<false>(dA0, s0, w0), Avx512vnni::Madd4<false>(dA1, s0, w1);
-                    if (M > 0xB) s0 = Set4(src5 + offs6), Avx512vnni::Madd4<false>(dB0, s0, w0), Avx512vnni::Madd4<false>(dB1, s0, w1);
-                    weight0 += A, weight1 += A;
-                }
-                __mmask16 tail = TailMask16(dstC - F);
-                if (M > 0x0) Save2<term>(dst, buf, d00, d01, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x1) Save2<term>(dst, buf, d10, d11, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x2) Save2<term>(dst, buf, d20, d21, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x3) Save2<term>(dst, buf, d30, d31, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x4) Save2<term>(dst, buf, d40, d41, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x5) Save2<term>(dst, buf, d50, d51, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x6) Save2<term>(dst, buf, d60, d61, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x7) Save2<term>(dst, buf, d70, d71, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x8) Save2<term>(dst, buf, d80, d81, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x9) Save2<term>(dst, buf, d90, d91, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0xA) Save2<term>(dst, buf, dA0, dA1, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0xB) Save2<term>(dst, buf, dB0, dB1, bias, norm, zero, tail), dst += dD, buf += dB;
+                _tile_stream_loadd(0, buf0 + 0, strideB);
+                _tile_stream_loadd(1, buf0 + F, strideB);
+                _tile_stream_loadd(2, buf1 + 0, strideB);
+                _tile_stream_loadd(3, buf1 + F, strideB);
             }
             else
             {
-                if (update)
-                {
-                    if (M > 0x0) d00 = _mm512_loadu_si512(buf + 0x0 * dB + 0);
-                    if (M > 0x1) d10 = _mm512_loadu_si512(buf + 0x1 * dB + 0);
-                    if (M > 0x2) d20 = _mm512_loadu_si512(buf + 0x2 * dB + 0);
-                    if (M > 0x3) d30 = _mm512_loadu_si512(buf + 0x3 * dB + 0);
-                    if (M > 0x4) d40 = _mm512_loadu_si512(buf + 0x4 * dB + 0);
-                    if (M > 0x5) d50 = _mm512_loadu_si512(buf + 0x5 * dB + 0);
-                    if (M > 0x6) d60 = _mm512_loadu_si512(buf + 0x6 * dB + 0);
-                    if (M > 0x7) d70 = _mm512_loadu_si512(buf + 0x7 * dB + 0);
-                    if (M > 0x8) d80 = _mm512_loadu_si512(buf + 0x8 * dB + 0);
-                    if (M > 0x9) d90 = _mm512_loadu_si512(buf + 0x9 * dB + 0);
-                    if (M > 0xA) dA0 = _mm512_loadu_si512(buf + 0xA * dB + 0);
-                    if (M > 0xB) dB0 = _mm512_loadu_si512(buf + 0xB * dB + 0);
-                }
-                else
-                {
-                    if (M > 0x0) d00 = _mm512_setzero_si512();
-                    if (M > 0x1) d10 = _mm512_setzero_si512();
-                    if (M > 0x2) d20 = _mm512_setzero_si512();
-                    if (M > 0x3) d30 = _mm512_setzero_si512();
-                    if (M > 0x4) d40 = _mm512_setzero_si512();
-                    if (M > 0x5) d50 = _mm512_setzero_si512();
-                    if (M > 0x6) d60 = _mm512_setzero_si512();
-                    if (M > 0x7) d70 = _mm512_setzero_si512();
-                    if (M > 0x8) d80 = _mm512_setzero_si512();
-                    if (M > 0x9) d90 = _mm512_setzero_si512();
-                    if (M > 0xA) dA0 = _mm512_setzero_si512();
-                    if (M > 0xB) dB0 = _mm512_setzero_si512();
-                }
-                for (size_t offs0 = 0, offs6 = offs0 + 6 * dS; offs0 < srcC; offs0 += 4, offs6 += 4)
-                {
-                    w0 = _mm512_loadu_si512((__m512i*)weight0);
-                    if (M > 0x0) s0 = Set4(src0 + offs0), Avx512vnni::Madd4<false>(d00, s0, w0);
-                    if (M > 0x1) s0 = Set4(src1 + offs0), Avx512vnni::Madd4<false>(d10, s0, w0);
-                    if (M > 0x2) s0 = Set4(src2 + offs0), Avx512vnni::Madd4<false>(d20, s0, w0);
-                    if (M > 0x3) s0 = Set4(src3 + offs0), Avx512vnni::Madd4<false>(d30, s0, w0);
-                    if (M > 0x4) s0 = Set4(src4 + offs0), Avx512vnni::Madd4<false>(d40, s0, w0);
-                    if (M > 0x5) s0 = Set4(src5 + offs0), Avx512vnni::Madd4<false>(d50, s0, w0);
-                    if (M > 0x6) s0 = Set4(src0 + offs6), Avx512vnni::Madd4<false>(d60, s0, w0);
-                    if (M > 0x7) s0 = Set4(src1 + offs6), Avx512vnni::Madd4<false>(d70, s0, w0);
-                    if (M > 0x8) s0 = Set4(src2 + offs6), Avx512vnni::Madd4<false>(d80, s0, w0);
-                    if (M > 0x9) s0 = Set4(src3 + offs6), Avx512vnni::Madd4<false>(d90, s0, w0);
-                    if (M > 0xA) s0 = Set4(src4 + offs6), Avx512vnni::Madd4<false>(dA0, s0, w0);
-                    if (M > 0xB) s0 = Set4(src5 + offs6), Avx512vnni::Madd4<false>(dB0, s0, w0);
-                    weight0 += A;
-                }
-                __mmask16 tail = TailMask16(dstC);
-                if (M > 0x0) Save1<term>(dst, buf, d00, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x1) Save1<term>(dst, buf, d10, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x2) Save1<term>(dst, buf, d20, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x3) Save1<term>(dst, buf, d30, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x4) Save1<term>(dst, buf, d40, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x5) Save1<term>(dst, buf, d50, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x6) Save1<term>(dst, buf, d60, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x7) Save1<term>(dst, buf, d70, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x8) Save1<term>(dst, buf, d80, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0x9) Save1<term>(dst, buf, d90, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0xA) Save1<term>(dst, buf, dA0, bias, norm, zero, tail), dst += dD, buf += dB;
-                if (M > 0xB) Save1<term>(dst, buf, dB0, bias, norm, zero, tail), dst += dD, buf += dB;
+                _tile_zero(0);
+                _tile_zero(1);
+                _tile_zero(2);
+                _tile_zero(3);
             }
-        }
 
-        typedef void(*QuantizedMergedConvolutionOutputConvolution_2xM_Ptr)(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
-            size_t srcC, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf, uint8_t* dst);
-
-        template<Term8iType term> QuantizedMergedConvolutionOutputConvolution_2xM_Ptr GetQuantizedMergedConvolutionOutputConvolution_2xM(size_t M)
-        {
-            switch (M)
+            int srcC64 = (int)srcC - 64, sc = 0;
+            _tile_stream_loadd(4, src0, strideS);
+            _tile_loadd(6, weight0 + sc * 16, strideW);
+            for (; sc < srcC64; src1 += stepS)
             {
-            case 0x0: return NULL;
-            case 0x1: return QuantizedMergedConvolutionOutput_2xM<term, 0x1>;
-            case 0x2: return QuantizedMergedConvolutionOutput_2xM<term, 0x2>;
-            case 0x3: return QuantizedMergedConvolutionOutput_2xM<term, 0x3>;
-            case 0x4: return QuantizedMergedConvolutionOutput_2xM<term, 0x4>;
-            case 0x5: return QuantizedMergedConvolutionOutput_2xM<term, 0x5>;
-            case 0x6: return QuantizedMergedConvolutionOutput_2xM<term, 0x6>;
-            case 0x7: return QuantizedMergedConvolutionOutput_2xM<term, 0x7>;
-            case 0x8: return QuantizedMergedConvolutionOutput_2xM<term, 0x8>;
-            case 0x9: return QuantizedMergedConvolutionOutput_2xM<term, 0x9>;
-            case 0xA: return QuantizedMergedConvolutionOutput_2xM<term, 0xA>;
-            case 0xB: return QuantizedMergedConvolutionOutput_2xM<term, 0xB>;
-            case 0xC: return QuantizedMergedConvolutionOutput_2xM<term, 0xC>;
+                _tile_loadd(7, weight1 + sc * 16, strideW);
+                _tile_stream_loadd(5, src1, strideS);
+                _tile_dpbusd(0, 4, 6);
+                _tile_dpbusd(1, 4, 7);
+                src0 += stepS;
+                _tile_stream_loadd(4, src0, strideS);
+                _tile_dpbusd(2, 5, 6);
+                sc += 64;
+                _tile_loadd(6, weight0 + sc * 16, strideW);
+                _tile_dpbusd(3, 5, 7);
             }
-            assert(0);
-            return NULL;
+            _tile_loadd(7, weight1 + sc * 16, strideW);
+            _tile_stream_loadd(5, src1, strideS);
+            _tile_dpbusd(0, 4, 6);
+            _tile_dpbusd(1, 4, 7);
+            _tile_dpbusd(2, 5, 6);
+            _tile_dpbusd(3, 5, 7);
+
+            _tile_stored(0, buf0 + 0, strideB);
+            _tile_stored(1, buf0 + F, strideB);
+            _tile_stored(2, buf1 + 0, strideB);
+            _tile_stored(3, buf1 + F, strideB);
+            if (term == Term8iLast8u)
+            {
+                __mmask16 tailD = TailMask16(dstC - F);
+                size_t dstS8 = AlignLo(dstS, 8), s = 0;
+                for (; s < dstS8; s += 8)
+                    Apply2x8<term>(dst + s * dD, dD, buf0 + s * dB, dB, bias, norm, zero, tailD);
+                for (; s < dstS; ++s)
+                    Apply2<term>(dst + s * dD, buf0 + s * dB, bias, norm, zero, tailD);
+            }
         }
+
+        template<Term8iType term, int cfg> void QuantizedMergedConvolutionOutput_2x1(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
+            size_t srcC, size_t dstS, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf0, uint8_t* dst)
+        {
+            int dS = (int)a.maC, dB = a.obStep ? (int)a.owStep : 32, dD = int(p.dstC);
+            int strideS = dS, strideW = 64, strideB = dB * 4, stepS = 64;
+            const uint8_t* src1 = src0 + dS * 16;
+            int32_t* buf1 = buf0 + 16 * dB;
+
+            if (cfg)
+                SetTileConf2x1(dstS, dstC);
+            if (update)
+            {
+                _tile_stream_loadd(0, buf0 + 0, strideB);
+                _tile_stream_loadd(2, buf1 + 0, strideB);
+            }
+            else
+            {
+                _tile_zero(0);
+                _tile_zero(2);
+            }
+
+            int srcC64 = (int)srcC - 64, sc = 0;
+            _tile_stream_loadd(4, src0, strideS);
+            for (; sc < srcC64; sc += 64, src1 += stepS)
+            {
+                _tile_loadd(6, weight0 + sc * 16, strideW);
+                _tile_stream_loadd(5, src1, strideS);
+                _tile_dpbusd(0, 4, 6);
+                src0 += stepS;
+                _tile_stream_loadd(4, src0, strideS);
+                _tile_dpbusd(2, 5, 6);
+            }
+            _tile_loadd(6, weight0 + sc * 16, strideW);
+            _tile_stream_loadd(5, src1, strideS);
+            _tile_dpbusd(0, 4, 6);
+            _tile_dpbusd(2, 5, 6);
+
+            _tile_stored(0, buf0 + 0, strideB);
+            _tile_stored(2, buf1 + 0, strideB);
+            if (term == Term8iLast8u)
+            {
+                __mmask16 tailD = TailMask16(dstC);
+                size_t dstS8 = AlignLo(dstS, 8), s = 0;
+                for (; s < dstS8; s += 8)
+                    Apply1x8<term>(dst + s * dD, dD, buf0 + s * dB, dB, bias, norm, zero, tailD);
+                for (; s < dstS; ++s)
+                    Apply1<term>(dst + s * dD, buf0 + s * dB, bias, norm, zero, tailD);
+            }
+        }
+
+        template<Term8iType term, int cfg> void QuantizedMergedConvolutionOutput_1x2(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
+            size_t srcC, size_t dstS, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf0, uint8_t* dst)
+        {
+            int dS = (int)a.maC, dB = a.obStep ? (int)a.owStep : 32, dD = int(p.dstC);
+            int strideS = dS, strideW = 64, strideB = dB * 4, stepS = 64;
+            const int8_t* weight1 = weight0 + AlignHi(srcC, a.miK) * F;
+
+            if (cfg)
+                SetTileConf1x2(dstS, dstC);
+            if (update)
+            {
+                _tile_stream_loadd(0, buf0 + 0, strideB);
+                _tile_stream_loadd(1, buf0 + F, strideB);
+            }
+            else
+            {
+                _tile_zero(0);
+                _tile_zero(1);
+            }
+
+            int srcC64 = (int)srcC - 64, sc = 0;
+            _tile_loadd(6, weight0 + sc * 16, strideW);
+            for (; sc < srcC64; src0 += stepS)
+            {
+                _tile_stream_loadd(4, src0, strideS);
+                _tile_loadd(7, weight1 + sc * 16, strideW);
+                _tile_dpbusd(0, 4, 6);
+                sc += 64;
+                _tile_loadd(6, weight0 + sc * 16, strideW);
+                _tile_dpbusd(1, 4, 7);
+            }
+            _tile_stream_loadd(4, src0, strideS);
+            _tile_loadd(7, weight1 + sc * 16, strideW);
+            _tile_dpbusd(0, 4, 6);
+            _tile_dpbusd(1, 4, 7);
+
+            _tile_stored(0, buf0 + 0, strideB);
+            _tile_stored(1, buf0 + F, strideB);
+            if (term == Term8iLast8u)
+            {
+                __mmask16 tailD = TailMask16(dstC - F);
+                size_t dstS8 = AlignLo(dstS, 8), s = 0;
+                for (; s < dstS8; s += 8)
+                    Apply2x8<term>(dst + s * dD, dD, buf0 + s * dB, dB, bias, norm, zero, tailD);
+                for (; s < dstS; ++s)
+                    Apply2<term>(dst + s * dD, buf0 + s * dB, bias, norm, zero, tailD);
+            }
+        }
+
+        template<Term8iType term, int cfg> void QuantizedMergedConvolutionOutput_1x1(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
+            size_t srcC, size_t dstS, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf0, uint8_t* dst)
+        {
+            int dS = (int)a.maC, dB = a.obStep ? (int)a.owStep : 32, dD = int(p.dstC);
+            int strideS = dS, strideW = 64, strideB = dB * 4, stepS = 64;
+
+            if (cfg)
+                SetTileConf1x1(dstS, dstC);
+            if (update)
+            {
+                _tile_stream_loadd(0, buf0 + 0, strideB);
+            }
+            else
+            {
+                _tile_zero(0);
+            }
+
+            for (size_t sc = 0; sc < srcC; sc += 64, src0 += stepS)
+            {
+                _tile_stream_loadd(4, src0, strideS);
+                _tile_loadd(6, weight0 + sc * 16, strideW);
+                _tile_dpbusd(0, 4, 6);
+            }
+
+            _tile_stored(0, buf0 + 0, strideB);
+            if (term == Term8iLast8u)
+            {
+                __mmask16 tailD = TailMask16(dstC);
+                size_t dstS8 = AlignLo(dstS, 8), s = 0;
+                for (; s < dstS8; s += 8)
+                    Apply1x8<term>(dst + s * dD, dD, buf0 + s * dB, dB, bias, norm, zero, tailD);
+                for (; s < dstS; ++s)
+                    Apply1<term>(dst + s * dD, buf0 + s * dB, bias, norm, zero, tailD);
+            }
+        }
+
+        typedef void (*QuantizedMergedConvolutionOutputPtr)(const uint8_t* src0, const ConvParam& p, const AlgParam& a,
+            size_t srcC, size_t dstS, size_t dstC, int update, const int8_t* weight0, const __m512i* bias, const __m512* norm, const __m512i& zero, int32_t* buf, uint8_t* dst);
 
         template<Term8iType term> void QuantizedMergedConvolutionOutputConvolution_2(const uint8_t* src, const ConvParam& p, const AlgParam& a, size_t maC, size_t yBeg, size_t yEnd,
             int update, const int8_t* weight, const int32_t* bias, const float* norm, int32_t zero, int32_t* buf, uint8_t* dst)
         {
-            size_t n = 12, n1 = (yEnd - yBeg) * p.dstW, nn = AlignLoAny(n1, n), m = n1 - nn;
-            QuantizedMergedConvolutionOutputConvolution_2xM_Ptr outputConvolution1x1_2xN = GetQuantizedMergedConvolutionOutputConvolution_2xM<term>(n);
-            QuantizedMergedConvolutionOutputConvolution_2xM_Ptr outputConvolution1x1_2xM = GetQuantizedMergedConvolutionOutputConvolution_2xM<term>(m);
+            size_t n = 32, n1 = (yEnd - yBeg) * p.dstW, nn = AlignLoAny(n1, n), m = n1 - nn;
+            size_t dW = AlignHi(maC, a.miK) * DF, dS = a.maC, dB = a.obStep, dD = p.dstC;
             __m512 _norm[2];
             __m512i _bias[2], _zero = _mm512_set1_epi32(zero);
-            for (size_t dc = 0; dc < p.dstC; dc += DF)
+            if (nn)
             {
-                size_t dC = Simd::Min(DF, p.dstC - dc);
-                _bias[0] = _mm512_loadu_si512((__m512i*)(bias + dc) + 0);
-                _bias[1] = _mm512_loadu_si512((__m512i*)(bias + dc) + 1);
-                _norm[0] = _mm512_loadu_ps(norm + dc + 0);
-                _norm[1] = _mm512_loadu_ps(norm + dc + F);
-                const uint8_t* s = src;
-                int32_t* b = buf + dc + yBeg * p.dstW * a.owStep;
-                uint8_t* d = dst + dc + yBeg * p.dstW * p.dstC;
-                size_t i = 0;
-                for (; i < nn; i += n, s += a.maC * n, b += a.owStep * n, d += p.dstC * n)
-                    outputConvolution1x1_2xN(s, p, a, maC, dC, update, weight, _bias, _norm, _zero, b, d);
-                for (; i < n1; i += m, s += a.maC * m, b += a.owStep * m, d += p.dstC * m)
-                    outputConvolution1x1_2xM(s, p, a, maC, dC, update, weight, _bias, _norm, _zero, b, d);
-                weight += AlignHi(maC, a.miK) * DF;
+                QuantizedMergedConvolutionOutputPtr body_2 = QuantizedMergedConvolutionOutput_2x2<term, 0>;
+                QuantizedMergedConvolutionOutputPtr tail_2 = m > 16 ? QuantizedMergedConvolutionOutput_2x2<term, 0> : QuantizedMergedConvolutionOutput_1x2<term, 0>;
+                QuantizedMergedConvolutionOutputPtr body_1 = QuantizedMergedConvolutionOutput_2x1<term, 0>;
+                QuantizedMergedConvolutionOutputPtr tail_1 = m > 16 ? QuantizedMergedConvolutionOutput_2x1<term, 0> : QuantizedMergedConvolutionOutput_1x1<term, 0>;
+                SetTileConfFull();
+                for (size_t dc = 0; dc < p.dstC; dc += DF)
+                {
+                    size_t dC = Simd::Min(DF, p.dstC - dc);
+                    _bias[0] = _mm512_loadu_si512((__m512i*)(bias + dc) + 0);
+                    _bias[1] = _mm512_loadu_si512((__m512i*)(bias + dc) + 1);
+                    _norm[0] = _mm512_loadu_ps(norm + dc + 0);
+                    _norm[1] = _mm512_loadu_ps(norm + dc + F);
+                    const uint8_t* s = src;
+                    int32_t* b = buf + dc + yBeg * p.dstW * dB;
+                    uint8_t* d = dst + dc + yBeg * p.dstW * p.dstC;
+                    size_t i = 0;
+                    if (dC > F)
+                    {
+                        for (; i < nn; i += n)
+                            body_2(s + i * dS, p, a, maC, n, dC, update, weight, _bias, _norm, _zero, b + i * dB, d + i * dD);
+                        if (m)
+                            tail_2(s + i * dS, p, a, maC, m, dC, update, weight, _bias, _norm, _zero, b + i * dB, d + i * dD);
+                    }
+                    else
+                    {
+                        for (; i < nn; i += n)
+                            body_1(s + i * dS, p, a, maC, n, dC, update, weight, _bias, _norm, _zero, b + i * dB, d + i * dD);
+                        if (m)
+                            tail_1(s + i * dS, p, a, maC, m, dC, update, weight, _bias, _norm, _zero, b + i * dB, d + i * dD);
+                    }
+                    weight += dW;
+                }
             }
-        }
-
-        //------------------------------------------------------------------------------------------------
-
-        SIMD_INLINE __m512i QuantizedAdd(const __m512i& a, const __m512i& aBias, const __m512& aNorm, const __m512i& b, const __m512i& bBias, const __m512& bNorm, const __m512& dNorm, const __m512i& dZero)
-        {
-            return QuantizeLinear(_mm512_add_ps(DequantizeLinear(a, aBias, aNorm), DequantizeLinear(b, bBias, bNorm)), dNorm, dZero);
-        }
-
-        SIMD_INLINE void AddInputToOutput16(const uint8_t* a, const __m512i& aBias, const __m512& aNorm, const uint8_t* b, const __m512i& bBias, const __m512& bNorm, uint8_t* dst, const __m512& dNorm, const __m512i& dZero, __mmask16 tail = -1)
-        {
-            __m512i d0 = QuantizedAdd(_mm512_cvtepu8_epi32(_mm_maskz_loadu_epi8(tail, a)), aBias, aNorm, _mm512_cvtepu8_epi32(_mm_maskz_loadu_epi8(tail, b)), bBias, bNorm, dNorm, dZero);
-            _mm_mask_storeu_epi8(dst, tail, _mm512_castsi512_si128(PackI16ToU8(PackI32ToI16(d0), K_ZERO)));
-        }
-
-        SIMD_INLINE void AddInputToOutput64(const uint8_t* a, const __m512i& aBias, const __m512& aNorm, const uint8_t* b, const __m512i& bBias, const __m512& bNorm, uint8_t* dst, const __m512& dNorm, const __m512i& dZero)
-        {
-            __m512i d0 = QuantizedAdd(_mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)a + 0)), aBias, aNorm, _mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)b + 0)), bBias, bNorm, dNorm, dZero);
-            __m512i d1 = QuantizedAdd(_mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)a + 1)), aBias, aNorm, _mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)b + 1)), bBias, bNorm, dNorm, dZero);
-            __m512i d2 = QuantizedAdd(_mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)a + 2)), aBias, aNorm, _mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)b + 2)), bBias, bNorm, dNorm, dZero);
-            __m512i d3 = QuantizedAdd(_mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)a + 3)), aBias, aNorm, _mm512_cvtepu8_epi32(_mm_loadu_si128((__m128i*)b + 3)), bBias, bNorm, dNorm, dZero);
-            _mm512_storeu_si512((__m512i*)dst, PackI16ToU8(PackI32ToI16(d0, d1), PackI32ToI16(d2, d3)));
-        }
-
-        void QuantizedMergedConvolutionAddInputToOutput(const uint8_t* a, int aBias, float aNorm, const uint8_t* b, int bBias, float bNorm,
-            const ConvParam& p, size_t yBeg, size_t yEnd, float dNorm, int dZero, uint8_t* dst)
-        {
-            __m512i _aBias = _mm512_set1_epi32(aBias), _bBias = _mm512_set1_epi32(bBias), _dZero = _mm512_set1_epi32(dZero);
-            __m512 _aNorm = _mm512_set1_ps(aNorm), _bNorm = _mm512_set1_ps(bNorm), _dNorm = _mm512_set1_ps(dNorm);
-            size_t beg = yBeg * p.dstW * p.dstC, end = yEnd * p.dstW * p.dstC;
-            size_t i = beg, end16 = beg + AlignLo(end - beg, 16), end64 = beg + AlignLo(end - beg, 64);
-            __mmask16 tail = TailMask16(end - end16);
-            for (; i < end64; i += 64)
-                AddInputToOutput64(a + i, _aBias, _aNorm, b + i, _bBias, _bNorm, dst + i, _dNorm, _dZero);
-            for (; i < end16; i += 16)
-                AddInputToOutput16(a + i, _aBias, _aNorm, b + i, _bBias, _bNorm, dst + i, _dNorm, _dZero);
-            if (i < end)
-                AddInputToOutput16(a + i, _aBias, _aNorm, b + i, _bBias, _bNorm, dst + i, _dNorm, _dZero, tail);
-
+            else
+            {
+                QuantizedMergedConvolutionOutputPtr tail_2 = m > 16 ? QuantizedMergedConvolutionOutput_2x2<term, 0> : QuantizedMergedConvolutionOutput_1x2<term, 0>;
+                QuantizedMergedConvolutionOutputPtr tail_1 = m > 16 ? QuantizedMergedConvolutionOutput_2x1<term, 0> : QuantizedMergedConvolutionOutput_1x1<term, 0>;
+                if (m > 16)
+                    SetTileConf2x2(m, 32);
+                else
+                    SetTileConf1x2(m, 32);
+                for (size_t dc = 0; dc < p.dstC; dc += DF)
+                {
+                    size_t dC = Simd::Min(DF, p.dstC - dc);
+                    _bias[0] = _mm512_loadu_si512((__m512i*)(bias + dc) + 0);
+                    _bias[1] = _mm512_loadu_si512((__m512i*)(bias + dc) + 1);
+                    _norm[0] = _mm512_loadu_ps(norm + dc + 0);
+                    _norm[1] = _mm512_loadu_ps(norm + dc + F);
+                    const uint8_t* s = src;
+                    int32_t* b = buf + dc + yBeg * p.dstW * dB;
+                    uint8_t* d = dst + dc + yBeg * p.dstW * p.dstC;
+                    size_t i = 0;
+                    if (dC > F)
+                        tail_2(s + i * dS, p, a, maC, m, dC, update, weight, _bias, _norm, _zero, b + i * dB, d + i * dD);
+                    else
+                        tail_1(s + i * dS, p, a, maC, m, dC, update, weight, _bias, _norm, _zero, b + i * dB, d + i * dD);
+                    weight += dW;
+                }
+            }
         }
 
         //------------------------------------------------------------------------------------------------
@@ -276,11 +317,6 @@ namespace Simd
         {
             funcs[0] = QuantizedMergedConvolutionOutputConvolution_2<Term8iInterim>;
             funcs[1] = QuantizedMergedConvolutionOutputConvolution_2<Term8iLast8u>;
-        }
-
-        void SetAddInputToOutput(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::AddInputToOutputPtr& func)
-        {
-            func = QuantizedMergedConvolutionAddInputToOutput;
         }
     }
 #endif

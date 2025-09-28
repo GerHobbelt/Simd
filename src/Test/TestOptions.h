@@ -182,6 +182,8 @@ namespace Test
 
         double warmUpTime;
 
+        uint32_t disabledExtensions;
+
         Options(int argc, char* argv[])
             : ArgsParser(argc, argv, true)
             , mode(Auto)
@@ -202,6 +204,7 @@ namespace Test
             source = GetArg("-s", "", false);
             output = GetArg("-o", "", false);
             warmUpTime = FromString<int>(GetArg("-wu", "0", false)) * 0.001;
+            disabledExtensions = FromString<uint32_t>(GetArg("-de", "0", false));
 
             for (int i = 1; i < argc; ++i)
             {
@@ -304,7 +307,7 @@ namespace Test
                 }
                 else if (arg.find("-de=") == 0)
                 {
-                    DISABLED_EXTENSIONS = FromString<uint32_t>(arg.substr(4, arg.size() - 4));
+                    //DISABLED_EXTENSIONS = FromString<uint32_t>(arg.substr(4, arg.size() - 4));
                 }
                 else if (arg.find("-wu=") == 0)
                 {
@@ -322,6 +325,43 @@ namespace Test
             }
         }
     };
+
+    //-------------------------------------------------------------------------------------------------
+
+    SIMD_INLINE bool TestBase(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000001) == 0;
+    }
+
+    SIMD_INLINE bool TestSse41(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000002) == 0;
+    }
+
+    SIMD_INLINE bool TestAvx2(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000004) == 0;
+    }
+
+    SIMD_INLINE bool TestAvx512bw(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000008) == 0;
+    }
+
+    SIMD_INLINE bool TestAvx512vnni(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000010) == 0;
+    }
+
+    SIMD_INLINE bool TestAmxBf16(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000020) == 0;
+    }
+
+    SIMD_INLINE bool TestNeon(const Options& options)
+    {
+        return (options.disabledExtensions & 0x000000002) == 0;
+    }
 }
 
 #endif

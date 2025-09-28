@@ -26,6 +26,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -91,30 +92,30 @@ namespace Test
         return result;
     }
 
-    bool ConditionalCount8uAutoTest()
+    bool ConditionalCount8uAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Base::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Sse41::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Avx2::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Avx512bw::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && ConditionalCount8uAutoTest(FUNC_C8U(Simd::Neon::ConditionalCount8u), FUNC_C8U(SimdConditionalCount8u));
 #endif 
 
@@ -183,30 +184,30 @@ namespace Test
         return result;
     }
 
-    bool ConditionalCount16iAutoTest()
+    bool ConditionalCount16iAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Base::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::HA)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::HA)
             result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Sse41::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::HA)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::HA)
             result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Avx2::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Avx512bw::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::HA)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::HA)
             result = result && ConditionalCount16iAutoTest(FUNC_C16I(Simd::Neon::ConditionalCount16i), FUNC_C16I(SimdConditionalCount16i));
 #endif
 
@@ -277,90 +278,90 @@ namespace Test
         return result;
     }
 
-    bool ConditionalSumAutoTest()
+    bool ConditionalSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Base::ConditionalSum), FUNC_S(SimdConditionalSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Sse41::ConditionalSum), FUNC_S(SimdConditionalSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx2::ConditionalSum), FUNC_S(SimdConditionalSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx512bw::ConditionalSum), FUNC_S(SimdConditionalSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Neon::ConditionalSum), FUNC_S(SimdConditionalSum));
 #endif 
 
         return result;
     }
 
-    bool ConditionalSquareSumAutoTest()
+    bool ConditionalSquareSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Base::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Sse41::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx2::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx512bw::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Neon::ConditionalSquareSum), FUNC_S(SimdConditionalSquareSum));
 #endif
 
         return result;
     }
 
-    bool ConditionalSquareGradientSumAutoTest()
+    bool ConditionalSquareGradientSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Base::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A + 2)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A + 2)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Sse41::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A + 2)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A + 2)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx2::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Avx512bw::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A + 2)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A + 2)
             result = result && ConditionalSumAutoTest(FUNC_S(Simd::Neon::ConditionalSquareGradientSum), FUNC_S(SimdConditionalSquareGradientSum));
 #endif 
 
@@ -433,30 +434,30 @@ namespace Test
         return result;
     }
 
-    bool ConditionalFillAutoTest()
+    bool ConditionalFillAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ConditionalFillAutoTest(FUNC_F(Simd::Base::ConditionalFill), FUNC_F(SimdConditionalFill));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && ConditionalFillAutoTest(FUNC_F(Simd::Sse41::ConditionalFill), FUNC_F(SimdConditionalFill));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && ConditionalFillAutoTest(FUNC_F(Simd::Avx2::ConditionalFill), FUNC_F(SimdConditionalFill));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ConditionalFillAutoTest(FUNC_F(Simd::Avx512bw::ConditionalFill), FUNC_F(SimdConditionalFill));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && ConditionalFillAutoTest(FUNC_F(Simd::Neon::ConditionalFill), FUNC_F(SimdConditionalFill));
 #endif
 

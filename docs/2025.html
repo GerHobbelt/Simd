@@ -43,9 +43,16 @@
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI, AMX-INT8 optimizations of class SynetQuantizedMergedConvolutionCd.</li>
  <li>Base implementation, SSE4.1, AVX2, AVX-512BW, AVX-512VNNI, AMX-INT8 optimizations of class SynetQuantizedMergedConvolutionDc.</li>
 </ul>
+<h5>Improve</h5>
+<ul>
+ <li>AVX-512VNNI optimizations of class SynetQuantizedConvolutionNhwcDepthwiseV3.</li>
+</ul>
 <h5>Bug fixing</h5>
 <ul>
  <li>Error in AVX-512BW optimizations of function SynetQuantizedConcatLayerForward.</li>
+ <li>Error in function Base::CpuModel (Windows Server 2025).</li>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of class SynetQuantizedAddUniform.</li>
+ <li>Error in Base implementation, SSE4.1, AVX2, AVX-512BW optimizations of function QuantizedMergedConvolutionAddInputToOutput.</li>
 </ul>
 
 <h4>Infrastructure</h4>
@@ -53,6 +60,10 @@
 <ul>
  <li>Fix bug in step 'Host Properties' in Github actions script for MSBuild.</li>
  <li>Fix bug in step 'Host Properties' in Github actions script for CMake.</li>
+</ul>
+<h5>Removing</h5>
+<ul>
+ <li>Support of Microsoft Visual Studio 2019.</li>
 </ul>
 
 <a href="#HOME">Home</a>

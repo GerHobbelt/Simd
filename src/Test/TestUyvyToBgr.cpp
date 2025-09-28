@@ -26,6 +26,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -82,30 +83,30 @@ namespace Test
         return result;
     }
 
-    bool Uyvy422ToBgrAutoTest()
+    bool Uyvy422ToBgrAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && Uyvy422ToBgrAutoTest(FUNC_0(Simd::Base::Uyvy422ToBgr), FUNC_0(SimdUyvy422ToBgr));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::DA)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::DA)
             result = result && Uyvy422ToBgrAutoTest(FUNC_0(Simd::Sse41::Uyvy422ToBgr), FUNC_0(SimdUyvy422ToBgr));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::DA)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::DA)
             result = result && Uyvy422ToBgrAutoTest(FUNC_0(Simd::Avx2::Uyvy422ToBgr), FUNC_0(SimdUyvy422ToBgr));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && Uyvy422ToBgrAutoTest(FUNC_0(Simd::Avx512bw::Uyvy422ToBgr), FUNC_0(SimdUyvy422ToBgr));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::DA)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::DA)
             result = result && Uyvy422ToBgrAutoTest(FUNC_0(Simd::Neon::Uyvy422ToBgr), FUNC_0(SimdUyvy422ToBgr));
 #endif 
 

@@ -27,6 +27,7 @@
 #include "Test/TestTensor.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdSynetGridSample.h"
 
@@ -199,20 +200,20 @@ namespace Test
         return result;
     }
 
-    bool SynetGridSample2dAutoTest()
+    bool SynetGridSample2dAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetGridSample2dAutoTest(FUNC_GS2D(Simd::Base::SynetGridSample2dInit), FUNC_GS2D(SimdSynetGridSample2dInit));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetGridSample2dAutoTest(FUNC_GS2D(Simd::Sse41::SynetGridSample2dInit), FUNC_GS2D(SimdSynetGridSample2dInit));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetGridSample2dAutoTest(FUNC_GS2D(Simd::Avx2::SynetGridSample2dInit), FUNC_GS2D(SimdSynetGridSample2dInit));
 #endif 
 

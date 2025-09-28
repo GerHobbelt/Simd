@@ -27,6 +27,7 @@
 #include "Test/TestTensor.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdSynetScale8i.h"
 #include "Simd/SimdSynetScale16b.h"
@@ -117,30 +118,30 @@ namespace Test
         return result;
     }
 
-    bool SynetScaleLayerForwardAutoTest()
+    bool SynetScaleLayerForwardAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Base::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Sse41::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Avx2::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Avx512bw::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SynetScaleLayerForwardAutoTest(FUNC_SCLF(Simd::Neon::SynetScaleLayerForward), FUNC_SCLF(SimdSynetScaleLayerForward));
 #endif 
 
@@ -309,25 +310,25 @@ namespace Test
         return result;
     }
 
-    bool SynetScale8iForwardAutoTest()
+    bool SynetScale8iForwardAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetScale8iForwardAutoTest(FUNC_S8I(Simd::Base::SynetScale8iInit), FUNC_S8I(SimdSynetScale8iInit));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetScale8iForwardAutoTest(FUNC_S8I(Simd::Sse41::SynetScale8iInit), FUNC_S8I(SimdSynetScale8iInit));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetScale8iForwardAutoTest(FUNC_S8I(Simd::Avx2::SynetScale8iInit), FUNC_S8I(SimdSynetScale8iInit));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetScale8iForwardAutoTest(FUNC_S8I(Simd::Avx512bw::SynetScale8iInit), FUNC_S8I(SimdSynetScale8iInit));
 #endif
 
@@ -452,25 +453,25 @@ namespace Test
         return result;
     }
 
-    bool SynetScale16bAutoTest()
+    bool SynetScale16bAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetScale16bAutoTest(FUNC_S16B(Simd::Base::SynetScale16bInit), FUNC_S16B(SimdSynetScale16bInit));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetScale16bAutoTest(FUNC_S16B(Simd::Sse41::SynetScale16bInit), FUNC_S16B(SimdSynetScale16bInit));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetScale16bAutoTest(FUNC_S16B(Simd::Avx2::SynetScale16bInit), FUNC_S16B(SimdSynetScale16bInit));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetScale16bAutoTest(FUNC_S16B(Simd::Avx512bw::SynetScale16bInit), FUNC_S16B(SimdSynetScale16bInit));
 #endif
 

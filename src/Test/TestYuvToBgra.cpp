@@ -24,6 +24,7 @@
 #include "Test/TestCompare.h"
 #include "Test/TestPerformance.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -90,90 +91,90 @@ namespace Test
         return result;
     }
 
-    bool Yuva420pToBgraV2AutoTest()
+    bool Yuva420pToBgraV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Base::Yuva420pToBgraV2), FUNC_YUVA2(SimdYuva420pToBgraV2), 2, 2);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Sse41::Yuva420pToBgraV2), FUNC_YUVA2(SimdYuva420pToBgraV2), 2, 2);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Avx2::Yuva420pToBgraV2), FUNC_YUVA2(SimdYuva420pToBgraV2), 2, 2);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Avx512bw::Yuva420pToBgraV2), FUNC_YUVA2(SimdYuva420pToBgraV2), 2, 2);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Neon::Yuva420pToBgraV2), FUNC_YUVA2(SimdYuva420pToBgraV2), 2, 2);
 #endif 
 
         return result;
     }
 
-    bool Yuva422pToBgraV2AutoTest()
+    bool Yuva422pToBgraV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Base::Yuva422pToBgraV2), FUNC_YUVA2(SimdYuva422pToBgraV2), 2, 1);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Sse41::Yuva422pToBgraV2), FUNC_YUVA2(SimdYuva422pToBgraV2), 2, 1);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Avx2::Yuva422pToBgraV2), FUNC_YUVA2(SimdYuva422pToBgraV2), 2, 1);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Avx512bw::Yuva422pToBgraV2), FUNC_YUVA2(SimdYuva422pToBgraV2), 2, 1);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Neon::Yuva422pToBgraV2), FUNC_YUVA2(SimdYuva422pToBgraV2), 2, 1);
 #endif 
 
         return result;
     }
 
-    bool Yuva444pToBgraV2AutoTest()
+    bool Yuva444pToBgraV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Base::Yuva444pToBgraV2), FUNC_YUVA2(SimdYuva444pToBgraV2), 1, 1);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Sse41::Yuva444pToBgraV2), FUNC_YUVA2(SimdYuva444pToBgraV2), 1, 1);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Avx2::Yuva444pToBgraV2), FUNC_YUVA2(SimdYuva444pToBgraV2), 1, 1);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Avx512bw::Yuva444pToBgraV2), FUNC_YUVA2(SimdYuva444pToBgraV2), 1, 1);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && YuvaToBgra2AutoTest(FUNC_YUVA2(Simd::Neon::Yuva444pToBgraV2), FUNC_YUVA2(SimdYuva444pToBgraV2), 1, 1);
 #endif 
 
@@ -244,120 +245,120 @@ namespace Test
         return result;
     }
 
-    bool Yuv420pToBgraV2AutoTest()
+    bool Yuv420pToBgraV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Base::Yuv420pToBgraV2), FUNC_YUV2(SimdYuv420pToBgraV2), 2, 2);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Sse41::Yuv420pToBgraV2), FUNC_YUV2(SimdYuv420pToBgraV2), 2, 2);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx2::Yuv420pToBgraV2), FUNC_YUV2(SimdYuv420pToBgraV2), 2, 2);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx512bw::Yuv420pToBgraV2), FUNC_YUV2(SimdYuv420pToBgraV2), 2, 2);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Neon::Yuv420pToBgraV2), FUNC_YUV2(SimdYuv420pToBgraV2), 2, 2);
 #endif 
 
         return result;
     }
 
-    bool Yuv422pToBgraV2AutoTest()
+    bool Yuv422pToBgraV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Base::Yuv422pToBgraV2), FUNC_YUV2(SimdYuv422pToBgraV2), 2, 1);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Sse41::Yuv422pToBgraV2), FUNC_YUV2(SimdYuv422pToBgraV2), 2, 1);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx2::Yuv422pToBgraV2), FUNC_YUV2(SimdYuv422pToBgraV2), 2, 1);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx512bw::Yuv422pToBgraV2), FUNC_YUV2(SimdYuv422pToBgraV2), 2, 1);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Neon::Yuv422pToBgraV2), FUNC_YUV2(SimdYuv422pToBgraV2), 2, 1);
 #endif 
 
         return result;
     }
 
-    bool Yuv444pToBgraV2AutoTest()
+    bool Yuv444pToBgraV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Base::Yuv444pToBgraV2), FUNC_YUV2(SimdYuv444pToBgraV2), 1, 1);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Sse41::Yuv444pToBgraV2), FUNC_YUV2(SimdYuv444pToBgraV2), 1, 1);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx2::Yuv444pToBgraV2), FUNC_YUV2(SimdYuv444pToBgraV2), 1, 1);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx512bw::Yuv444pToBgraV2), FUNC_YUV2(SimdYuv444pToBgraV2), 1, 1);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Neon::Yuv444pToBgraV2), FUNC_YUV2(SimdYuv444pToBgraV2), 1, 1);
 #endif 
 
         return result;
     }
 
-    bool Yuv444pToRgbaV2AutoTest()
+    bool Yuv444pToRgbaV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Base::Yuv444pToRgbaV2), FUNC_YUV2(SimdYuv444pToRgbaV2), 1, 1);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Sse41::Yuv444pToRgbaV2), FUNC_YUV2(SimdYuv444pToRgbaV2), 1, 1);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx2::Yuv444pToRgbaV2), FUNC_YUV2(SimdYuv444pToRgbaV2), 1, 1);
 #endif 
 
 //#ifdef SIMD_AVX512BW_ENABLE
-//        if (Simd::Avx512bw::Enable && TestAvx512bw())
+//        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
 //            result = result && YuvToBgra2AutoTest(FUNC_YUV2(Simd::Avx512bw::Yuv444pToRgbaV2), FUNC_YUV2(SimdYuv444pToRgbaV2), 1, 1);
 //#endif 
 //
 //#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable && TestNeon())
+//        if (Simd::Neon::Enable && TestNeon(options))
 //            result = result && YuvToRgba2AutoTest(FUNC_YUV2(Simd::Neon::Yuv444pToRgbaV2), FUNC_YUV2(SimdYuv444pToRgbaV2), 1, 1);
 //#endif 
 

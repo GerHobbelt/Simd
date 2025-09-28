@@ -43,7 +43,6 @@ namespace Simd
             : Avx2::SynetQuantizedMergedConvolutionCdc(p)
         {
             SetSize(F, 4, 2);
-            SetInputPreprocess(p.conv[0], _alg, _inputPreprocess);
             SetInputConvolution(p.conv[0], _alg, _inputConvolution);
             SetDepthwisePreprocess(p.conv[1], _alg, _depthwisePreprocess);
             SetDepthwiseConvolution(p.conv[1], _alg, _depthwiseConvolution);
@@ -57,7 +56,6 @@ namespace Simd
             : Avx2::SynetQuantizedMergedConvolutionCd(p)
         {
             SetSize(F, 4, 2);
-            SetInputPreprocess(p.conv[0], _alg, _inputPreprocess);
             SetInputConvolution(p.conv[0], _alg, _inputConvolution);
             SetDepthwisePreprocess(p.conv[1], _alg, _depthwisePreprocess);
             SetDepthwiseConvolution(p.conv[1], _alg, _depthwiseConvolution);
@@ -77,7 +75,7 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add)
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add)
         {
             MergConvParam param(batch, convs, count, add);
             if (!param.Valid(SimdTensorData8u, SimdTensorData8u))

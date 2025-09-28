@@ -28,6 +28,7 @@
 #include "Test/TestSynetConvolutionParam.h"
 #include "Test/TestRandom.h"
 #include "Test/TestString.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdSynetQuantizedMergedConvolution.h"
 #include "Simd/SimdSynet.h"
@@ -43,7 +44,7 @@ namespace Test
 
         struct FuncQMC
         {
-            typedef void*(*FuncPtr)(size_t batch, const SimdConvolutionParameters* params, size_t count, SimdBool add);
+            typedef void*(*FuncPtr)(size_t batch, const SimdConvolutionParameters* params, size_t count, int add);
 
             FuncPtr func;
             String desc;
@@ -304,10 +305,12 @@ namespace Test
             aHi = SimdConvolutionActivationHardSigmoid, aSw = SimdConvolutionActivationSwish, aGe = SimdConvolutionActivationGelu;
 
 #ifdef NDEBUG
-#if 1
-        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 48, 55, 55), Cnv(aId, 1, 1, 48), Cnv(aId, 3, 2), u8, u8), o, f1, f2);
+#if 0
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 16, 112, 112), Cnv(aId, 1, 1, 24), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 32), f, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 64, 112, 112), Cnv(aId, 1, 1, 24), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 32), f, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 16, 112, 112), Cnv(aId, 1, 1, 128), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 32), f, u8, u8), o, f1, f2);
 #endif
-#if 1
+#if 0
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 64, 16, 16), Cnv(aId, 1, 1, 128), Cnv(aId, 3, 1), u8, u8), o, f1, f2);
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 16, 112, 112), Cnv(aId, 1, 1, 96), Cnv(aId, 3, 2), Cnv(aId, 1, 1, 24), f, u8, u8), o, f1, f2);
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 48, 55, 55), Cnv(aId, 1, 1, 96), Cnv(aId, 3, 2), u8, u8), o, f1, f2);
@@ -318,7 +321,7 @@ namespace Test
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 25, 55, 55), Cnv(aId, 1, 1, 145), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 25), f, u8, u8), o, f1, f2);
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 16, 112, 112), Cnv(aId, 1, 1, 32), Cnv(aId, 3, 1), u8, u8), o, f1, f2);
 #endif
-#if 1
+#if 0
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 32, 112, 112), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 16), u8, u8), o, f1, f2);
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 16, 112, 112), Cnv(aId, 1, 1, 96), Cnv(aId, 3, 2), Cnv(aId, 1, 1, 24), f, u8, u8), o, f1, f2);
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 24, 56, 56), Cnv(aId, 1, 1, 144), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 24), t, u8, u8), o, f1, f2);
@@ -332,6 +335,14 @@ namespace Test
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 160, 7, 7), Cnv(aId, 1, 1, 960), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 160), t, u8, u8), o, f1, f2);
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 160, 7, 7), Cnv(aId, 1, 1, 960), Cnv(aId, 3, 1), Cnv(aId, 1, 1, 320), f, u8, u8), o, f1, f2);
 #endif
+#if 1
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 112, 14, 14), Cnv(aId, 1, 1, 672), Cnv(aId, 5, 1), Cnv(aId, 1, 1, 112), t, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 160, 14, 14), Cnv(aId, 1, 1, 960), Cnv(aId, 5, 1), Cnv(aId, 1, 1, 160), t, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 160, 14, 14), Cnv(aId, 1, 1, 960), Cnv(aId, 5, 2), Cnv(aId, 1, 1, 272), f, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 272, 7, 7), Cnv(aId, 1, 1, 1632), Cnv(aId, 5, 1), Cnv(aId, 1, 1, 272), t, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 32, 56, 56), Cnv(aId, 1, 1, 192), Cnv(aId, 5, 2), Cnv(aId, 1, 1, 56), f, u8, u8), o, f1, f2);
+        result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 56, 28, 28), Cnv(aId, 1, 1, 336), Cnv(aId, 5, 1), Cnv(aId, 1, 1, 56), t, u8, u8), o, f1, f2);
+#endif
 #else
         result = result && SynetQuantizedMergedConvolutionForwardAutoTest(e, Param(Shp(1, 16, 112, 112), Cnv(aId, 1, 1, 96), Cnv(aId, 3, 2), Cnv(aId, 1, 1, 24), f, u8, u8), o, f1, f2); 
 #endif
@@ -339,37 +350,37 @@ namespace Test
         return result;
     }
 
-    bool SynetQuantizedMergedConvolutionForwardAutoTest()
+    bool SynetQuantizedMergedConvolutionForwardAutoTest(const Options & options)
     {
         bool result = true;
 
         const SimdBool f = SimdFalse, t = SimdTrue;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetQuantizedMergedConvolutionForwardAutoTest(t, FUNC_QMC(Simd::Base::SynetQuantizedMergedConvolutionInit), FUNC_QMC(SimdSynetQuantizedMergedConvolutionInit));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetQuantizedMergedConvolutionForwardAutoTest(t, FUNC_QMC(Simd::Sse41::SynetQuantizedMergedConvolutionInit), FUNC_QMC(SimdSynetQuantizedMergedConvolutionInit));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetQuantizedMergedConvolutionForwardAutoTest(t, FUNC_QMC(Simd::Avx2::SynetQuantizedMergedConvolutionInit), FUNC_QMC(SimdSynetQuantizedMergedConvolutionInit));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetQuantizedMergedConvolutionForwardAutoTest(t, FUNC_QMC(Simd::Avx512bw::SynetQuantizedMergedConvolutionInit), FUNC_QMC(SimdSynetQuantizedMergedConvolutionInit));
 #endif
 
 #if defined(SIMD_AVX512VNNI_ENABLE) && !defined(SIMD_AMX_EMULATE)
-        if (Simd::Avx512vnni::Enable && TestAvx512vnni())
+        if (Simd::Avx512vnni::Enable && TestAvx512vnni(options))
             result = result && SynetQuantizedMergedConvolutionForwardAutoTest(f, FUNC_QMC(Simd::Avx512vnni::SynetQuantizedMergedConvolutionInit), FUNC_QMC(SimdSynetQuantizedMergedConvolutionInit));
 #endif
 
 #if defined(SIMD_AMXBF16_ENABLE) || (defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_AMX_EMULATE))
-        if (Simd::AmxBf16::Enable && TestAmxBf16())
+        if (Simd::AmxBf16::Enable && TestAmxBf16(options))
             result = result && SynetQuantizedMergedConvolutionForwardAutoTest(f, FUNC_QMC(Simd::AmxBf16::SynetQuantizedMergedConvolutionInit), FUNC_QMC(SimdSynetQuantizedMergedConvolutionInit));
 #endif
 

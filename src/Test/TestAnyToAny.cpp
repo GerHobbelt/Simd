@@ -108,405 +108,405 @@ namespace Test
         return result;
     }
 
-    bool BgraToBgrAutoTest()
+    bool BgraToBgrAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Bgr24, FUNC_O(Simd::Base::BgraToBgr), FUNC_O(SimdBgraToBgr));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Bgr24, FUNC_O(Simd::Sse41::BgraToBgr), FUNC_O(SimdBgraToBgr));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::F)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::F)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Bgr24, FUNC_O(Simd::Avx2::BgraToBgr), FUNC_O(SimdBgraToBgr));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Bgr24, FUNC_O(Simd::Avx512bw::BgraToBgr), FUNC_O(SimdBgraToBgr));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Bgr24, FUNC_O(Simd::Neon::BgraToBgr), FUNC_O(SimdBgraToBgr));
 #endif 
 
         return result;
     }
 
-    bool BgraToGrayAutoTest()
+    bool BgraToGrayAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Gray8, FUNC_O(Simd::Base::BgraToGray), FUNC_O(SimdBgraToGray));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Gray8, FUNC_O(Simd::Sse41::BgraToGray), FUNC_O(SimdBgraToGray));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Gray8, FUNC_O(Simd::Avx2::BgraToGray), FUNC_O(SimdBgraToGray));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Gray8, FUNC_O(Simd::Avx512bw::BgraToGray), FUNC_O(SimdBgraToGray));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Gray8, FUNC_O(Simd::Neon::BgraToGray), FUNC_O(SimdBgraToGray));
 #endif 
 
         return result;
     }
 
-    bool BgraToRgbAutoTest()
+    bool BgraToRgbAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgb24, FUNC_O(Simd::Base::BgraToRgb), FUNC_O(SimdBgraToRgb));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgb24, FUNC_O(Simd::Sse41::BgraToRgb), FUNC_O(SimdBgraToRgb));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::F)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::F)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgb24, FUNC_O(Simd::Avx2::BgraToRgb), FUNC_O(SimdBgraToRgb));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgb24, FUNC_O(Simd::Avx512bw::BgraToRgb), FUNC_O(SimdBgraToRgb));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgb24, FUNC_O(Simd::Neon::BgraToRgb), FUNC_O(SimdBgraToRgb));
 #endif
 
         return result;
     }
 
-    bool BgraToRgbaAutoTest()
+    bool BgraToRgbaAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgba32, FUNC_O(Simd::Base::BgraToRgba), FUNC_O(SimdBgraToRgba));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgba32, FUNC_O(Simd::Sse41::BgraToRgba), FUNC_O(SimdBgraToRgba));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgba32, FUNC_O(Simd::Avx2::BgraToRgba), FUNC_O(SimdBgraToRgba));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgba32, FUNC_O(Simd::Avx512bw::BgraToRgba), FUNC_O(SimdBgraToRgba));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Bgra32, View::Rgba32, FUNC_O(Simd::Neon::BgraToRgba), FUNC_O(SimdBgraToRgba));
 #endif
 
         return result;
     }
 
-    bool BgrToGrayAutoTest()
+    bool BgrToGrayAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Gray8, FUNC_O(Simd::Base::BgrToGray), FUNC_O(SimdBgrToGray));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Gray8, FUNC_O(Simd::Sse41::BgrToGray), FUNC_O(SimdBgrToGray));
 #endif 
 
 #if defined(SIMD_AVX2_ENABLE) && !defined(SIMD_CLANG_AVX2_BGR_TO_BGRA_ERROR)
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Gray8, FUNC_O(Simd::Avx2::BgrToGray), FUNC_O(SimdBgrToGray));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Gray8, FUNC_O(Simd::Avx512bw::BgrToGray), FUNC_O(SimdBgrToGray));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Gray8, FUNC_O(Simd::Neon::BgrToGray), FUNC_O(SimdBgrToGray));
 #endif
 
         return result;
     }
 
-    bool BgrToHslAutoTest()
+    bool BgrToHslAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Hsl24, FUNC_O(Simd::Base::BgrToHsl), FUNC_O(SimdBgrToHsl));
 
         return result;
     }
 
-    bool BgrToHsvAutoTest()
+    bool BgrToHsvAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Hsv24, FUNC_O(Simd::Base::BgrToHsv), FUNC_O(SimdBgrToHsv));
 
         return result;
     }
 
-    bool BgrToLabAutoTest()
+    bool BgrToLabAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Base::BgrToLab), FUNC_N(SimdBgrToLab));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Sse41::BgrToLab), FUNC_N(SimdBgrToLab));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Avx2::BgrToLab), FUNC_N(SimdBgrToLab));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Lab24, FUNC_N(Simd::Avx512bw::BgrToLab), FUNC_N(SimdBgrToLab));
 #endif 
 
         return result;
     }
 
-    bool BgrToRgbAutoTest()
+    bool BgrToRgbAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Rgb24, FUNC_O(Simd::Base::BgrToRgb), FUNC_O(SimdBgrToRgb));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Rgb24, FUNC_O(Simd::Sse41::BgrToRgb), FUNC_O(SimdBgrToRgb));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Rgb24, FUNC_O(Simd::Avx2::BgrToRgb), FUNC_O(SimdBgrToRgb));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Rgb24, FUNC_O(Simd::Avx512bw::BgrToRgb), FUNC_O(SimdBgrToRgb));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Bgr24, View::Rgb24, FUNC_O(Simd::Neon::BgrToRgb), FUNC_O(SimdBgrToRgb));
 #endif
 
         return result;
     }
 
-    bool GrayToBgrAutoTest()
+    bool GrayToBgrAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Gray8, View::Bgr24, FUNC_O(Simd::Base::GrayToBgr), FUNC_O(SimdGrayToBgr));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Bgr24, FUNC_O(Simd::Sse41::GrayToBgr), FUNC_O(SimdGrayToBgr));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Bgr24, FUNC_O(Simd::Avx2::GrayToBgr), FUNC_O(SimdGrayToBgr));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Gray8, View::Bgr24, FUNC_O(Simd::Avx512bw::GrayToBgr), FUNC_O(SimdGrayToBgr));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Bgr24, FUNC_O(Simd::Neon::GrayToBgr), FUNC_O(SimdGrayToBgr));
 #endif 
 
         return result;
     }
 
-    bool GrayToYAutoTest()
+    bool GrayToYAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Base::GrayToY), FUNC_N(SimdGrayToY));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Sse41::GrayToY), FUNC_N(SimdGrayToY));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Avx2::GrayToY), FUNC_N(SimdGrayToY));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Avx512bw::GrayToY), FUNC_N(SimdGrayToY));
 #endif
 
 //#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+//        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
 //            result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Neon::GrayToY), FUNC_N(SimdGrayToY));
 //#endif 
 
         return result;
     }
 
-    bool Int16ToGrayAutoTest()
+    bool Int16ToGrayAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Int16, View::Gray8, FUNC_O(Simd::Base::Int16ToGray), FUNC_O(SimdInt16ToGray));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Int16, View::Gray8, FUNC_O(Simd::Sse41::Int16ToGray), FUNC_O(SimdInt16ToGray));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Int16, View::Gray8, FUNC_O(Simd::Avx2::Int16ToGray), FUNC_O(SimdInt16ToGray));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Int16, View::Gray8, FUNC_O(Simd::Avx512bw::Int16ToGray), FUNC_O(SimdInt16ToGray));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Int16, View::Gray8, FUNC_O(Simd::Neon::Int16ToGray), FUNC_O(SimdInt16ToGray));
 #endif 
 
         return result;
     }
 
-    bool RgbToGrayAutoTest()
+    bool RgbToGrayAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Rgb24, View::Gray8, FUNC_O(Simd::Base::RgbToGray), FUNC_O(SimdRgbToGray));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Rgb24, View::Gray8, FUNC_O(Simd::Sse41::RgbToGray), FUNC_O(SimdRgbToGray));
 #endif 
 
 #if defined(SIMD_AVX2_ENABLE) && !defined(SIMD_CLANG_AVX2_BGR_TO_BGRA_ERROR)
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Rgb24, View::Gray8, FUNC_O(Simd::Avx2::RgbToGray), FUNC_O(SimdRgbToGray));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Rgb24, View::Gray8, FUNC_O(Simd::Avx512bw::RgbToGray), FUNC_O(SimdRgbToGray));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Rgb24, View::Gray8, FUNC_O(Simd::Neon::RgbToGray), FUNC_O(SimdRgbToGray));
 #endif
 
         return result;
     }
 
-    bool RgbaToGrayAutoTest()
+    bool RgbaToGrayAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Rgba32, View::Gray8, FUNC_O(Simd::Base::RgbaToGray), FUNC_O(SimdRgbaToGray));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Rgba32, View::Gray8, FUNC_O(Simd::Sse41::RgbaToGray), FUNC_O(SimdRgbaToGray));
 #endif 
 
 #if defined(SIMD_AVX2_ENABLE)
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Rgba32, View::Gray8, FUNC_O(Simd::Avx2::RgbaToGray), FUNC_O(SimdRgbaToGray));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Rgba32, View::Gray8, FUNC_O(Simd::Avx512bw::RgbaToGray), FUNC_O(SimdRgbaToGray));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AnyToAnyAutoTest(View::Rgba32, View::Gray8, FUNC_O(Simd::Neon::RgbaToGray), FUNC_O(SimdRgbaToGray));
 #endif
 
         return result;
     }
 
-    bool YToGrayAutoTest()
+    bool YToGrayAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Base::YToGray), FUNC_N(SimdYToGray));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Sse41::YToGray), FUNC_N(SimdYToGray));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Avx2::YToGray), FUNC_N(SimdYToGray));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Avx512bw::YToGray), FUNC_N(SimdYToGray));
 #endif
 
 //#ifdef SIMD_NEON_ENABLE
-//        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+//        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
 //            result = result && AnyToAnyAutoTest(View::Gray8, View::Gray8, FUNC_N(Simd::Neon::YToGray), FUNC_N(SimdYToGray));
 //#endif 
 

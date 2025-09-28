@@ -27,6 +27,7 @@
 #include "Test/TestTensor.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdSynetMergedConvolution8i.h"
 #include "Simd/SimdSynet.h"
@@ -327,35 +328,35 @@ namespace Test
         return result;
     }
 
-    bool SynetMergedConvolution8iForwardAutoTest()
+    bool SynetMergedConvolution8iForwardAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Base::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Sse41::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Avx2::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Avx512bw::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif 
 
 #if defined(SIMD_AVX512VNNI_ENABLE) && !defined(SIMD_AMX_EMULATE)
-        if (Simd::Avx512vnni::Enable && TestAvx512vnni())
+        if (Simd::Avx512vnni::Enable && TestAvx512vnni(options))
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::Avx512vnni::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif
 
 #if defined(SIMD_AMXBF16_ENABLE) || (defined(SIMD_AVX512BW_ENABLE) && defined(SIMD_AMX_EMULATE))
-        if (Simd::AmxBf16::Enable && TestAmxBf16())
+        if (Simd::AmxBf16::Enable && TestAmxBf16(options))
             result = result && SynetMergedConvolution8iForwardAutoTest(EPS, FUNC_MC(Simd::AmxBf16::SynetMergedConvolution8iInit), FUNC_MC(SimdSynetMergedConvolution8iInit));
 #endif
 

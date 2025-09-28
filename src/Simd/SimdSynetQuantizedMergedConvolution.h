@@ -72,8 +72,8 @@ namespace Simd
         Array8i _weight[3];
         Array32i _bias[3];
         Array32f _norm[3];
-        float _ioScale[5], _srcNorm, _dstNorm, _addScale;
-        int32_t _ioZero[5], _addZero, _srcBias, _dstBias;
+        float _ioScale[5], _aNorm, _bNorm, _term;
+        int32_t _ioZero[5];
         size_t _batch, _merge, _count, _sizeS, _sizeD;
     };
 
@@ -98,7 +98,7 @@ namespace Simd
             virtual void Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst);
 
             void Depthwise(const uint8_t* src, const uint8_t* zero, const ConvParam& p, const int8_t* weight, int32_t* dst);
-            void AddSrc(const uint8_t* src, uint8_t* dst);
+            void Add(const uint8_t* a, const uint8_t* b, uint8_t* dst);
 
             size_t _sizeB;
         };
@@ -120,7 +120,7 @@ namespace Simd
                 size_t dsStep, dbStep, ddStep, dsStart;
                 size_t isH, dsH, dbH, ddH;
                 size_t isB, idB, dsB, dbB, ddB, odB;
-                size_t dbW, dwC, dwStep, dwSize, iwStep, owStep;
+                size_t dbW, dwC, dwStep, dwSize, iwStep, owStep, obStep;
             };
 
             typedef void(*InputPreprocessPtr)(const uint8_t* src, const ConvParam& p, const AlgParam& a, size_t yBeg, size_t yEnd, uint8_t* dst);
@@ -136,8 +136,7 @@ namespace Simd
             typedef void(*OutputConvolutionPtr)(const uint8_t* src, const ConvParam& p, const AlgParam& a, size_t maC, size_t yBeg, size_t yEnd,
                 int update, const int8_t* weight, const int32_t* bias, const float* norm, int32_t zero, int32_t* sum, uint8_t* dst);
 
-            typedef void(*AddInputToOutputPtr)(const uint8_t* a, int aBias, float aNorm, const uint8_t* b, int bBias, float bNorm, 
-                const ConvParam& p, size_t yBeg, size_t yEnd, float dNorm, int dZero, uint8_t* dst);
+            typedef void(*AddInputToOutputPtr)(const uint8_t* a, float aNorm, const uint8_t* b, float bNorm, const ConvParam& p, size_t yBeg, size_t yEnd, float dBias, uint8_t* dst);
 
         protected:
             virtual void SetInput(const int8_t* weight, const ConvParam& p, Array8i& dst);
@@ -201,14 +200,12 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add);
     }
 
 #ifdef SIMD_SSE41_ENABLE    
     namespace Sse41
     {
-        void SetInputPreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputPreprocessPtr& func);
-
         void SetInputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputConvolutionPtr & func);
 
         void SetDepthwisePreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwisePreprocessPtr& func);
@@ -251,15 +248,13 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add);
     }
 #endif
 
 #ifdef SIMD_AVX2_ENABLE    
     namespace Avx2
     {
-        void SetInputPreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputPreprocessPtr& func);
-
         void SetInputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputConvolutionPtr& func);
 
         void SetDepthwisePreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwisePreprocessPtr& func);
@@ -302,15 +297,13 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add);
     }
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE    
     namespace Avx512bw
     {
-        void SetInputPreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputPreprocessPtr& func);
-
         void SetInputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputConvolutionPtr& func);
 
         void SetDepthwisePreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwisePreprocessPtr& func);
@@ -353,15 +346,13 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add);
     }
 #endif
 
 #ifdef SIMD_AVX512VNNI_ENABLE    
     namespace Avx512vnni
     {
-        void SetInputPreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputPreprocessPtr& func);
-
         void SetInputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputConvolutionPtr& func);
 
         void SetDepthwisePreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwisePreprocessPtr& func);
@@ -369,8 +360,6 @@ namespace Simd
         void SetDepthwiseConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwiseConvolutionPtr& func);
 
         void SetOutputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::OutputConvolutionPtr* funcs);
-
-        void SetAddInputToOutput(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::AddInputToOutputPtr& func);
 
         //------------------------------------------------------------------------------------------------
 
@@ -404,7 +393,7 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add);
     }
 #endif
 
@@ -415,13 +404,7 @@ namespace Simd
 
         void SetInputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::InputConvolutionPtr& func);
 
-        void SetDepthwisePreprocess(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwisePreprocessPtr& func);
-
-        void SetDepthwiseConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::DepthwiseConvolutionPtr& func);
-
         void SetOutputConvolution(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::OutputConvolutionPtr* funcs);
-
-        void SetAddInputToOutput(const ConvParam& p, const Base::SynetQuantizedMergedConvolution::AlgParam& a, Base::SynetQuantizedMergedConvolution::AddInputToOutputPtr& func);
 
         //------------------------------------------------------------------------------------------------
 
@@ -455,7 +438,7 @@ namespace Simd
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add);
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add);
     }
 #endif
 

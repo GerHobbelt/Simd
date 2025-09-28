@@ -25,6 +25,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -84,30 +85,30 @@ namespace Test
         return result;
     }
 
-    bool GetStatisticAutoTest()
+    bool GetStatisticAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && GetStatisticAutoTest(FUNC1(Simd::Base::GetStatistic), FUNC1(SimdGetStatistic));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetStatisticAutoTest(FUNC1(Simd::Sse41::GetStatistic), FUNC1(SimdGetStatistic));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetStatisticAutoTest(FUNC1(Simd::Avx2::GetStatistic), FUNC1(SimdGetStatistic));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetStatisticAutoTest(FUNC1(Simd::Avx512bw::GetStatistic), FUNC1(SimdGetStatistic));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetStatisticAutoTest(FUNC1(Simd::Neon::GetStatistic), FUNC1(SimdGetStatistic));
 #endif
 
@@ -194,30 +195,30 @@ namespace Test
         return result;
     }
 
-    bool GetMomentsAutoTest()
+    bool GetMomentsAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && GetMomentsAutoTest(FUNC_M(Simd::Base::GetMoments), FUNC_M(SimdGetMoments));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetMomentsAutoTest(FUNC_M(Simd::Sse41::GetMoments), FUNC_M(SimdGetMoments));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetMomentsAutoTest(FUNC_M(Simd::Avx2::GetMoments), FUNC_M(SimdGetMoments));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetMomentsAutoTest(FUNC_M(Simd::Avx512bw::GetMoments), FUNC_M(SimdGetMoments));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetMomentsAutoTest(FUNC_M(Simd::Neon::GetMoments), FUNC_M(SimdGetMoments));
 #endif
 
@@ -307,30 +308,30 @@ namespace Test
         return result;
     }
 
-    bool GetObjectMomentsAutoTest()
+    bool GetObjectMomentsAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && GetObjectMomentsAutoTest(FUNC_GOM(Simd::Base::GetObjectMoments), FUNC_GOM(SimdGetObjectMoments));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetObjectMomentsAutoTest(FUNC_GOM(Simd::Sse41::GetObjectMoments), FUNC_GOM(SimdGetObjectMoments));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetObjectMomentsAutoTest(FUNC_GOM(Simd::Avx2::GetObjectMoments), FUNC_GOM(SimdGetObjectMoments));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetObjectMomentsAutoTest(FUNC_GOM(Simd::Avx512bw::GetObjectMoments), FUNC_GOM(SimdGetObjectMoments));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetObjectMomentsAutoTest(FUNC_GOM(Simd::Neon::GetObjectMoments), FUNC_GOM(SimdGetObjectMoments));
 #endif
 
@@ -393,119 +394,119 @@ namespace Test
         return result;
     }
 
-    bool GetRowSumsAutoTest()
+    bool GetRowSumsAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Base::GetRowSums), FUNC3(SimdGetRowSums), true);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Sse41::GetRowSums), FUNC3(SimdGetRowSums), true);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx2::GetRowSums), FUNC3(SimdGetRowSums), true);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx512bw::GetRowSums), FUNC3(SimdGetRowSums), true);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Neon::GetRowSums), FUNC3(SimdGetRowSums), true);
 #endif
 
         return result;
     }
 
-    bool GetColSumsAutoTest()
+    bool GetColSumsAutoTest(const Options & options)
     {
         bool result = true;
 
         result = result && GetSumsAutoTest(FUNC3(Simd::Base::GetColSums), FUNC3(SimdGetColSums), false);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Sse41::GetColSums), FUNC3(SimdGetColSums), false);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx2::GetColSums), FUNC3(SimdGetColSums), false);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx512bw::GetColSums), FUNC3(SimdGetColSums), false);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Neon::GetColSums), FUNC3(SimdGetColSums), false);
 #endif 
 
         return result;
     }
 
-    bool GetAbsDyRowSumsAutoTest()
+    bool GetAbsDyRowSumsAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Base::GetAbsDyRowSums), FUNC3(SimdGetAbsDyRowSums), true);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Sse41::GetAbsDyRowSums), FUNC3(SimdGetAbsDyRowSums), true);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx2::GetAbsDyRowSums), FUNC3(SimdGetAbsDyRowSums), true);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx512bw::GetAbsDyRowSums), FUNC3(SimdGetAbsDyRowSums), true);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Neon::GetAbsDyRowSums), FUNC3(SimdGetAbsDyRowSums), true);
 #endif
 
         return result;
     }
 
-    bool GetAbsDxColSumsAutoTest()
+    bool GetAbsDxColSumsAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Base::GetAbsDxColSums), FUNC3(SimdGetAbsDxColSums), false);
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Sse41::GetAbsDxColSums), FUNC3(SimdGetAbsDxColSums), false);
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx2::GetAbsDxColSums), FUNC3(SimdGetAbsDxColSums), false);
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Avx512bw::GetAbsDxColSums), FUNC3(SimdGetAbsDxColSums), false);
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && GetSumsAutoTest(FUNC3(Simd::Neon::GetAbsDxColSums), FUNC3(SimdGetAbsDxColSums), false);
 #endif
 
@@ -567,150 +568,150 @@ namespace Test
         return result;
     }
 
-    bool ValueSumAutoTest()
+    bool ValueSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SumAutoTest(FUNC4(Simd::Base::ValueSum), FUNC4(SimdValueSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SumAutoTest(FUNC4(Simd::Sse41::ValueSum), FUNC4(SimdValueSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx2::ValueSum), FUNC4(SimdValueSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx512bw::ValueSum), FUNC4(SimdValueSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SumAutoTest(FUNC4(Simd::Neon::ValueSum), FUNC4(SimdValueSum));
 #endif
 
         return result;
     }
 
-    bool SquareSumAutoTest()
+    bool SquareSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SumAutoTest(FUNC4(Simd::Base::SquareSum), FUNC4(SimdSquareSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SumAutoTest(FUNC4(Simd::Sse41::SquareSum), FUNC4(SimdSquareSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx2::SquareSum), FUNC4(SimdSquareSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx512bw::SquareSum), FUNC4(SimdSquareSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SumAutoTest(FUNC4(Simd::Neon::SquareSum), FUNC4(SimdSquareSum));
 #endif
 
         return result;
     }
 
-    bool SobelDxAbsSumAutoTest()
+    bool SobelDxAbsSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SumAutoTest(FUNC4(Simd::Base::SobelDxAbsSum), FUNC4(SimdSobelDxAbsSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SumAutoTest(FUNC4(Simd::Sse41::SobelDxAbsSum), FUNC4(SimdSobelDxAbsSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx2::SobelDxAbsSum), FUNC4(SimdSobelDxAbsSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx512bw::SobelDxAbsSum), FUNC4(SimdSobelDxAbsSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SumAutoTest(FUNC4(Simd::Neon::SobelDxAbsSum), FUNC4(SimdSobelDxAbsSum));
 #endif
 
         return result;
     }
 
-    bool SobelDyAbsSumAutoTest()
+    bool SobelDyAbsSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SumAutoTest(FUNC4(Simd::Base::SobelDyAbsSum), FUNC4(SimdSobelDyAbsSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SumAutoTest(FUNC4(Simd::Sse41::SobelDyAbsSum), FUNC4(SimdSobelDyAbsSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx2::SobelDyAbsSum), FUNC4(SimdSobelDyAbsSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx512bw::SobelDyAbsSum), FUNC4(SimdSobelDyAbsSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SumAutoTest(FUNC4(Simd::Neon::SobelDyAbsSum), FUNC4(SimdSobelDyAbsSum));
 #endif
 
         return result;
     }
 
-    bool LaplaceAbsSumAutoTest()
+    bool LaplaceAbsSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SumAutoTest(FUNC4(Simd::Base::LaplaceAbsSum), FUNC4(SimdLaplaceAbsSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SumAutoTest(FUNC4(Simd::Sse41::LaplaceAbsSum), FUNC4(SimdLaplaceAbsSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx2::LaplaceAbsSum), FUNC4(SimdLaplaceAbsSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SumAutoTest(FUNC4(Simd::Avx512bw::LaplaceAbsSum), FUNC4(SimdLaplaceAbsSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && SumAutoTest(FUNC4(Simd::Neon::LaplaceAbsSum), FUNC4(SimdLaplaceAbsSum));
 #endif
 
@@ -772,30 +773,30 @@ namespace Test
         return result;
     }
 
-    bool ValueSquareSumAutoTest()
+    bool ValueSquareSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && ValueSquareSumAutoTest(FUNC_VSS(Simd::Base::ValueSquareSum), FUNC_VSS(SimdValueSquareSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && ValueSquareSumAutoTest(FUNC_VSS(Simd::Sse41::ValueSquareSum), FUNC_VSS(SimdValueSquareSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && ValueSquareSumAutoTest(FUNC_VSS(Simd::Avx2::ValueSquareSum), FUNC_VSS(SimdValueSquareSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ValueSquareSumAutoTest(FUNC_VSS(Simd::Avx512bw::ValueSquareSum), FUNC_VSS(SimdValueSquareSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && ValueSquareSumAutoTest(FUNC_VSS(Simd::Neon::ValueSquareSum), FUNC_VSS(SimdValueSquareSum));
 #endif
 
@@ -869,31 +870,31 @@ namespace Test
         return result;
     }
 
-    bool ValueSquareSumsAutoTest()
+    bool ValueSquareSumsAutoTest(const Options & options)
     {
         bool result = true;
 
 #if !(defined(_MSC_VER) && _MSC_VER >= 1933 && defined(NDEBUG))
-        if (TestBase())
+        if (TestBase(options))
             result = result && ValueSquareSumsAutoTest(FUNC_VSSs(Simd::Base::ValueSquareSums), FUNC_VSSs(SimdValueSquareSums));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && ValueSquareSumsAutoTest(FUNC_VSSs(Simd::Sse41::ValueSquareSums), FUNC_VSSs(SimdValueSquareSums));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && ValueSquareSumsAutoTest(FUNC_VSSs(Simd::Avx2::ValueSquareSums), FUNC_VSSs(SimdValueSquareSums));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && ValueSquareSumsAutoTest(FUNC_VSSs(Simd::Avx512bw::ValueSquareSums), FUNC_VSSs(SimdValueSquareSums));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && ValueSquareSumsAutoTest(FUNC_VSSs(Simd::Neon::ValueSquareSums), FUNC_VSSs(SimdValueSquareSums));
 #endif
 #endif
@@ -958,30 +959,30 @@ namespace Test
         return result;
     }
 
-    bool CorrelationSumAutoTest()
+    bool CorrelationSumAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && CorrelationSumAutoTest(FUNC5(Simd::Base::CorrelationSum), FUNC5(SimdCorrelationSum));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && CorrelationSumAutoTest(FUNC5(Simd::Sse41::CorrelationSum), FUNC5(SimdCorrelationSum));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && CorrelationSumAutoTest(FUNC5(Simd::Avx2::CorrelationSum), FUNC5(SimdCorrelationSum));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && CorrelationSumAutoTest(FUNC5(Simd::Avx512bw::CorrelationSum), FUNC5(SimdCorrelationSum));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && CorrelationSumAutoTest(FUNC5(Simd::Neon::CorrelationSum), FUNC5(SimdCorrelationSum));
 #endif
 

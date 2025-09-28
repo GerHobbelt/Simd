@@ -25,6 +25,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -91,11 +92,11 @@ namespace Test
         return result;
     }
 
-    bool CopyAutoTest()
+    bool CopyAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && CopyAutoTest(FUNC(Simd::Base::Copy), FUNC(SimdCopy));
 
         return result;
@@ -170,11 +171,11 @@ namespace Test
         return result;
     }
 
-    bool CopyFrameAutoTest()
+    bool CopyFrameAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && CopyFrameAutoTest(FUNC_F(Simd::Base::CopyFrame), FUNC_F(SimdCopyFrame));
 
         return result;

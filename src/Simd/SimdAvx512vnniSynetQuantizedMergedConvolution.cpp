@@ -43,12 +43,10 @@ namespace Simd
             : Avx512bw::SynetQuantizedMergedConvolutionCdc(p)
         {
             SetSize(F, 4, 1);
-            SetInputPreprocess(p.conv[0], _alg, _inputPreprocess);
             SetInputConvolution(p.conv[0], _alg, _inputConvolution);
             SetDepthwisePreprocess(p.conv[1], _alg, _depthwisePreprocess);
             SetDepthwiseConvolution(p.conv[1], _alg, _depthwiseConvolution);
             SetOutputConvolution(p.conv[2], _alg, _outputConvolution);
-            SetAddInputToOutput(p.conv[2], _alg, _addInputToOutput);
         }
 
         //------------------------------------------------------------------------------------------------
@@ -57,7 +55,6 @@ namespace Simd
             : Avx512bw::SynetQuantizedMergedConvolutionCd(p)
         {
             SetSize(F, 4, 1);
-            SetInputPreprocess(p.conv[0], _alg, _inputPreprocess);
             SetInputConvolution(p.conv[0], _alg, _inputConvolution);
             SetDepthwisePreprocess(p.conv[1], _alg, _depthwisePreprocess);
             SetDepthwiseConvolution(p.conv[1], _alg, _depthwiseConvolution);
@@ -72,12 +69,11 @@ namespace Simd
             SetDepthwisePreprocess(p.conv[0], _alg, _depthwisePreprocess);
             SetDepthwiseConvolution(p.conv[0], _alg, _depthwiseConvolution);
             SetOutputConvolution(p.conv[1], _alg, _outputConvolution);
-            SetAddInputToOutput(p.conv[1], _alg, _addInputToOutput);
         }
 
         //------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add)
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add)
         {
             MergConvParam param(batch, convs, count, add);
             if (!param.Valid(SimdTensorData8u, SimdTensorData8u))

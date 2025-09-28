@@ -24,6 +24,8 @@
 #include "Simd/SimdSynetQuantizedMergedConvolution.h"
 #include "Simd/SimdSynetQuantizeLinear.h"
 #include "Simd/SimdSynetConvolution8iCommon.h"
+#include "Simd/SimdSynetQuantizedAddCommon.h"
+#include "Simd/SimdFmadd.h"
 #include "Simd/SimdSynet.h"
 #include "Simd/SimdMath.h"
 #include "Simd/SimdBase.h"
@@ -108,12 +110,10 @@ namespace Simd
         if (p.add)
         {
             assert(p.count == 3 && p.conv[0].srcC == p.conv[2].dstC && p.conv[0].srcH == p.conv[2].dstH && p.conv[0].srcW == p.conv[2].dstW);
-            _srcBias = -ioZero[0];
-            _srcNorm = ioScale[0];
-            _dstBias = -ioZero[3];
-            _dstNorm = ioScale[3];
-            _addZero = ioZero[4];
-            _addScale = 1.0f / ioScale[4];
+            int a = p.add == 1 ? 3 : 0, b = 3 - a;
+            _aNorm = ioScale[a] / ioScale[4];
+            _bNorm = ioScale[b] / ioScale[4];
+            _term = float(ioZero[4]) - Base::Fmadd<false>(_aNorm, float(ioZero[a]), _bNorm * float(ioZero[b]));
         }
     }
 
@@ -214,8 +214,10 @@ namespace Simd
                         GemmNhwc(p.dstH * p.dstW, p.dstC, 1, p.srcC, ps, p.srcC, pw, p.dstC, sum, p.dstC, overflow);
                     QuantizeSumLinear(sum, 1, p.dstC, p.dstH, p.dstW, p.dstF, _bias[c].data, _norm[c].data, _ioZero[c + 1], pd);
                 }
-                if (_param.add)
-                    AddSrc(src, dst);
+                if (_param.add == 1)
+                    Add(dst, src, dst);
+                else if (_param.add == 2)
+                    Add(src, dst, dst);
                 src += _sizeS;
                 dst += _sizeD;
             }
@@ -255,14 +257,10 @@ namespace Simd
             }
         }
 
-        void SynetQuantizedMergedConvolutionRef::AddSrc(const uint8_t* src, uint8_t* dst)
+        void SynetQuantizedMergedConvolutionRef::Add(const uint8_t* a, const uint8_t* b, uint8_t* dst)
         {
             for (size_t i = 0; i < _sizeS; ++i)
-            {
-                float _src = DequantizeLinear(src[i], _srcBias, _srcNorm);
-                float _dst = DequantizeLinear(dst[i], _dstBias, _dstNorm);
-                dst[i] = QuantizeLinear(_src + _dst, _addScale, _addZero, 0, 255);
-            }
+                QuantizedAdd(a[i], _aNorm, b[i], _bNorm, _term, dst[i]);
         }
 
         //-------------------------------------------------------------------------------------------------
@@ -468,7 +466,7 @@ namespace Simd
                 a.ddH = Pow2Hi(a.ddStep);
 
                 a.dsStep = a.ddStep * c1.strideY;
-                a.dsStart = Simd::Min(AlignHi((a.ddStep - 1) * c1.strideY + c1.kernelY + (2 - a.dbE), c1.strideY), c1.srcH);
+                a.dsStart = Simd::Min(AlignHi((a.ddStep - 1) * c1.strideY + c1.kernelY + (2 - a.dbE) + (c1.padY == 0 && c1.strideY == 2 ? 1 : 0), c1.strideY), c1.srcH);
                 a.dsH = Pow2Hi(Simd::Max((a.ddStep - 1) * c1.strideY + c1.kernelY, a.dsStart));
 
                 a.isH = (Aligned(c0.srcC, a.miK) || a.miK == 4) ? 0 : a.dsH;
@@ -480,14 +478,26 @@ namespace Simd
                 if (a.isB + a.dsB + a.dbB + a.ddB <= L2)
                     break;
             }
+            a.idB = a.miK == 64 ? 4 * 16 * 16 : 0;
             if (a.miK == 64)
             {
                 bool aligned = Aligned(c2.dstC, a.miC) && Aligned(c2.dstH * c2.dstW, a.miC) && Aligned((c2.dstH % a.ddStep) * c2.dstW, a.miC);
-                a.odB = (count > 1 || !aligned) ? a.owStep * AlignHi(c2.dstH * c2.dstW + a.miC, a.miC) : 0;
-                a.idB = 4 * 16 * 16;
+                if (count > 1 || !aligned)
+                {
+                    a.obStep = a.owStep;
+                    a.odB = a.owStep * AlignHi(c1.dstH * c1.dstW + a.miC, a.miC);
+                }
+                else
+                {
+                    a.obStep = 0;
+                    a.odB = 4 * 16 * 16 + a.maC;
+                }
             }
             else
+            {
+                a.obStep = a.owStep;
                 a.odB = count > 1 ? _sizeD : 0;
+            }
         }
 
         void SynetQuantizedMergedConvolutionCdc::Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst)
@@ -545,8 +555,11 @@ namespace Simd
                             _outputConvolution[0](ddBuf, c2, a, maC, dyBeg, dyEnd, c != 0 ? 1 : 0,
                                 _weight[2].data + c * a.owStep, _bias[2].data, _norm[2].data, _ioZero[3], odBuf, dst);
                          
-                        if (p.add && c + maC == C)
-                            _addInputToOutput(src, _srcBias, _srcNorm, dst, _dstBias, _dstNorm, c2, dyBeg, dyEnd, _addScale, _addZero, dst);
+                        if (p.add == 1 && c + maC == C)
+                            _addInputToOutput(dst, _aNorm, src, _bNorm, c2, dyBeg, dyEnd, _term, dst);
+                        else if (p.add == 2 && c + maC == C)
+                            _addInputToOutput(src, _aNorm, dst, _bNorm, c2, dyBeg, dyEnd, _term, dst);
+
                         dyBeg = dyEnd;
                         syBeg = syEnd;
                     }
@@ -732,10 +745,22 @@ namespace Simd
             if (a.miK == 64)
             {
                 bool aligned = Aligned(c1.dstC, a.miC) && Aligned(c1.dstH * c1.dstW, a.miC) && Aligned((c1.dstH % a.ddStep) * c1.dstW, a.miC);
-                a.odB = (count > 1 || !aligned) ? a.owStep * AlignHi(c1.dstH * c1.dstW + a.miC, a.miC) : 0;
+                if (count > 1 || !aligned)
+                {
+                    a.obStep = a.owStep;
+                    a.odB = a.owStep * AlignHi(c1.dstH * c1.dstW + a.miC, a.miC);
+                }
+                else
+                {
+                    a.obStep = 0;
+                    a.odB = 4 * 16 * 16 + a.maC;
+                }
             }
             else
+            {
+                a.obStep = a.owStep;
                 a.odB = count > 1 ? _sizeD : 0;
+            }
         }
 
         void SynetQuantizedMergedConvolutionDc::Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst)
@@ -791,7 +816,7 @@ namespace Simd
 
         //-------------------------------------------------------------------------------------------------
 
-        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, SimdBool add)
+        void* SynetQuantizedMergedConvolutionInit(size_t batch, const SimdConvolutionParameters* convs, size_t count, int add)
         {
             MergConvParam param(batch, convs, count, add);
             if (!param.Valid(SimdTensorData8u, SimdTensorData8u))

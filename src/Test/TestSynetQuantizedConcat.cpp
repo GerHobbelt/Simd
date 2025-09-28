@@ -27,6 +27,7 @@
 #include "Test/TestTensor.h"
 #include "Test/TestRandom.h"
 #include "Test/TestString.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -115,25 +116,25 @@ namespace Test
         return result;
     }
 
-    bool SynetQuantizedConcatLayerForwardAutoTest()
+    bool SynetQuantizedConcatLayerForwardAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetQuantizedConcatLayerForwardAutoTest(FUNC_SQCLF(Simd::Base::SynetQuantizedConcatLayerForward), FUNC_SQCLF(SimdSynetQuantizedConcatLayerForward));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetQuantizedConcatLayerForwardAutoTest(FUNC_SQCLF(Simd::Sse41::SynetQuantizedConcatLayerForward), FUNC_SQCLF(SimdSynetQuantizedConcatLayerForward));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetQuantizedConcatLayerForwardAutoTest(FUNC_SQCLF(Simd::Avx2::SynetQuantizedConcatLayerForward), FUNC_SQCLF(SimdSynetQuantizedConcatLayerForward));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetQuantizedConcatLayerForwardAutoTest(FUNC_SQCLF(Simd::Avx512bw::SynetQuantizedConcatLayerForward), FUNC_SQCLF(SimdSynetQuantizedConcatLayerForward));
 #endif 
 

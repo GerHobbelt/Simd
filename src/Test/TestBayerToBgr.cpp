@@ -25,6 +25,7 @@
 #include "Test/TestPerformance.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -83,30 +84,30 @@ namespace Test
         return result;
     }
 
-    bool BayerToBgrAutoTest()
+    bool BayerToBgrAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && BayerToBgrAutoTest(FUNC(Simd::Base::BayerToBgr), FUNC(SimdBayerToBgr));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A + 2)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A + 2)
             result = result && BayerToBgrAutoTest(FUNC(Simd::Sse41::BayerToBgr), FUNC(SimdBayerToBgr));
 #endif
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A + 2)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A + 2)
             result = result && BayerToBgrAutoTest(FUNC(Simd::Avx2::BayerToBgr), FUNC(SimdBayerToBgr));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw() && W >= Simd::Avx512bw::A + 2)
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options) && W >= Simd::Avx512bw::A + 2)
             result = result && BayerToBgrAutoTest(FUNC(Simd::Avx512bw::BayerToBgr), FUNC(SimdBayerToBgr));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A + 2)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A + 2)
             result = result && BayerToBgrAutoTest(FUNC(Simd::Neon::BayerToBgr), FUNC(SimdBayerToBgr));
 #endif 
 

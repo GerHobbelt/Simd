@@ -27,6 +27,7 @@
 #include "Test/TestTensor.h"
 #include "Test/TestString.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 #include "Simd/SimdSynet.h"
 
@@ -115,25 +116,25 @@ namespace Test
         return result;
     }
 
-    bool SynetNormalizeLayerForwardAutoTest()
+    bool SynetNormalizeLayerForwardAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetNormalizeLayerForwardAutoTest(FUNC_SNLF(Simd::Base::SynetNormalizeLayerForward), FUNC_SNLF(SimdSynetNormalizeLayerForward));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetNormalizeLayerForwardAutoTest(FUNC_SNLF(Simd::Sse41::SynetNormalizeLayerForward), FUNC_SNLF(SimdSynetNormalizeLayerForward));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetNormalizeLayerForwardAutoTest(FUNC_SNLF(Simd::Avx2::SynetNormalizeLayerForward), FUNC_SNLF(SimdSynetNormalizeLayerForward));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetNormalizeLayerForwardAutoTest(FUNC_SNLF(Simd::Avx512bw::SynetNormalizeLayerForward), FUNC_SNLF(SimdSynetNormalizeLayerForward));
 #endif 
 
@@ -216,50 +217,50 @@ namespace Test
         return result;
     }
 
-    bool SynetNormalizeLayerForwardV2AutoTest()
+    bool SynetNormalizeLayerForwardV2AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Base::SynetNormalizeLayerForwardV2), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV2));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Sse41::SynetNormalizeLayerForwardV2), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV2));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Avx2::SynetNormalizeLayerForwardV2), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV2));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Avx512bw::SynetNormalizeLayerForwardV2), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV2));
 #endif 
 
         return result;
     }
 
-    bool SynetNormalizeLayerForwardV3AutoTest()
+    bool SynetNormalizeLayerForwardV3AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Base::SynetNormalizeLayerForwardV3), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV3));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Sse41::SynetNormalizeLayerForwardV3), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV3));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Avx2::SynetNormalizeLayerForwardV3), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV3));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Avx512bw::SynetNormalizeLayerForwardV3), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV3));
 #endif 
 
@@ -267,25 +268,25 @@ namespace Test
     }
 
 
-    bool SynetNormalizeLayerForwardV4AutoTest()
+    bool SynetNormalizeLayerForwardV4AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Base::SynetNormalizeLayerForwardV4), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV4));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Sse41::SynetNormalizeLayerForwardV4), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV4));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Avx2::SynetNormalizeLayerForwardV4), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV4));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && SynetNormalizeLayerForwardV2AutoTest(FUNC_SNLF2(Simd::Avx512bw::SynetNormalizeLayerForwardV4), FUNC_SNLF2(SimdSynetNormalizeLayerForwardV4));
 #endif 
 

@@ -24,6 +24,7 @@
 #include "Test/TestCompare.h"
 #include "Test/TestPerformance.h"
 #include "Test/TestRandom.h"
+#include "Test/TestOptions.h"
 
 namespace Test
 {
@@ -86,25 +87,25 @@ namespace Test
         return result;
     }
 
-    bool Crc32AutoTest()
+    bool Crc32AutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && Crc32AutoTest(FUNC(Simd::Base::Crc32), FUNC(SimdCrc32));
 
         return result;
     }
 
-    bool Crc32cAutoTest()
+    bool Crc32cAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && Crc32AutoTest(FUNC(Simd::Base::Crc32c), FUNC(SimdCrc32c));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && Crc32AutoTest(FUNC(Simd::Sse41::Crc32c), FUNC(SimdCrc32c));
 #endif 
 

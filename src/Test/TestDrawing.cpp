@@ -92,30 +92,30 @@ namespace Test
         return result;
     }
 
-    bool AlphaBlendingAutoTest()
+    bool AlphaBlendingAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaBlendingAutoTest(FUNC_AB(Simd::Base::AlphaBlending), FUNC_AB(SimdAlphaBlending));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AlphaBlendingAutoTest(FUNC_AB(Simd::Sse41::AlphaBlending), FUNC_AB(SimdAlphaBlending));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AlphaBlendingAutoTest(FUNC_AB(Simd::Avx2::AlphaBlending), FUNC_AB(SimdAlphaBlending));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AlphaBlendingAutoTest(FUNC_AB(Simd::Avx512bw::AlphaBlending), FUNC_AB(SimdAlphaBlending));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AlphaBlendingAutoTest(FUNC_AB(Simd::Neon::AlphaBlending), FUNC_AB(SimdAlphaBlending));
 #endif
 
@@ -193,25 +193,25 @@ namespace Test
         return result;
     }
 
-    bool AlphaBlending2xAutoTest()
+    bool AlphaBlending2xAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaBlending2xAutoTest(FUNC_AB2(Simd::Base::AlphaBlending2x), FUNC_AB2(SimdAlphaBlending2x));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AlphaBlending2xAutoTest(FUNC_AB2(Simd::Sse41::AlphaBlending2x), FUNC_AB2(SimdAlphaBlending2x));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AlphaBlending2xAutoTest(FUNC_AB2(Simd::Avx2::AlphaBlending2x), FUNC_AB2(SimdAlphaBlending2x));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AlphaBlending2xAutoTest(FUNC_AB2(Simd::Neon::AlphaBlending2x), FUNC_AB2(SimdAlphaBlending2x));
 #endif 
 
@@ -286,31 +286,31 @@ namespace Test
         return result;
     }
 
-    bool AlphaBlendingBgraToYuv420pAutoTest()
+    bool AlphaBlendingBgraToYuv420pAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaBlendingBgraToYuv420pAutoTest(FUNC_ABBY(Simd::Base::AlphaBlendingBgraToYuv420p), FUNC_ABBY(SimdAlphaBlendingBgraToYuv420p));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AlphaBlendingBgraToYuv420pAutoTest(FUNC_ABBY(Simd::Sse41::AlphaBlendingBgraToYuv420p), FUNC_ABBY(SimdAlphaBlendingBgraToYuv420p));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AlphaBlendingBgraToYuv420pAutoTest(FUNC_ABBY(Simd::Avx2::AlphaBlendingBgraToYuv420p), FUNC_ABBY(SimdAlphaBlendingBgraToYuv420p));
 #endif 
 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AlphaBlendingBgraToYuv420pAutoTest(FUNC_ABBY(Simd::Avx512bw::AlphaBlendingBgraToYuv420p), FUNC_ABBY(SimdAlphaBlendingBgraToYuv420p));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AlphaBlendingBgraToYuv420pAutoTest(FUNC_ABBY(Simd::Neon::AlphaBlendingBgraToYuv420p), FUNC_ABBY(SimdAlphaBlendingBgraToYuv420p));
 #endif 
 
@@ -381,30 +381,30 @@ namespace Test
         return result;
     }
 
-    bool AlphaBlendingUniformAutoTest()
+    bool AlphaBlendingUniformAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaBlendingUniformAutoTest(FUNC_ABU(Simd::Base::AlphaBlendingUniform), FUNC_ABU(SimdAlphaBlendingUniform));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AlphaBlendingUniformAutoTest(FUNC_ABU(Simd::Sse41::AlphaBlendingUniform), FUNC_ABU(SimdAlphaBlendingUniform));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AlphaBlendingUniformAutoTest(FUNC_ABU(Simd::Avx2::AlphaBlendingUniform), FUNC_ABU(SimdAlphaBlendingUniform));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AlphaBlendingUniformAutoTest(FUNC_ABU(Simd::Avx512bw::AlphaBlendingUniform), FUNC_ABU(SimdAlphaBlendingUniform));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AlphaBlendingUniformAutoTest(FUNC_ABU(Simd::Neon::AlphaBlendingUniform), FUNC_ABU(SimdAlphaBlendingUniform));
 #endif
 
@@ -476,30 +476,30 @@ namespace Test
         return result;
     }
 
-    bool AlphaFillingAutoTest()
+    bool AlphaFillingAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaFillingAutoTest(FUNC_AF(Simd::Base::AlphaFilling), FUNC_AF(SimdAlphaFilling));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41() && W >= Simd::Sse41::A)
+        if (Simd::Sse41::Enable && TestSse41(options) && W >= Simd::Sse41::A)
             result = result && AlphaFillingAutoTest(FUNC_AF(Simd::Sse41::AlphaFilling), FUNC_AF(SimdAlphaFilling));
 #endif
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2() && W >= Simd::Avx2::A)
+        if (Simd::Avx2::Enable && TestAvx2(options) && W >= Simd::Avx2::A)
             result = result && AlphaFillingAutoTest(FUNC_AF(Simd::Avx2::AlphaFilling), FUNC_AF(SimdAlphaFilling));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AlphaFillingAutoTest(FUNC_AF(Simd::Avx512bw::AlphaFilling), FUNC_AF(SimdAlphaFilling));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon() && W >= Simd::Neon::A)
+        if (Simd::Neon::Enable && TestNeon(options) && W >= Simd::Neon::A)
             result = result && AlphaFillingAutoTest(FUNC_AF(Simd::Neon::AlphaFilling), FUNC_AF(SimdAlphaFilling));
 #endif
 
@@ -567,60 +567,60 @@ namespace Test
         return result;
     }
 
-    bool AlphaPremultiplyAutoTest()
+    bool AlphaPremultiplyAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaPremultiplyAutoTest(false, FUNC_AP(Simd::Base::AlphaPremultiply), FUNC_AP(SimdAlphaPremultiply));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && AlphaPremultiplyAutoTest(false, FUNC_AP(Simd::Sse41::AlphaPremultiply), FUNC_AP(SimdAlphaPremultiply));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && AlphaPremultiplyAutoTest(false, FUNC_AP(Simd::Avx2::AlphaPremultiply), FUNC_AP(SimdAlphaPremultiply));
 #endif
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AlphaPremultiplyAutoTest(false, FUNC_AP(Simd::Avx512bw::AlphaPremultiply), FUNC_AP(SimdAlphaPremultiply));
 #endif
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && AlphaPremultiplyAutoTest(false, FUNC_AP(Simd::Neon::AlphaPremultiply), FUNC_AP(SimdAlphaPremultiply));
 #endif
 
         return result;
     }
 
-    bool AlphaUnpremultiplyAutoTest()
+    bool AlphaUnpremultiplyAutoTest(const Options & options)
     {
         bool result = true;
 
-        if (TestBase())
+        if (TestBase(options))
             result = result && AlphaPremultiplyAutoTest(true, FUNC_AP(Simd::Base::AlphaUnpremultiply), FUNC_AP(SimdAlphaUnpremultiply));
 
 #ifdef SIMD_SSE41_ENABLE
-        if (Simd::Sse41::Enable && TestSse41())
+        if (Simd::Sse41::Enable && TestSse41(options))
             result = result && AlphaPremultiplyAutoTest(true, FUNC_AP(Simd::Sse41::AlphaUnpremultiply), FUNC_AP(SimdAlphaUnpremultiply));
 #endif 
 
 #ifdef SIMD_AVX2_ENABLE
-        if (Simd::Avx2::Enable && TestAvx2())
+        if (Simd::Avx2::Enable && TestAvx2(options))
             result = result && AlphaPremultiplyAutoTest(true, FUNC_AP(Simd::Avx2::AlphaUnpremultiply), FUNC_AP(SimdAlphaUnpremultiply));
 #endif 
 
 #ifdef SIMD_AVX512BW_ENABLE
-        if (Simd::Avx512bw::Enable && TestAvx512bw())
+        if (Simd::Avx512bw::Enable && TestAvx512bw(options))
             result = result && AlphaPremultiplyAutoTest(true, FUNC_AP(Simd::Avx512bw::AlphaUnpremultiply), FUNC_AP(SimdAlphaUnpremultiply));
 #endif 
 
 #ifdef SIMD_NEON_ENABLE
-        if (Simd::Neon::Enable && TestNeon())
+        if (Simd::Neon::Enable && TestNeon(options))
             result = result && AlphaPremultiplyAutoTest(true, FUNC_AP(Simd::Neon::AlphaUnpremultiply), FUNC_AP(SimdAlphaUnpremultiply));
 #endif 
 
