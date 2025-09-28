@@ -90,9 +90,8 @@ namespace Simd
         {
             if (p.conv[c].IsDepthwise())
             {
-                _dwSrcZero.Resize(p.conv[c].group);
-                memset(_dwSrcZero.data, ioZero[c], p.conv[c].group);
                 SetDepthwise(weight[c], p.conv[c], _weight[c]);
+                SetZero(ioZero[c], p.conv[c], _dwSrcZero);
             }
             else
             {
@@ -185,6 +184,12 @@ namespace Simd
             dst.Assign(weight, dst.size);
         }
 
+        void SynetQuantizedMergedConvolutionRef::SetZero(uint8_t zero, const ConvParam& p, Array8u& dst)
+        {
+            dst.Resize(p.group);
+            memset(dst.data, zero, p.group);
+        }
+
         void SynetQuantizedMergedConvolutionRef::Forward(const uint8_t* src, uint8_t* buf8, uint8_t* dst)
         {
             buf8 = Buffer(buf8);
@@ -271,13 +276,13 @@ namespace Simd
             , _outputConvolution{NULL, NULL}
             , _addInputToOutput(NULL)
         {
-            for (size_t i = 0; i < 6; ++i)
-                _sizeB[i] = 0;
+            memset(&_alg, 0, sizeof(_alg));
         }
 
         size_t SynetQuantizedMergedConvolution::ExternalBufferSize() const
         {
-            return SIMD_ALIGN + _sizeB[0] + _sizeB[1] * 4 + _sizeB[2] + _sizeB[3] * _alg.dwE + _sizeB[4] + _sizeB[5] * 4;
+            const AlgParam& a = _alg;
+            return a.isB + a.idB * 4 + a.dsB + a.dbB + a.ddB + a.odB * 4 + SIMD_ALIGN * 3;
         }
 
         void SynetQuantizedMergedConvolution::SetInput(const int8_t* src, const ConvParam& p, Array8i& dst)
@@ -312,10 +317,10 @@ namespace Simd
             assert(IsDepthwise(p));
             const AlgParam& a = _alg;
             size_t Y = p.kernelY, X = p.kernelX, C = p.srcC, F = a.miC, B = AlignHi(p.srcC, a.miC);
-            dst.Resize(a.sizeW * 2 * a.dwE);
-            if (a.dwE == 2)
+            dst.Resize(a.dwSize * 2 * a.dbE);
+            if (a.dbE == 2)
             {
-                int16_t* dstE = (int16_t*)dst.data, * dstO = dstE + a.sizeW;
+                int16_t* dstE = (int16_t*)dst.data, * dstO = dstE + a.dwSize;
                 for (size_t c = 0; c < C; c += F)
                 {
                     for (size_t y = 0; y < Y + 1; y += 2)
@@ -341,7 +346,7 @@ namespace Simd
             }
             else
             {
-                int8_t* dstE = dst.data, * dstO = dstE + a.sizeW;
+                int8_t* dstE = dst.data, * dstO = dstE + a.dwSize;
                 for (size_t c = 0; c < C; c += F)
                 {
                     for (size_t y = 0; y < Y + 1; y += 4)
@@ -402,6 +407,385 @@ namespace Simd
                         }
                     }
                 }
+            }
+        }
+
+        void SynetQuantizedMergedConvolution::SetZero(uint8_t zero, const ConvParam& p, Array8u& dst)
+        {
+            const AlgParam& a = _alg;
+            dst.Resize(a.dbW * AlignHi(p.dstC, 16));
+            memset(dst.data, zero, dst.size);
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SynetQuantizedMergedConvolutionCdc::SynetQuantizedMergedConvolutionCdc(const MergConvParam& p)
+            : SynetQuantizedMergedConvolution(p)
+        {
+        }
+
+        bool SynetQuantizedMergedConvolutionCdc::Preferable(const MergConvParam& p)
+        {
+            return p.count == 3 && Is1x1(p.conv[0]);
+        }
+
+        void SynetQuantizedMergedConvolutionCdc::SetSize(size_t miC, size_t miK, size_t dbE)
+        {
+            const size_t L1 = Base::AlgCacheL1(), L2 = Base::AlgCacheL2(), L3 = Base::AlgCacheL3();
+            const MergConvParam& p = _param;
+            const ConvParam& c0 = p.conv[0];
+            const ConvParam& c1 = p.conv[1];
+            const ConvParam& c2 = p.conv[2];
+            AlgParam& a = _alg;
+
+            a.miC = miC;
+            a.miK = miK;
+            a.dbE = dbE;
+
+            a.iwStep = AlignHi(c0.srcC, a.miK);
+            a.dwC = AlignHi(c1.srcC, a.miC);
+            a.dbStep = 2 / c1.strideY;
+            a.dbH = Pow2Hi(AlignHi(c1.kernelY, 4 / a.dbE));
+            a.dbW = c1.srcW + c1.padX + c1.padW;
+            a.dwStep = c1.kernelX * AlignHi(c1.kernelY + 1, 4 / a.dbE);
+            a.dwSize = a.dwStep * a.dwC;
+            a.owStep = AlignHi(c2.dstC, a.miC);
+
+            size_t size = 0;
+            for (size_t i = 0; i < 3; ++i)
+            {
+                const ConvParam& c = p.conv[i];
+                if (c.group == 1)
+                    size += AlignHi(c.srcC, a.miK) * AlignHi(c.dstC, a.miC * 2);
+                else
+                    size += a.dwSize * a.dbE * 2;
+            }
+            size_t count = size / (L3 / 2) + 1;
+            a.maC = AlignHi(AlignHi(c0.dstC / count, 2 * a.miC), a.miK);
+            for (size_t yStep = c1.dstH; yStep >= 1; yStep--)
+            {
+                a.ddStep = Simd::Min(AlignHi(Simd::Max<size_t>(1, yStep), a.dbStep), c1.dstH);
+                a.ddH = Pow2Hi(a.ddStep);
+
+                a.dsStep = a.ddStep * c1.strideY;
+                a.dsStart = Simd::Min(AlignHi((a.ddStep - 1) * c1.strideY + c1.kernelY + (2 - a.dbE), c1.strideY), c1.srcH);
+                a.dsH = Pow2Hi(Simd::Max((a.ddStep - 1) * c1.strideY + c1.kernelY, a.dsStart));
+
+                a.isH = (Aligned(c0.srcC, a.miK) || a.miK == 4) ? 0 : a.dsH;
+
+                a.isB = (Aligned(c0.srcC, a.miK) || a.miK == 4) ? 0 : AlignHi(a.isH * c0.srcW, a.miC) * AlignHi(c0.srcC, a.miK);
+                a.dsB = a.dsH * c1.srcW * a.maC;
+                a.dbB = a.dbH * a.dbW * a.maC * 2;
+                a.ddB = a.ddH * c1.dstW * a.maC;
+                if (a.isB + a.dsB + a.dbB + a.ddB <= L2)
+                    break;
+            }
+            if (a.miK == 64)
+            {
+                bool aligned = Aligned(c2.dstC, a.miC) && Aligned(c2.dstH * c2.dstW, a.miC) && Aligned((c2.dstH % a.ddStep) * c2.dstW, a.miC);
+                a.odB = (count > 1 || !aligned) ? a.owStep * AlignHi(c2.dstH * c2.dstW + a.miC, a.miC) : 0;
+                a.idB = 4 * 16 * 16;
+            }
+            else
+                a.odB = count > 1 ? _sizeD : 0;
+        }
+
+        void SynetQuantizedMergedConvolutionCdc::Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst)
+        {
+            const MergConvParam& p = _param;
+            const ConvParam& c0 = p.conv[0];
+            const ConvParam& c1 = p.conv[1];
+            const ConvParam& c2 = p.conv[2];
+            const AlgParam& a = _alg;
+
+            buf = Buffer(buf);
+            uint8_t* isBuf = Allocate<uint8_t>(buf, a.isB);
+            SetGap(buf);
+            int32_t* idBuf = Allocate<int32_t>(buf, a.idB);
+            uint8_t* dsBuf = Allocate<uint8_t>(buf, a.dsB);
+            SetGap(buf);
+            uint8_t* dbBuf = Allocate<uint8_t>(buf, a.dbB);
+            uint8_t* ddBuf = Allocate<uint8_t>(buf, a.ddB);
+            SetGap(buf);
+            int32_t* odBuf = Allocate<int32_t>(buf, a.odB);
+
+            for (size_t b = 0; b < c0.batch; ++b)
+            {
+                for (size_t c = 0, C = c1.dstC; c < C; c += a.maC)
+                {
+                    size_t maC = Simd::Min(C, c + a.maC) - c;
+                    for (size_t dyBeg = 0, syBeg = 0; dyBeg < c1.dstH;)
+                    {
+                        size_t dyEnd = Simd::RestrictRange(dyBeg + a.ddStep, a.ddStep, c1.dstH);
+                        size_t syEnd = Simd::RestrictRange(syBeg + a.dsStep, a.dsStart, c1.srcH);
+
+                        if (_inputPreprocess && isBuf)
+                            _inputPreprocess(src, c0, a, syBeg, syEnd, isBuf);
+
+                        const uint8_t* isPtr = (_inputPreprocess && isBuf) ? isBuf : src;
+                        _inputConvolution(isPtr, c0, a, maC, syBeg, syEnd, _weight[0].data + c * a.iwStep,
+                            _bias[0].data + c, _norm[0].data + c, _ioZero[1], idBuf, dsBuf);
+
+                        for (size_t byBeg = dyBeg; byBeg < dyEnd;)
+                        {
+                            size_t byEnd = Simd::Min(byBeg + a.dbStep, dyEnd);
+
+                            _depthwisePreprocess(dsBuf, _dwSrcZero.data, c1, a, maC, byBeg, byEnd, dbBuf);
+
+                            _depthwiseConvolution(dbBuf, c1, a, maC, byBeg, byEnd, _weight[1].data + c * a.dwStep * a.dbE,
+                                _bias[1].data + c, _norm[1].data + c, _ioZero[2], ddBuf);
+
+                            byBeg = byEnd;
+                        }
+
+                        if (c + maC == C)
+                            _outputConvolution[1](ddBuf, c2, a, maC, dyBeg, dyEnd, maC != C ? 1 : 0,
+                                _weight[2].data + c * a.owStep, _bias[2].data, _norm[2].data, _ioZero[3], odBuf, dst);
+                        else
+                            _outputConvolution[0](ddBuf, c2, a, maC, dyBeg, dyEnd, c != 0 ? 1 : 0,
+                                _weight[2].data + c * a.owStep, _bias[2].data, _norm[2].data, _ioZero[3], odBuf, dst);
+                         
+                        if (p.add && c + maC == C)
+                            _addInputToOutput(src, _srcBias, _srcNorm, dst, _dstBias, _dstNorm, c2, dyBeg, dyEnd, _addScale, _addZero, dst);
+                        dyBeg = dyEnd;
+                        syBeg = syEnd;
+                    }
+                }
+                src += _sizeS;
+                dst += _sizeD;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------
+
+        SynetQuantizedMergedConvolutionCd::SynetQuantizedMergedConvolutionCd(const MergConvParam& p)
+            : SynetQuantizedMergedConvolution(p)
+        {
+        }
+
+        bool SynetQuantizedMergedConvolutionCd::Preferable(const MergConvParam& p)
+        {
+            return p.count == 2 && p.conv[0].group == 1 && Is1x1(p.conv[0]);
+        }
+
+        void SynetQuantizedMergedConvolutionCd::SetSize(size_t miC, size_t miK, size_t dbE)
+        {
+            const size_t L1 = Base::AlgCacheL1(), L2 = Base::AlgCacheL2(), L3 = Base::AlgCacheL3();
+            const MergConvParam& p = _param;
+            const ConvParam& c0 = p.conv[0];
+            const ConvParam& c1 = p.conv[1];
+            AlgParam& a = _alg;
+
+            a.miC = miC;
+            a.miK = miK;
+            a.dbE = dbE;
+
+            a.iwStep = AlignHi(c0.srcC, a.miK);
+            a.dwC = AlignHi(c1.srcC, a.miC);
+            a.dbStep = 2 / c1.strideY;
+            a.dbH = Pow2Hi(AlignHi(c1.kernelY, 4 / a.dbE));
+            a.dbW = c1.srcW + c1.padX + c1.padW;
+            a.dwStep = c1.kernelX * AlignHi(c1.kernelY + 1, 4 / a.dbE);
+            a.dwSize = a.dwStep * a.dwC;
+            a.owStep = 0;
+
+            size_t size = 0;
+            for (size_t i = 0; i < 2; ++i)
+            {
+                const ConvParam& c = p.conv[i];
+                if (c.group == 1)
+                    size += AlignHi(c.srcC, a.miK) * AlignHi(c.dstC, a.miC * 2);
+                else
+                    size += a.dwSize * a.dbE * 2;
+            }
+            size_t count = size / (L3 / 2) + 1;
+            a.maC = AlignHi(AlignHi(c0.dstC / count, 2 * a.miC), a.miK);
+            for (size_t yStep = c1.dstH; yStep >= 1; yStep--)
+            {
+                a.ddStep = Simd::Min(AlignHi(Simd::Max<size_t>(1, yStep), a.dbStep), c1.dstH);
+                a.ddH = Pow2Hi(a.ddStep);
+
+                a.dsStep = a.ddStep * c1.strideY;
+                a.dsStart = Simd::Min(AlignHi((a.ddStep - 1) * c1.strideY + c1.kernelY + (2 - a.dbE), c1.strideY), c1.srcH);
+                a.dsH = Pow2Hi(Simd::Max((a.ddStep - 1) * c1.strideY + c1.kernelY, a.dsStart));
+
+                a.isH = (Aligned(c0.srcC, a.miK) || a.miK == 4) ? 0 : a.dsH;
+
+                a.isB = (Aligned(c0.srcC, a.miK) || a.miK == 4) ? 0 : AlignHi(a.isH * c0.srcW, a.miC) * AlignHi(c0.srcC, a.miK);
+                a.dsB = a.dsH * c1.srcW * a.maC;
+                a.dbB = a.dbH * a.dbW * a.maC * 2;
+                if (a.isB + a.dsB + a.dbB <= L2)
+                    break;
+            }
+            if (a.miK == 64)
+                a.idB = 4 * 16 * 16;
+        }
+
+        void SynetQuantizedMergedConvolutionCd::Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst)
+        {
+            const MergConvParam& p = _param;
+            const ConvParam& c0 = p.conv[0];
+            const ConvParam& c1 = p.conv[1];
+            const AlgParam& a = _alg;
+
+            buf = Buffer(buf);
+            uint8_t* isBuf = Allocate<uint8_t>(buf, a.isB);
+            SetGap(buf);
+            int32_t* idBuf = Allocate<int32_t>(buf, a.idB);
+            uint8_t* dsBuf = Allocate<uint8_t>(buf, a.dsB);
+            SetGap(buf);
+            uint8_t* dbBuf = Allocate<uint8_t>(buf, a.dbB);
+
+            for (size_t b = 0; b < c0.batch; ++b)
+            {
+                for (size_t c = 0, C = c1.dstC; c < C; c += a.maC)
+                {
+                    size_t maC = Simd::Min(C, c + a.maC) - c;
+                    for (size_t dyBeg = 0, syBeg = 0; dyBeg < c1.dstH;)
+                    {
+                        size_t dyEnd = Simd::RestrictRange(dyBeg + a.ddStep, a.ddStep, c1.dstH);
+                        size_t syEnd = Simd::RestrictRange(syBeg + a.dsStep, a.dsStart, c1.srcH);
+
+                        if (_inputPreprocess && isBuf)
+                            _inputPreprocess(src, c0, a, syBeg, syEnd, isBuf);
+
+                        const uint8_t* isPtr = (_inputPreprocess && isBuf) ? isBuf : src;
+                        _inputConvolution(isPtr, c0, a, maC, syBeg, syEnd, _weight[0].data + c * a.iwStep,
+                            _bias[0].data + c, _norm[0].data + c, _ioZero[1], idBuf, dsBuf);
+
+                        for (size_t byBeg = dyBeg; byBeg < dyEnd;)
+                        {
+                            size_t byEnd = Simd::Min(byBeg + a.dbStep, dyEnd);
+
+                            _depthwisePreprocess(dsBuf, _dwSrcZero.data, c1, a, maC, byBeg, byEnd, dbBuf);
+
+                            _depthwiseConvolution(dbBuf, c1, a, maC, byBeg, byEnd, _weight[1].data + c * a.dwStep * a.dbE,
+                                _bias[1].data + c, _norm[1].data + c, _ioZero[2], dst);
+
+                            byBeg = byEnd;
+                        }
+
+                        dyBeg = dyEnd;
+                        syBeg = syEnd;
+                    }
+                }
+                src += _sizeS;
+                dst += _sizeD;
+            }
+        }
+        //-------------------------------------------------------------------------------------------------
+
+        SynetQuantizedMergedConvolutionDc::SynetQuantizedMergedConvolutionDc(const MergConvParam& p)
+            : SynetQuantizedMergedConvolution(p)
+        {
+        }
+
+        bool SynetQuantizedMergedConvolutionDc::Preferable(const MergConvParam& p)
+        {
+            return p.count == 2 && p.conv[0].IsDepthwise();
+        }
+
+        void SynetQuantizedMergedConvolutionDc::SetSize(size_t miC, size_t miK, size_t dbE)
+        {
+            const size_t L1 = Base::AlgCacheL1(), L2 = Base::AlgCacheL2(), L3 = Base::AlgCacheL3();
+            const MergConvParam& p = _param;
+            const ConvParam& c0 = p.conv[0];
+            const ConvParam& c1 = p.conv[1];
+            AlgParam& a = _alg;
+
+            a.miC = miC;
+            a.miK = miK;
+            a.dbE = dbE;
+
+            a.dwC = AlignHi(c0.srcC, a.miC);
+            a.dbStep = 2 / c0.strideY;
+            a.dbH = Pow2Hi(AlignHi(c0.kernelY, 4 / a.dbE));
+            a.dbW = c0.srcW + c0.padX + c0.padW;
+            a.dwStep = c0.kernelX * AlignHi(c0.kernelY + 1, 4 / a.dbE);
+            a.dwSize = a.dwStep * a.dwC;
+            a.owStep = AlignHi(c1.dstC, a.miC);
+
+            size_t size = 0;
+            for (size_t i = 0; i < 2; ++i)
+            {
+                const ConvParam& c = p.conv[i];
+                if (c.group == 1)
+                    size += AlignHi(c.srcC, a.miK) * AlignHi(c.dstC, a.miC * 2);
+                else
+                    size += a.dwSize * a.dbE * 2;
+            }
+            size_t count = size / (L3 / 2) + 1;
+            a.maC = AlignHi(AlignHi(c0.srcC / count, 2 * a.miC), a.miK);
+            for (size_t yStep = c0.dstH; yStep >= 1; yStep--)
+            {
+                a.ddStep = Simd::Min(AlignHi(Simd::Max<size_t>(1, yStep), a.dbStep), c0.dstH);
+                a.ddH = Pow2Hi(a.ddStep);
+
+                a.dsStep = a.ddStep * c0.strideY;
+                a.dsStart = Simd::Min(AlignHi((a.ddStep - 1) * c0.strideY + c0.kernelY + (2 - a.dbE), c0.strideY), c0.srcH);
+
+                a.dbB = a.dbH * a.dbW * a.maC * 2;
+                a.ddB = a.ddH * c0.dstW * a.maC;
+                if (a.dbB + a.ddB <= L2)
+                    break;
+            }
+            if (a.miK == 64)
+            {
+                bool aligned = Aligned(c1.dstC, a.miC) && Aligned(c1.dstH * c1.dstW, a.miC) && Aligned((c1.dstH % a.ddStep) * c1.dstW, a.miC);
+                a.odB = (count > 1 || !aligned) ? a.owStep * AlignHi(c1.dstH * c1.dstW + a.miC, a.miC) : 0;
+            }
+            else
+                a.odB = count > 1 ? _sizeD : 0;
+        }
+
+        void SynetQuantizedMergedConvolutionDc::Forward(const uint8_t* src, uint8_t* buf, uint8_t* dst)
+        {
+            const MergConvParam& p = _param;
+            const ConvParam& c0 = p.conv[0];
+            const ConvParam& c1 = p.conv[1];
+            const AlgParam& a = _alg;
+
+            buf = Buffer(buf);
+            uint8_t* dbBuf = Allocate<uint8_t>(buf, a.dbB);
+            uint8_t* ddBuf = Allocate<uint8_t>(buf, a.ddB);
+            SetGap(buf);
+            int32_t* odBuf = Allocate<int32_t>(buf, a.odB);
+
+            for (size_t b = 0; b < c0.batch; ++b)
+            {
+                for (size_t c = 0, C = c0.dstC; c < C; c += a.maC)
+                {
+                    size_t maC = Simd::Min(C, c + a.maC) - c;
+                    for (size_t dyBeg = 0, syBeg = 0; dyBeg < c0.dstH;)
+                    {
+                        size_t dyEnd = Simd::RestrictRange(dyBeg + a.ddStep, a.ddStep, c0.dstH);
+                        size_t syEnd = Simd::RestrictRange(syBeg + a.dsStep, a.dsStart, c0.srcH);
+
+                        for (size_t byBeg = dyBeg; byBeg < dyEnd;)
+                        {
+                            size_t byEnd = Simd::Min(byBeg + a.dbStep, dyEnd);
+
+                            _depthwisePreprocess(src + c, _dwSrcZero.data, c0, a, maC, byBeg, byEnd, dbBuf);
+
+                            _depthwiseConvolution(dbBuf, c0, a, maC, byBeg, byEnd, _weight[0].data + c * a.dwStep * a.dbE,
+                                _bias[0].data + c, _norm[0].data + c, _ioZero[1], ddBuf);
+
+                            byBeg = byEnd;
+                        }
+
+                        if (c + maC == C)
+                            _outputConvolution[1](ddBuf, c1, a, maC, dyBeg, dyEnd, maC != C ? 1 : 0,
+                                _weight[1].data + c * a.owStep, _bias[1].data, _norm[1].data, _ioZero[2], odBuf, dst);
+                        else
+                            _outputConvolution[0](ddBuf, c1, a, maC, dyBeg, dyEnd, c != 0 ? 1 : 0,
+                                _weight[1].data + c * a.owStep, _bias[1].data, _norm[1].data, _ioZero[2], odBuf, dst);
+
+                        dyBeg = dyEnd;
+                        syBeg = syEnd;
+                    }
+                }
+                src += _sizeS;
+                dst += _sizeD;
             }
         }
 

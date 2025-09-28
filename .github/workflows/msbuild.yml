@@ -29,7 +29,8 @@ jobs:
       run: nuget restore ./prj/vs2022 -Project2ProjectTimeOut 300
 
     - name: Host properties
-      run: wmic cpu get Name,NumberOfCores,NumberOfLogicalProcessors /format:value
+      shell: powershell
+      run: echo "$((Get-CimInstance Win32_Processor).Name), $((Get-CimInstance Win32_Processor).NumberOfCores) cores, $((Get-CimInstance Win32_Processor).NumberOfLogicalProcessors) threads."
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -37,7 +38,7 @@ jobs:
      
     - name: Test
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: bin/v143/${{matrix.platform}}/${{matrix.build_type}}/Test.exe "-r=." -m=a -tt=4 "-ot=log_${{matrix.platform}}_${{matrix.build_type}}.txt" -ts=10
+      run: bin\v143\${{matrix.platform}}\${{matrix.build_type}}\Test.exe "-r=." -m=a -tt=4 "-ot=log_${{matrix.platform}}_${{matrix.build_type}}.txt" -ts=10
 
   build_and_test_vs2019:
     runs-on: windows-latest
@@ -58,7 +59,8 @@ jobs:
       run: nuget restore ./prj/vs2019 -Project2ProjectTimeOut 300
 
     - name: Host properties
-      run: wmic cpu get Name,NumberOfCores,NumberOfLogicalProcessors /format:value
+      shell: powershell
+      run: echo "$((Get-CimInstance Win32_Processor).Name), $((Get-CimInstance Win32_Processor).NumberOfCores) cores, $((Get-CimInstance Win32_Processor).NumberOfLogicalProcessors) threads."
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -66,5 +68,5 @@ jobs:
      
     - name: Test
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: bin/v142/${{matrix.platform}}/${{matrix.build_type}}/Test.exe "-r=." -m=a -tt=4 "-ot=log_${{matrix.platform}}_${{matrix.build_type}}.txt" -ts=10
+      run: bin\v142\${{matrix.platform}}\${{matrix.build_type}}\Test.exe "-r=." -m=a -tt=4 "-ot=log_${{matrix.platform}}_${{matrix.build_type}}.txt" -ts=10
 
