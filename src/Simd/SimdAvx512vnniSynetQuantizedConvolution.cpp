@@ -40,12 +40,16 @@ namespace Simd
             ConvParam param(batch, conv);
             if (!ValidQuantized(param))
                 return NULL;
+            else if (SynetQuantizedConvolutionNhwcDepthwiseV1::Preferable(param, 1) && param.IsStride(1))
+                return new SynetQuantizedConvolutionNhwcDepthwiseV1(param);
+            else if (SynetQuantizedConvolutionNhwcDepthwiseV0::Preferable(param, 1))
+                return new SynetQuantizedConvolutionNhwcDepthwiseV0(param);
             else if (SynetQuantizedConvolutionNhwcSpecV0::Preferable(param))
                 return new SynetQuantizedConvolutionNhwcSpecV0(param);
             else if(SynetQuantizedConvolutionNhwcGemm::Preferable(param))
                 return new SynetQuantizedConvolutionNhwcGemm(param);
             else
-                return new Base::SynetQuantizedConvolutionGemm(param);
+                return Avx512bw::SynetQuantizedConvolutionInit(batch, conv);
         }
     }
 #endif
