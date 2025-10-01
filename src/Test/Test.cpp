@@ -402,6 +402,8 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetPoolingMax32f);
     TEST_ADD_GROUP_A0(SynetPoolingMax8u);
 
+    TEST_ADD_GROUP_A0(SynetQuantizedPreluLayerForward);
+
     TEST_ADD_GROUP_A0(SynetQuantizedAddForward);
 
     TEST_ADD_GROUP_A0(SynetQuantizedConcatLayerForward);
@@ -411,6 +413,8 @@ namespace Test
     TEST_ADD_GROUP_A0(SynetQuantizedInnerProductForward);
 
     TEST_ADD_GROUP_A0(SynetQuantizedMergedConvolutionForward);
+
+    TEST_ADD_GROUP_A0(SynetQuantizedScaleLayerForward);
 
     TEST_ADD_GROUP_A0(SynetQuantizedShuffleLayerForward);
 
